@@ -1,0 +1,543 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		06D6B6F1EAEB44F3C4B4DEF2 /* CookieAppearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AECA516F99D7320B6103200 /* CookieAppearance.swift */; };
+		0CE4BE5C51E456D58155093D /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6AC056B58E4AD81D70E2C27 /* SettingsView.swift */; };
+		1C855222F7D4B071ECF00337 /* CookiePersonality.swift in Sources */ = {isa = PBXBuildFile; fileRef = D80EF6B30682B627D283E04C /* CookiePersonality.swift */; };
+		2310CA94125B1F76D0C15A74 /* CharacterPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACB87B0BAECF70291F77A18E /* CharacterPreviewView.swift */; };
+		2E1766FDB9E264CD72F5EB92 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82D8641805F78FBEF35E59DB /* AppDelegate.swift */; };
+		2E9356EE81B3E75ED15253CB /* SpriteProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0550502DB31F161C2B875C18 /* SpriteProviding.swift */; };
+		3153B6B34DAB06EABE69469E /* CookieActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EA514DEE6FAA1148700CA19 /* CookieActivity.swift */; };
+		3E3C863DEB21A842A439B102 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BC6B895FFF0816B8909B8F5D /* Assets.xcassets */; };
+		59E4ED3C7B9326545B7F6D88 /* CookieScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 424D427E50BF371EE3A46EB1 /* CookieScene.swift */; };
+		66993E5F26C3BBE14A852558 /* AudioManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36159B09F5FDDE812EDC109D /* AudioManager.swift */; };
+		6C09E36D31F20A24163A04A2 /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06F45E3ADDD910733BF5B402 /* WelcomeView.swift */; };
+		75F8F4B5A76D428D6E58211E /* StatsSettingsTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDC0882CE04D10761E870D71 /* StatsSettingsTab.swift */; };
+		773EDC284CCD1FBA7269A543 /* CookieProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25E43140410CFF6A30747EEE /* CookieProfile.swift */; };
+		846BDE6259D6CD478DFF2268 /* CompanionPanelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42EF6275F8DEEEC0C937CB46 /* CompanionPanelController.swift */; };
+		8D960B8E35B12D6FCE17132A /* WelcomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B4DA208DB477D8FFA80328E /* WelcomeViewModel.swift */; };
+		94B286277D51F093C96D6693 /* AppEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BCB2E11C61DF6D031CFBA22 /* AppEnvironment.swift */; };
+		9BEC35005396CB95947194EA /* AppearanceSettingsTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7252C79B320C493D5EC404C /* AppearanceSettingsTab.swift */; };
+		A140A648479AA4A84A741F27 /* CompanionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 975A9064828C80542840C9AC /* CompanionViewController.swift */; };
+		AF3EF671019818971B8154D9 /* GeneralSettingsTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32EDF3FA653CE83E0D1DB60B /* GeneralSettingsTab.swift */; };
+		B0B61C232AAA04A81082D986 /* CookieStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BE787A28BF7199A003BD756 /* CookieStatistics.swift */; };
+		B0E58B1F32ECF00B9469B471 /* SKColor+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = D58ECB8B9630CEB1C0F716D8 /* SKColor+Hex.swift */; };
+		B3D19352A88DC0D1B679B3A6 /* AppearanceCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2261244F8DFA336173EBF459 /* AppearanceCatalog.swift */; };
+		B6837E1CBB130F848CE267AF /* CookieAnimationFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68336BF1ED8E5378A72A5DC0 /* CookieAnimationFactory.swift */; };
+		BE54668AF817E83639842215 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = F7178F418AC0591364B75A69 /* README.md */; };
+		C0C1F4B21B4347387C7A1F95 /* MenuBarContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6A4C9CA132970A998D329F2 /* MenuBarContent.swift */; };
+		CC32FFCBE756E720AD5B37F6 /* WindowManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD3A06C9DFA605ECE0FE1E3 /* WindowManager.swift */; };
+		CDA994145CB0964CA47681EB /* CookieBehaviorEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97E4F7E33C5112C40D7D66E4 /* CookieBehaviorEngine.swift */; };
+		CE912B9F98BCBB80899EDD61 /* CookieCharacterNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44994CF7A0FE01B9276C2B2F /* CookieCharacterNode.swift */; };
+		E67568E5D520C3E9FDE9A171 /* CookieStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7CBD9626E2243F075587141 /* CookieStore.swift */; };
+		EA63057604B4A8C098A2BFDA /* CookieApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D56AE459069F97085CE459DB /* CookieApp.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		0550502DB31F161C2B875C18 /* SpriteProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpriteProviding.swift; sourceTree = "<group>"; };
+		06F45E3ADDD910733BF5B402 /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
+		0EA514DEE6FAA1148700CA19 /* CookieActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieActivity.swift; sourceTree = "<group>"; };
+		2261244F8DFA336173EBF459 /* AppearanceCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearanceCatalog.swift; sourceTree = "<group>"; };
+		25E43140410CFF6A30747EEE /* CookieProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieProfile.swift; sourceTree = "<group>"; };
+		32EDF3FA653CE83E0D1DB60B /* GeneralSettingsTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralSettingsTab.swift; sourceTree = "<group>"; };
+		36159B09F5FDDE812EDC109D /* AudioManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioManager.swift; sourceTree = "<group>"; };
+		424D427E50BF371EE3A46EB1 /* CookieScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieScene.swift; sourceTree = "<group>"; };
+		42EF6275F8DEEEC0C937CB46 /* CompanionPanelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompanionPanelController.swift; sourceTree = "<group>"; };
+		44994CF7A0FE01B9276C2B2F /* CookieCharacterNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieCharacterNode.swift; sourceTree = "<group>"; };
+		5AECA516F99D7320B6103200 /* CookieAppearance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieAppearance.swift; sourceTree = "<group>"; };
+		68336BF1ED8E5378A72A5DC0 /* CookieAnimationFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieAnimationFactory.swift; sourceTree = "<group>"; };
+		82D8641805F78FBEF35E59DB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		8B4DA208DB477D8FFA80328E /* WelcomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewModel.swift; sourceTree = "<group>"; };
+		8BCB2E11C61DF6D031CFBA22 /* AppEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppEnvironment.swift; sourceTree = "<group>"; };
+		8BE787A28BF7199A003BD756 /* CookieStatistics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieStatistics.swift; sourceTree = "<group>"; };
+		975A9064828C80542840C9AC /* CompanionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompanionViewController.swift; sourceTree = "<group>"; };
+		97E4F7E33C5112C40D7D66E4 /* CookieBehaviorEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieBehaviorEngine.swift; sourceTree = "<group>"; };
+		A6AC056B58E4AD81D70E2C27 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		A7252C79B320C493D5EC404C /* AppearanceSettingsTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearanceSettingsTab.swift; sourceTree = "<group>"; };
+		ACB87B0BAECF70291F77A18E /* CharacterPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterPreviewView.swift; sourceTree = "<group>"; };
+		BC6B895FFF0816B8909B8F5D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		CA97B56C89CF6D05039E4F73 /* Cookie.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Cookie.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CDC0882CE04D10761E870D71 /* StatsSettingsTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsSettingsTab.swift; sourceTree = "<group>"; };
+		CDD3A06C9DFA605ECE0FE1E3 /* WindowManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowManager.swift; sourceTree = "<group>"; };
+		D56AE459069F97085CE459DB /* CookieApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieApp.swift; sourceTree = "<group>"; };
+		D58ECB8B9630CEB1C0F716D8 /* SKColor+Hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SKColor+Hex.swift"; sourceTree = "<group>"; };
+		D6A4C9CA132970A998D329F2 /* MenuBarContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarContent.swift; sourceTree = "<group>"; };
+		D80EF6B30682B627D283E04C /* CookiePersonality.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookiePersonality.swift; sourceTree = "<group>"; };
+		F7178F418AC0591364B75A69 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		F7CBD9626E2243F075587141 /* CookieStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieStore.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		023EDB96CF612702B54F0AF6 /* Audio */ = {
+			isa = PBXGroup;
+			children = (
+				36159B09F5FDDE812EDC109D /* AudioManager.swift */,
+			);
+			path = Audio;
+			sourceTree = "<group>";
+		};
+		03FBD696802DD2256AF3132F /* Customization */ = {
+			isa = PBXGroup;
+			children = (
+				2261244F8DFA336173EBF459 /* AppearanceCatalog.swift */,
+			);
+			path = Customization;
+			sourceTree = "<group>";
+		};
+		1F04D45C17D14FB0D83119BA /* Cookie */ = {
+			isa = PBXGroup;
+			children = (
+				42EF6275F8DEEEC0C937CB46 /* CompanionPanelController.swift */,
+				975A9064828C80542840C9AC /* CompanionViewController.swift */,
+				424D427E50BF371EE3A46EB1 /* CookieScene.swift */,
+			);
+			path = Cookie;
+			sourceTree = "<group>";
+		};
+		20DADA0F017A4FAC1DB5B5EF /* MenuBar */ = {
+			isa = PBXGroup;
+			children = (
+				D6A4C9CA132970A998D329F2 /* MenuBarContent.swift */,
+			);
+			path = MenuBar;
+			sourceTree = "<group>";
+		};
+		282DCFF2DD383335D3C7C5AB /* Persistence */ = {
+			isa = PBXGroup;
+			children = (
+				F7CBD9626E2243F075587141 /* CookieStore.swift */,
+			);
+			path = Persistence;
+			sourceTree = "<group>";
+		};
+		29AC630A6B64586BFD6C0B1E /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				0EA514DEE6FAA1148700CA19 /* CookieActivity.swift */,
+				5AECA516F99D7320B6103200 /* CookieAppearance.swift */,
+				D80EF6B30682B627D283E04C /* CookiePersonality.swift */,
+				25E43140410CFF6A30747EEE /* CookieProfile.swift */,
+				8BE787A28BF7199A003BD756 /* CookieStatistics.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		749672DF45ECDC4427749B84 /* Behaviors */ = {
+			isa = PBXGroup;
+			children = (
+				97E4F7E33C5112C40D7D66E4 /* CookieBehaviorEngine.swift */,
+			);
+			path = Behaviors;
+			sourceTree = "<group>";
+		};
+		8145A28791FEB108E9261263 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				A7252C79B320C493D5EC404C /* AppearanceSettingsTab.swift */,
+				32EDF3FA653CE83E0D1DB60B /* GeneralSettingsTab.swift */,
+				A6AC056B58E4AD81D70E2C27 /* SettingsView.swift */,
+				CDC0882CE04D10761E870D71 /* StatsSettingsTab.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		84AEBB4705C2554CBC320135 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				ACB87B0BAECF70291F77A18E /* CharacterPreviewView.swift */,
+				06F45E3ADDD910733BF5B402 /* WelcomeView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		868613864E384042FBE7854E = {
+			isa = PBXGroup;
+			children = (
+				A162D6507B6CA1898F1DEC73 /* Cookie */,
+				E503855C6D4BC57F663A09EE /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		8B193CE84CEB2EC1A5695B2B /* Sounds */ = {
+			isa = PBXGroup;
+			children = (
+				F7178F418AC0591364B75A69 /* README.md */,
+			);
+			path = Sounds;
+			sourceTree = "<group>";
+		};
+		9030496221ADCF85FEE5871F /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				8B193CE84CEB2EC1A5695B2B /* Sounds */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		A162D6507B6CA1898F1DEC73 /* Cookie */ = {
+			isa = PBXGroup;
+			children = (
+				F0D39C7F903D943CAF2EDE29 /* Animation */,
+				A677288960C828883044EBDB /* App */,
+				BE120A1E9A248C4F5AF87979 /* Assets */,
+				023EDB96CF612702B54F0AF6 /* Audio */,
+				749672DF45ECDC4427749B84 /* Behaviors */,
+				1F04D45C17D14FB0D83119BA /* Cookie */,
+				03FBD696802DD2256AF3132F /* Customization */,
+				20DADA0F017A4FAC1DB5B5EF /* MenuBar */,
+				29AC630A6B64586BFD6C0B1E /* Models */,
+				282DCFF2DD383335D3C7C5AB /* Persistence */,
+				9030496221ADCF85FEE5871F /* Resources */,
+				8145A28791FEB108E9261263 /* Settings */,
+				DC705115CA70704F2F0CB827 /* ViewModels */,
+				84AEBB4705C2554CBC320135 /* Views */,
+			);
+			path = Cookie;
+			sourceTree = "<group>";
+		};
+		A677288960C828883044EBDB /* App */ = {
+			isa = PBXGroup;
+			children = (
+				82D8641805F78FBEF35E59DB /* AppDelegate.swift */,
+				8BCB2E11C61DF6D031CFBA22 /* AppEnvironment.swift */,
+				D56AE459069F97085CE459DB /* CookieApp.swift */,
+				CDD3A06C9DFA605ECE0FE1E3 /* WindowManager.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		BE120A1E9A248C4F5AF87979 /* Assets */ = {
+			isa = PBXGroup;
+			children = (
+				BC6B895FFF0816B8909B8F5D /* Assets.xcassets */,
+			);
+			path = Assets;
+			sourceTree = "<group>";
+		};
+		DC705115CA70704F2F0CB827 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				8B4DA208DB477D8FFA80328E /* WelcomeViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		E503855C6D4BC57F663A09EE /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				CA97B56C89CF6D05039E4F73 /* Cookie.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		F0D39C7F903D943CAF2EDE29 /* Animation */ = {
+			isa = PBXGroup;
+			children = (
+				68336BF1ED8E5378A72A5DC0 /* CookieAnimationFactory.swift */,
+				44994CF7A0FE01B9276C2B2F /* CookieCharacterNode.swift */,
+				D58ECB8B9630CEB1C0F716D8 /* SKColor+Hex.swift */,
+				0550502DB31F161C2B875C18 /* SpriteProviding.swift */,
+			);
+			path = Animation;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		04A5FCCC0AB455E61AD14C3B /* Cookie */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 90F7A45B24D51D1C0B5B8A6B /* Build configuration list for PBXNativeTarget "Cookie" */;
+			buildPhases = (
+				57A4FE773789BD76E0BF0BA4 /* Sources */,
+				D85D652D435BB0CB50701410 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Cookie;
+			packageProductDependencies = (
+			);
+			productName = Cookie;
+			productReference = CA97B56C89CF6D05039E4F73 /* Cookie.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		1DEF12A8EA9011540A345A44 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					04A5FCCC0AB455E61AD14C3B = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Manual;
+					};
+				};
+			};
+			buildConfigurationList = DA87FFFCF30F0E04EA578AC9 /* Build configuration list for PBXProject "Cookie" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 868613864E384042FBE7854E;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = E503855C6D4BC57F663A09EE /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				04A5FCCC0AB455E61AD14C3B /* Cookie */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		D85D652D435BB0CB50701410 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3E3C863DEB21A842A439B102 /* Assets.xcassets in Resources */,
+				BE54668AF817E83639842215 /* README.md in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		57A4FE773789BD76E0BF0BA4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2E1766FDB9E264CD72F5EB92 /* AppDelegate.swift in Sources */,
+				94B286277D51F093C96D6693 /* AppEnvironment.swift in Sources */,
+				B3D19352A88DC0D1B679B3A6 /* AppearanceCatalog.swift in Sources */,
+				9BEC35005396CB95947194EA /* AppearanceSettingsTab.swift in Sources */,
+				66993E5F26C3BBE14A852558 /* AudioManager.swift in Sources */,
+				2310CA94125B1F76D0C15A74 /* CharacterPreviewView.swift in Sources */,
+				846BDE6259D6CD478DFF2268 /* CompanionPanelController.swift in Sources */,
+				A140A648479AA4A84A741F27 /* CompanionViewController.swift in Sources */,
+				3153B6B34DAB06EABE69469E /* CookieActivity.swift in Sources */,
+				B6837E1CBB130F848CE267AF /* CookieAnimationFactory.swift in Sources */,
+				EA63057604B4A8C098A2BFDA /* CookieApp.swift in Sources */,
+				06D6B6F1EAEB44F3C4B4DEF2 /* CookieAppearance.swift in Sources */,
+				CDA994145CB0964CA47681EB /* CookieBehaviorEngine.swift in Sources */,
+				CE912B9F98BCBB80899EDD61 /* CookieCharacterNode.swift in Sources */,
+				1C855222F7D4B071ECF00337 /* CookiePersonality.swift in Sources */,
+				773EDC284CCD1FBA7269A543 /* CookieProfile.swift in Sources */,
+				59E4ED3C7B9326545B7F6D88 /* CookieScene.swift in Sources */,
+				B0B61C232AAA04A81082D986 /* CookieStatistics.swift in Sources */,
+				E67568E5D520C3E9FDE9A171 /* CookieStore.swift in Sources */,
+				AF3EF671019818971B8154D9 /* GeneralSettingsTab.swift in Sources */,
+				C0C1F4B21B4347387C7A1F95 /* MenuBarContent.swift in Sources */,
+				B0E58B1F32ECF00B9469B471 /* SKColor+Hex.swift in Sources */,
+				0CE4BE5C51E456D58155093D /* SettingsView.swift in Sources */,
+				2E9356EE81B3E75ED15253CB /* SpriteProviding.swift in Sources */,
+				75F8F4B5A76D428D6E58211E /* StatsSettingsTab.swift in Sources */,
+				6C09E36D31F20A24163A04A2 /* WelcomeView.swift in Sources */,
+				8D960B8E35B12D6FCE17132A /* WelcomeViewModel.swift in Sources */,
+				CC32FFCBE756E720AD5B37F6 /* WindowManager.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		13A03E1C22990AD360C5BF48 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 0.1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_STRICT_CONCURRENCY = minimal;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		3AA77CE36EE1565BB03D5C57 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = NO;
+				INFOPLIST_FILE = Cookie/Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.cookie.mac;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		A9C43733021E4FDDE538EFD1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 0.1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_STRICT_CONCURRENCY = minimal;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		E3BD18268C3E42F7EDA70634 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = NO;
+				INFOPLIST_FILE = Cookie/Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.cookie.mac;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		90F7A45B24D51D1C0B5B8A6B /* Build configuration list for PBXNativeTarget "Cookie" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E3BD18268C3E42F7EDA70634 /* Debug */,
+				3AA77CE36EE1565BB03D5C57 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		DA87FFFCF30F0E04EA578AC9 /* Build configuration list for PBXProject "Cookie" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				13A03E1C22990AD360C5BF48 /* Debug */,
+				A9C43733021E4FDDE538EFD1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 1DEF12A8EA9011540A345A44 /* Project object */;
+}
