@@ -9,21 +9,31 @@ final class CookieCharacterNode: SKNode, SpriteProviding {
 
     private let container = SKNode()
     private let sprite = SKSpriteNode()
+    private let shadow: SKShapeNode
     private let controller: SpriteAnimationController
     private var palette: CharacterPalette
 
     init(palette: CharacterPalette = .standard(for: .classicCream)) {
         self.palette = palette
+        shadow = {
+            let shadow = SKShapeNode(ellipseOf: CGSize(width: 96, height: 16))
+            shadow.fillColor = SKColor.black.withAlphaComponent(0.09)
+            shadow.strokeColor = .clear
+            shadow.position = CGPoint(x: 0, y: -82)
+            shadow.zPosition = -1
+            return shadow
+        }()
         controller = SpriteAnimationController(
             sprite: sprite,
             flipContainer: container,
             palette: palette,
-            sources: [SpriteSheetSource(), PlaceholderVectorSource()]
+            sources: [SpriteSheetSource(), ReferenceImageSource(), PlaceholderVectorSource()]
         )
         super.init()
 
         sprite.size = CookieSpriteRenderer.canvasSize
         container.addChild(sprite)
+        addChild(shadow)
         addChild(container)
         controller.setBase(.idle)
     }
@@ -47,6 +57,10 @@ final class CookieCharacterNode: SKNode, SpriteProviding {
             controller.setBase(.sit)
         case .watching:
             controller.setBase(.curious)
+        case .walkingLeft:
+            controller.setBase(.walkLeft)
+        case .walkingRight:
+            controller.setBase(.walkRight)
         case .stretching:
             controller.play(.stretch)
         case .yawning:

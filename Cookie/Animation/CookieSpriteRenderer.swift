@@ -13,11 +13,6 @@ enum CookieSpriteRenderer {
         let root = SKNode()
         root.position = CGPoint(x: canvasSize.width / 2, y: canvasSize.height / 2)
 
-        let shadow = ellipse(CGSize(width: 74, height: 12), fill: SKColor.black.withAlphaComponent(0.08))
-        shadow.position = CGPoint(x: 0, y: -72)
-        shadow.zPosition = -3
-        root.addChild(shadow)
-
         // Volume-ish preservation: squashing down widens the body.
         let character = SKNode()
         character.position = CGPoint(x: 0, y: pose.bodyY)

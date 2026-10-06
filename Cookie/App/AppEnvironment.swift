@@ -71,6 +71,7 @@ final class AppEnvironment: ObservableObject {
 
     func shutdown() {
         behaviorEngine.stop()
+        windows.companionController?.savePosition()
         store.flush()
     }
 

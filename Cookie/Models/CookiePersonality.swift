@@ -33,4 +33,13 @@ enum CookiePersonality: String, CaseIterable, Codable, Identifiable {
         case .curious: return 6...12
         }
     }
+
+    /// Desktop strolling speed in points per second.
+    var walkSpeed: CGFloat {
+        switch self {
+        case .playful: return 36
+        case .calm: return 22
+        case .curious: return 28
+        }
+    }
 }

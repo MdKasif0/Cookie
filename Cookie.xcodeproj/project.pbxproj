@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		009741E4D2F3FFE91AD2E169 /* PlaceholderVectorSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA3655D1B788BFAA8DB24B3A /* PlaceholderVectorSource.swift */; };
+		02C36CD1A684125C7E1BFFEF /* CookieHitTester.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA8868CC2A544CACF965959 /* CookieHitTester.swift */; };
 		06D6B6F1EAEB44F3C4B4DEF2 /* CookieAppearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AECA516F99D7320B6103200 /* CookieAppearance.swift */; };
 		0CE4BE5C51E456D58155093D /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6AC056B58E4AD81D70E2C27 /* SettingsView.swift */; };
 		1C855222F7D4B071ECF00337 /* CookiePersonality.swift in Sources */ = {isa = PBXBuildFile; fileRef = D80EF6B30682B627D283E04C /* CookiePersonality.swift */; };
@@ -27,6 +28,7 @@
 		7767963422B69B77A8DE4C57 /* CookiePoseCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1BFA316970DD8EE9919220A /* CookiePoseCatalog.swift */; };
 		846BDE6259D6CD478DFF2268 /* CompanionPanelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42EF6275F8DEEEC0C937CB46 /* CompanionPanelController.swift */; };
 		85E5BC09C60D58CC357921D3 /* SpriteSheetSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 942E7C690A470C300AE20375 /* SpriteSheetSource.swift */; };
+		8C3D9DD6A935AA74B29A7F4E /* ReferenceImageSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D22F26FDBDFCA2AC60FC0A0 /* ReferenceImageSource.swift */; };
 		8D960B8E35B12D6FCE17132A /* WelcomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B4DA208DB477D8FFA80328E /* WelcomeViewModel.swift */; };
 		94B286277D51F093C96D6693 /* AppEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BCB2E11C61DF6D031CFBA22 /* AppEnvironment.swift */; };
 		9BA77548E1C37D692D1C6D30 /* CookiePose.swift in Sources */ = {isa = PBXBuildFile; fileRef = 779501F6B071E7E2651115BD /* CookiePose.swift */; };
@@ -34,6 +36,7 @@
 		A140A648479AA4A84A741F27 /* CompanionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 975A9064828C80542840C9AC /* CompanionViewController.swift */; };
 		A46A56D1CFE236BD1DFDA9B4 /* MotionSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD5BB00064481F7484AA0282 /* MotionSettings.swift */; };
 		AF3EF671019818971B8154D9 /* GeneralSettingsTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32EDF3FA653CE83E0D1DB60B /* GeneralSettingsTab.swift */; };
+		AF8A2EA43EC89F417912C638 /* CookieScreenGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EA9D51FCB1BB96A519098EA /* CookieScreenGeometry.swift */; };
 		B0B61C232AAA04A81082D986 /* CookieStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BE787A28BF7199A003BD756 /* CookieStatistics.swift */; };
 		B0E58B1F32ECF00B9469B471 /* SKColor+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = D58ECB8B9630CEB1C0F716D8 /* SKColor+Hex.swift */; };
 		B3D19352A88DC0D1B679B3A6 /* AppearanceCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2261244F8DFA336173EBF459 /* AppearanceCatalog.swift */; };
@@ -43,6 +46,7 @@
 		CC32FFCBE756E720AD5B37F6 /* WindowManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD3A06C9DFA605ECE0FE1E3 /* WindowManager.swift */; };
 		CDA994145CB0964CA47681EB /* CookieBehaviorEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97E4F7E33C5112C40D7D66E4 /* CookieBehaviorEngine.swift */; };
 		CE912B9F98BCBB80899EDD61 /* CookieCharacterNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44994CF7A0FE01B9276C2B2F /* CookieCharacterNode.swift */; };
+		DEDFB19C3E8AED84E4DE4562 /* DesktopWindowScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4514BA6F0CCB5A84B5A4CA5F /* DesktopWindowScanner.swift */; };
 		E67568E5D520C3E9FDE9A171 /* CookieStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7CBD9626E2243F075587141 /* CookieStore.swift */; };
 		EA63057604B4A8C098A2BFDA /* CookieApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D56AE459069F97085CE459DB /* CookieApp.swift */; };
 		EFE3003C6C3BF75867316551 /* SpriteAnimationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA085C2C2832438FF2316878 /* SpriteAnimationController.swift */; };
@@ -61,9 +65,12 @@
 		42EF6275F8DEEEC0C937CB46 /* CompanionPanelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompanionPanelController.swift; sourceTree = "<group>"; };
 		445ACA6F52CF1CB035B5C229 /* Sprites */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Sprites; path = Cookie/Resources/Sprites; sourceTree = SOURCE_ROOT; };
 		44994CF7A0FE01B9276C2B2F /* CookieCharacterNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieCharacterNode.swift; sourceTree = "<group>"; };
+		4514BA6F0CCB5A84B5A4CA5F /* DesktopWindowScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesktopWindowScanner.swift; sourceTree = "<group>"; };
+		4EA9D51FCB1BB96A519098EA /* CookieScreenGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieScreenGeometry.swift; sourceTree = "<group>"; };
 		54D828731AF146F68B1F4290 /* CookieAnimationId.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieAnimationId.swift; sourceTree = "<group>"; };
 		5AECA516F99D7320B6103200 /* CookieAppearance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieAppearance.swift; sourceTree = "<group>"; };
 		779501F6B071E7E2651115BD /* CookiePose.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookiePose.swift; sourceTree = "<group>"; };
+		7D22F26FDBDFCA2AC60FC0A0 /* ReferenceImageSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReferenceImageSource.swift; sourceTree = "<group>"; };
 		82D8641805F78FBEF35E59DB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		8B4DA208DB477D8FFA80328E /* WelcomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewModel.swift; sourceTree = "<group>"; };
 		8BCB2E11C61DF6D031CFBA22 /* AppEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppEnvironment.swift; sourceTree = "<group>"; };
@@ -78,6 +85,7 @@
 		BC6B895FFF0816B8909B8F5D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		CA085C2C2832438FF2316878 /* SpriteAnimationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpriteAnimationController.swift; sourceTree = "<group>"; };
 		CA97B56C89CF6D05039E4F73 /* Cookie.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Cookie.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CDA8868CC2A544CACF965959 /* CookieHitTester.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieHitTester.swift; sourceTree = "<group>"; };
 		CDC0882CE04D10761E870D71 /* StatsSettingsTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsSettingsTab.swift; sourceTree = "<group>"; };
 		CDD3A06C9DFA605ECE0FE1E3 /* WindowManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowManager.swift; sourceTree = "<group>"; };
 		D56AE459069F97085CE459DB /* CookieApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieApp.swift; sourceTree = "<group>"; };
@@ -113,7 +121,10 @@
 			children = (
 				42EF6275F8DEEEC0C937CB46 /* CompanionPanelController.swift */,
 				975A9064828C80542840C9AC /* CompanionViewController.swift */,
+				CDA8868CC2A544CACF965959 /* CookieHitTester.swift */,
 				424D427E50BF371EE3A46EB1 /* CookieScene.swift */,
+				4EA9D51FCB1BB96A519098EA /* CookieScreenGeometry.swift */,
+				4514BA6F0CCB5A84B5A4CA5F /* DesktopWindowScanner.swift */,
 			);
 			path = Cookie;
 			sourceTree = "<group>";
@@ -266,6 +277,7 @@
 				DB2F49350312D645C76361AC /* CookieSpriteRenderer.swift */,
 				FD5BB00064481F7484AA0282 /* MotionSettings.swift */,
 				AA3655D1B788BFAA8DB24B3A /* PlaceholderVectorSource.swift */,
+				7D22F26FDBDFCA2AC60FC0A0 /* ReferenceImageSource.swift */,
 				D58ECB8B9630CEB1C0F716D8 /* SKColor+Hex.swift */,
 				CA085C2C2832438FF2316878 /* SpriteAnimationController.swift */,
 				0550502DB31F161C2B875C18 /* SpriteProviding.swift */,
@@ -362,18 +374,22 @@
 				06D6B6F1EAEB44F3C4B4DEF2 /* CookieAppearance.swift in Sources */,
 				CDA994145CB0964CA47681EB /* CookieBehaviorEngine.swift in Sources */,
 				CE912B9F98BCBB80899EDD61 /* CookieCharacterNode.swift in Sources */,
+				02C36CD1A684125C7E1BFFEF /* CookieHitTester.swift in Sources */,
 				1C855222F7D4B071ECF00337 /* CookiePersonality.swift in Sources */,
 				9BA77548E1C37D692D1C6D30 /* CookiePose.swift in Sources */,
 				7767963422B69B77A8DE4C57 /* CookiePoseCatalog.swift in Sources */,
 				773EDC284CCD1FBA7269A543 /* CookieProfile.swift in Sources */,
 				59E4ED3C7B9326545B7F6D88 /* CookieScene.swift in Sources */,
+				AF8A2EA43EC89F417912C638 /* CookieScreenGeometry.swift in Sources */,
 				B92086AA6E9FF3160C5706EC /* CookieSpriteRenderer.swift in Sources */,
 				B0B61C232AAA04A81082D986 /* CookieStatistics.swift in Sources */,
 				E67568E5D520C3E9FDE9A171 /* CookieStore.swift in Sources */,
+				DEDFB19C3E8AED84E4DE4562 /* DesktopWindowScanner.swift in Sources */,
 				AF3EF671019818971B8154D9 /* GeneralSettingsTab.swift in Sources */,
 				C0C1F4B21B4347387C7A1F95 /* MenuBarContent.swift in Sources */,
 				A46A56D1CFE236BD1DFDA9B4 /* MotionSettings.swift in Sources */,
 				009741E4D2F3FFE91AD2E169 /* PlaceholderVectorSource.swift in Sources */,
+				8C3D9DD6A935AA74B29A7F4E /* ReferenceImageSource.swift in Sources */,
 				B0E58B1F32ECF00B9469B471 /* SKColor+Hex.swift in Sources */,
 				0CE4BE5C51E456D58155093D /* SettingsView.swift in Sources */,
 				EFE3003C6C3BF75867316551 /* SpriteAnimationController.swift in Sources */,

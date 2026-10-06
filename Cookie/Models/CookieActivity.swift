@@ -18,4 +18,8 @@ enum CookieActivity: String, Codable, Equatable, CaseIterable {
     case yawning
     /// One-shot: licking a paw and tidying up.
     case grooming
+    /// Strolling toward the left screen edge.
+    case walkingLeft
+    /// Strolling toward the right screen edge.
+    case walkingRight
 }
