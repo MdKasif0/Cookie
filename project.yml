@@ -20,6 +20,10 @@ targets:
       - path: Cookie
         excludes:
           - "Resources/Info.plist"
+          - "Resources/Sprites"
+      - path: Cookie/Resources/Sprites
+        type: folder
+        buildPhase: resources
     info:
       path: Cookie/Resources/Info.plist
       properties:

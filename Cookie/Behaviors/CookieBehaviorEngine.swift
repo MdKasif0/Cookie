@@ -1,10 +1,11 @@
 import Foundation
 import os
 
-/// Decides what Cookie does next. This is the foundation layer — it
-/// alternates idle activities at a personality-driven cadence and emits
-/// a delighted reaction when Cookie is petted. Advanced behaviors
-/// (wandering, sleeping, playing) plug in here later.
+/// Decides what Cookie does next. This is the foundation layer — it moves
+/// between resting activities at a personality-driven cadence and emits a
+/// delighted reaction when Cookie is petted. The sprite layer turns each
+/// activity into animations; movement behaviors (wandering, playing) plug
+/// in here later.
 @MainActor
 final class CookieBehaviorEngine: ObservableObject {
     @Published private(set) var activity: CookieActivity = .idle
@@ -56,16 +57,36 @@ final class CookieBehaviorEngine: ObservableObject {
 
     private func pickNextActivity() {
         guard isRunning else { return }
-        let next: CookieActivity
-        if activity == .watching {
-            next = .idle
-        } else if Double.random(in: 0...1) < 0.55 {
-            next = .watching
-        } else {
-            next = .idle
-        }
-        transition(to: next)
+        transition(to: weightedNextActivity())
         scheduleNextActivity()
+    }
+
+    /// Personality-weighted choice of the next activity. One-shots
+    /// (stretch, yawn, groom) play once and the sprite layer returns to
+    /// the previous resting state on its own; the engine just keeps its
+    /// regular cadence.
+    private func weightedNextActivity() -> CookieActivity {
+        let weights: [(CookieActivity, Double)]
+        switch store.profile.personality {
+        case .playful:
+            weights = [(.idle, 0.34), (.watching, 0.26), (.sitting, 0.05),
+                       (.stretching, 0.17), (.yawning, 0.04), (.grooming, 0.14)]
+        case .calm:
+            weights = [(.idle, 0.30), (.watching, 0.14), (.sitting, 0.22),
+                       (.stretching, 0.04), (.yawning, 0.16), (.grooming, 0.14)]
+        case .curious:
+            weights = [(.idle, 0.30), (.watching, 0.34), (.sitting, 0.06),
+                       (.stretching, 0.05), (.yawning, 0.04), (.grooming, 0.21)]
+        }
+        let roll = Double.random(in: 0...1)
+        var cumulative = 0.0
+        for (activity, weight) in weights {
+            cumulative += weight
+            if roll <= cumulative {
+                return activity
+            }
+        }
+        return .idle
     }
 
     private func scheduleTransition(after seconds: Double, action: @escaping () -> Void) {

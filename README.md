@@ -41,27 +41,41 @@ scripts/make_icon.swift  Regenerates the placeholder app icon
 project.yml              XcodeGen project definition
 ```
 
+## Sprite animation system
+
+The character is driven by `Animation/SpriteAnimationController`: a single
+sprite node plays frame animations resolved from an ordered chain of
+sources — bundle sprite sheets first, the rendered placeholder second —
+so shipping final artwork means adding files, not changing code.
+
+- **Catalog**: `CookieAnimationId` defines every animation (idle, blink,
+  walk/run ×2 directions, sit, sleep, wake, stretch, yawn, groom, emotions,
+  eat/drink, jump/fall/pickedUp/dropped, pet, meow) with priority, fps,
+  and looping. Missing artwork falls back to idle automatically.
+- **Priorities**: sleep < idle < walk < interaction < special. Higher
+  priorities interrupt lower ones; one-shots finish into the previous
+  looping base state automatically.
+- **Direction**: one shared sheet per locomotion animation, mirrored at
+  render time via a flip container — no separate left/right art.
+- **Performance**: grid sheets are sliced with `SKTexture(rectIn:)` (one
+  GPU texture), and placeholder poses are baked into textures once per
+  palette and cached. Nothing is re-created per frame.
+- **Accessibility**: with macOS Reduced Motion enabled, transitions and
+  callbacks still occur but poses render statically.
+- **Resource contract**: `Resources/Sprites/README.md` documents the
+  `Sprites/Cookie/<Category>/` layout, the optional `manifest.json`
+  (fps, loop, frame order, grid), and frame-numbering conventions.
+
+The placeholder artwork is defined as parameterized poses
+(`CookiePoseCatalog`) rendered by `CookieSpriteRenderer` into cached
+textures, so it animates through the exact same pipeline final art will.
+
 ## Replacing the placeholder cat
 
-The current character is a temporary vector-drawn cat
-(`Animation/CookieCharacterNode.swift`). Everything downstream talks to the
-`SpriteProviding` protocol (`Animation/SpriteProviding.swift`):
-
-```swift
-protocol SpriteProviding: SKNode {
-    var activity: CookieActivity { get }
-    func startIdling()
-    func setActivity(_ activity: CookieActivity)
-    func playPetReaction()
-    func apply(palette: CharacterPalette)
-}
-```
-
-To ship the final artwork, add an `SKTextureAtlas`-backed conformer that
-maps `CookieActivity` cases (`.idle`, `.watching`, `.delighted`) to frame
-sequences and return it from `CookieScene` — the scene, behavior engine,
-persistence, and all UI stay untouched. `CookieScene` is the only place
-that constructs the character.
+Drop the final sheets into `Cookie/Resources/Sprites/Cookie/…` following
+`Resources/Sprites/README.md`. The sheet source wins over the placeholder
+automatically; `CookieScene`, the behavior engine, and persistence stay
+untouched.
 
 ## Sound effects
 
