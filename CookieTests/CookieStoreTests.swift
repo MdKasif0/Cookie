@@ -89,7 +89,9 @@ final class CookieStoreTests: XCTestCase {
         // Ensure flush writes the new versioned envelope
         store.flush()
         let rawData = try Data(contentsOf: storeURL)
-        let envelope = try JSONDecoder().decode(VersionedStoreEnvelope.self, from: rawData)
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        let envelope = try decoder.decode(VersionedStoreEnvelope.self, from: rawData)
         XCTAssertEqual(envelope.schemaVersion, VersionedStoreEnvelope.currentSchemaVersion)
         XCTAssertEqual(envelope.profile.name, "Mochi")
     }
