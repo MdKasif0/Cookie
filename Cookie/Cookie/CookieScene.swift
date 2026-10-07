@@ -32,6 +32,7 @@ final class CookieScene: SKScene {
     private var wasInLocomotion = false
     private var lastSoundKey: (state: CookieState, reaction: CookieReaction)?
 
+    private let menuProvider: (() -> NSMenu?)?
     private let log = Logger(subsystem: "com.cookie.mac", category: "Scene")
 
     init(size: CGSize,
@@ -39,11 +40,13 @@ final class CookieScene: SKScene {
          behaviorEngine: CookieBehaviorEngine? = nil,
          audioManager: AudioManager? = nil,
          hitTester: CookieHitTester? = nil,
+         menuProvider: (() -> NSMenu?)? = nil,
          onPositionSettled: ((NSPoint) -> Void)? = nil) {
         self.store = store
         self.behaviorEngine = behaviorEngine
         self.audioManager = audioManager
         self.hitTester = hitTester
+        self.menuProvider = menuProvider
         self.onPositionSettled = onPositionSettled
         character = CookieCharacterNode(config: store?.profile.customization ?? CookieAppearanceConfig())
         super.init(size: size)
@@ -311,6 +314,16 @@ final class CookieScene: SKScene {
             behaviorEngine?.handleDrop()
         } else {
             behaviorEngine?.handleClick(zone: zoneUnderMouse(for: event))
+            if let view, let menu = menuProvider?() {
+                let localPoint = view.convert(event.locationInWindow, from: nil)
+                menu.popUp(positioning: nil, at: localPoint, in: view)
+            }
         }
+    }
+
+    override func rightMouseDown(with event: NSEvent) {
+        guard let view, let menu = menuProvider?() else { return }
+        let localPoint = view.convert(event.locationInWindow, from: nil)
+        menu.popUp(positioning: nil, at: localPoint, in: view)
     }
 }

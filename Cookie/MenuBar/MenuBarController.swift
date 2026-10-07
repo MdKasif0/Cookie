@@ -157,6 +157,8 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         quitItem.keyEquivalentModifierMask = .command
         quitItem.target = self
         menu.addItem(quitItem)
+
+        return menu
     }
 
     // MARK: - Main Application Menu Bar (Top-Left)
