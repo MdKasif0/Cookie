@@ -760,12 +760,13 @@ img {
    ========================================================================== */
 .curious-stage {
   position: relative;
-  background-color: var(--surface);
-  border: 1px solid var(--border-strong);
+  background-color: var(--cream);
+  background: linear-gradient(160deg, #fbf7f0 0%, #f4ece0 100%);
+  border: 1px solid var(--beige);
   border-radius: var(--radius-lg);
   padding: 50px 32px;
   text-align: center;
-  box-shadow: var(--shadow-subtle);
+  box-shadow: var(--shadow-warm);
   cursor: crosshair;
   min-height: 380px;
   display: flex;
