@@ -10,6 +10,9 @@
 </head>
 <body>
 
+  <!-- Skip to Main Content for Accessibility -->
+  <a href="#hero" class="skip-link">Skip to main content</a>
+
   <!-- Site Masthead Navigation -->
   <header class="site-header">
     <div class="container nav-wrapper">
@@ -21,6 +24,7 @@
         <span>Cookie</span>
       </a>
 
+      <!-- Desktop Navigation -->
       <nav aria-label="Main Navigation">
         <ul class="nav-menu">
           <li><a href="#story-always-there">Always There</a></li>
@@ -31,6 +35,28 @@
           <li><a href="#download" class="nav-cta">Download</a></li>
         </ul>
       </nav>
+
+      <!-- Mobile Hamburger Toggle -->
+      <button class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="mobileNavMenu" type="button">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mobile Navigation Drawer -->
+    <div class="mobile-nav-drawer" id="mobileNavMenu" aria-hidden="true">
+      <ul class="mobile-nav-list">
+        <li><a href="#story-always-there" class="mobile-nav-link">Always There</a></li>
+        <li><a href="#story-curious" class="mobile-nav-link">Curious</a></li>
+        <li><a href="#story-sleepy" class="mobile-nav-link">Sleepy</a></li>
+        <li><a href="#story-drag-pet" class="mobile-nav-link">Play &amp; Drag</a></li>
+        <li><a href="#story-custom" class="mobile-nav-link">Customize</a></li>
+        <li><a href="#download" class="mobile-nav-link">System Specs</a></li>
+        <li><a href="downloads/Cookie-1.0.0.dmg" class="mobile-nav-btn" download>Download Cookie</a></li>
+      </ul>
     </div>
   </header>
 
@@ -928,17 +954,36 @@
     </section>
   </main>
 
-  <!-- Editorial Footer -->
+  <!-- Clean Apple-Indie Product Footer -->
   <footer class="site-footer">
     <div class="container footer-inner">
-      <div class="footer-copy">
-        <strong>Cookie 1.0.0</strong> — Crafted with care by Md Kasif Uddin for macOS.
+      <div class="footer-top">
+        <div class="footer-brand">
+          <a href="#hero" class="footer-logo" aria-label="Cookie Home">
+            <picture>
+              <source srcset="assets/app_icon.webp" type="image/webp">
+              <img src="assets/app_icon.png" alt="" class="footer-brand-icon" width="28" height="28" loading="lazy">
+            </picture>
+            <span class="footer-title">Cookie</span>
+          </a>
+          <p class="footer-tagline">A tiny cat for your Mac.</p>
+        </div>
+
+        <nav class="footer-nav" aria-label="Footer Links">
+          <ul class="footer-links">
+            <li><a href="#story-custom">Privacy</a></li>
+            <li><a href="downloads/Cookie-1.0.0.dmg" download>Download</a></li>
+            <li><a href="#download"><span class="footer-version-badge">Version 1.0.0</span></a></li>
+            <li><a href="https://github.com/MdKasif0/Cookie" target="_blank" rel="noopener">GitHub</a></li>
+          </ul>
+        </nav>
       </div>
-      <ul class="footer-links">
-        <li><a href="#download">Download</a></li>
-        <li><a href="https://github.com/MdKasif0/Cookie" target="_blank" rel="noopener">GitHub</a></li>
-        <li><a href="#hero">Back to Top ↑</a></li>
-      </ul>
+
+      <div class="footer-bottom">
+        <div class="footer-copyright">
+          © 2026 Md Kasif Uddin. All rights reserved. Crafted with care for macOS Sonoma and later.
+        </div>
+      </div>
     </div>
   </footer>
 
