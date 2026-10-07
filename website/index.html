@@ -95,209 +95,341 @@
       </div>
     </section>
 
-    <!-- Editorial Philosophy Section -->
-    <section class="philosophy-section" id="story">
+    <!-- Story Chapter 1: "Cookie is always there." -->
+    <section class="story-chapter" id="story-always-there">
       <div class="container">
-        <div class="editorial-header">
-          <h2>A quiet presence on your desktop.</h2>
-          <p>
-            Cookie isn’t a game with scores, and she isn’t another productivity app demanding your attention. 
-            She is simply a companion who keeps you company while you write, design, code, and browse.
-          </p>
-        </div>
-
-        <div class="philosophy-grid">
-          <div class="philosophy-card">
-            <span class="card-num">01</span>
-            <h3>Gentle Company</h3>
-            <p>
-              Cookie naps in warm corners of your display, stretches after long stretches of silence, 
-              and looks up with gentle curiosity whenever your cursor glides past.
+        <div class="story-grid">
+          <div class="story-text-column">
+            <span class="story-eyebrow">01 / Desktop Companion</span>
+            <h2 class="story-title">Cookie is always there.</h2>
+            <p class="story-lead">
+              Lives quietly on your desktop, keeping you company while you write, design, code, and browse.
+            </p>
+            <p class="story-detail-note">
+              No browser tabs to keep pinned, no intrusive dock notifications. Cookie wanders gently across your screen, perches quietly beside active windows, and stays with you throughout your workday.
             </p>
           </div>
 
-          <div class="philosophy-card">
-            <span class="card-num">02</span>
-            <h3>Zero Interruptions</h3>
-            <p>
-              Never plays unexpected loud sounds during meetings, never sends push notifications, 
-              and never asks for a review. When you need absolute stillness, she rests quietly.
+          <div class="story-visual-column">
+            <div class="desktop-scene-wrap">
+              <div class="mock-window">
+                <div class="mock-titlebar">
+                  <div class="traffic-dots">
+                    <span class="dot close"></span>
+                    <span class="dot min"></span>
+                    <span class="dot zoom"></span>
+                  </div>
+                  <span class="mock-doc-title">ProjectNotes.txt — Editor</span>
+                </div>
+                <div class="mock-editor-content">
+                  <p><span class="code-comment">// A quiet afternoon on macOS</span></p>
+                  <p>Deep focus flow.</p>
+                  <p><span class="code-warm">Cookie</span> is resting by the right margin.</p>
+                  <p>Zero distractions, zero CPU drain.</p>
+                </div>
+              </div>
+
+              <div class="scene-cookie-companion" id="desktopCookie" title="Cookie sitting beside your window">
+                <picture>
+                  <source srcset="assets/cookie.webp" type="image/webp">
+                  <img src="assets/cookie.png" alt="Cookie perching beside desktop window" width="170" height="170" loading="lazy">
+                </picture>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Story Chapter 2: "Sometimes curious." -->
+    <section class="story-chapter" id="story-curious">
+      <div class="container">
+        <div class="story-grid reverse">
+          <div class="story-text-column">
+            <span class="story-eyebrow">02 / Gentle Awareness</span>
+            <h2 class="story-title">Sometimes curious.</h2>
+            <p class="story-lead">
+              Cookie senses your presence. As your cursor glides across the display, her eyes follow and her head gently turns toward you.
+            </p>
+            <p class="story-detail-note">
+              Move your mouse inside the stage. Cookie tracks your movement in real time with soft micro-rotations. Bring your cursor close to give her a little chin scratch.
             </p>
           </div>
 
-          <div class="philosophy-card">
-            <span class="card-num">03</span>
-            <h3>Handcrafted for Mac</h3>
-            <p>
-              Built strictly with Swift and SpriteKit. When she falls asleep, CPU usage drops to virtually 0%, 
-              preserving every drop of battery life on MacBooks.
+          <div class="story-visual-column">
+            <div class="curious-stage" id="curiousStage">
+              <div class="curious-cat-container" id="curiousCat">
+                <picture>
+                  <source srcset="assets/hero-cookie-open.webp" type="image/webp" id="curiousCatWebp">
+                  <img src="assets/hero-cookie-open.png" alt="Curious Cookie watching cursor" class="curious-cat-sprite" id="curiousCatImg" width="220" height="220" loading="lazy">
+                </picture>
+              </div>
+              <div class="curious-target-indicator" id="curiousPointer"></div>
+              <p class="curious-hint">Hover and move your cursor across the stage to guide Cookie's gaze</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Story Chapter 3: "Sometimes sleepy." -->
+    <section class="story-chapter" id="story-sleepy">
+      <div class="container">
+        <div class="story-grid">
+          <div class="story-text-column">
+            <span class="story-eyebrow">03 / Rest &amp; Quiet Hours</span>
+            <h2 class="story-title">Sometimes sleepy.</h2>
+            <p class="story-lead">
+              When the afternoon grows quiet, Cookie curls up right beside her trusty cardboard box for a peaceful nap.
+            </p>
+            <p class="story-detail-note">
+              While sleeping, native SpriteKit throttles down to virtually 0% idle CPU. Click the cardboard box or Cookie to see her peek inside!
             </p>
           </div>
+
+          <div class="story-visual-column">
+            <div class="sleepy-scene-wrap" id="sleepyScene">
+              <div class="sleepy-box-wrap" id="cardboardBox" title="Click to see Cookie peek into the box">
+                <img src="assets/cardboard-box.svg" alt="Cardboard Box" width="160" height="135">
+                <span class="box-peek-tag" id="boxTag">Click box</span>
+              </div>
+
+              <div class="box-cat-peeker" id="boxCatPeeker">
+                <picture>
+                  <source srcset="assets/cookie-mischievous.webp" type="image/webp">
+                  <img src="assets/cookie-mischievous.png" alt="Cookie peeking out of the box" width="110" height="110">
+                </picture>
+              </div>
+
+              <div class="sleepy-cat-wrap" id="sleepyCat" title="Cookie sleeping soundly">
+                <div class="zzz-cloud">
+                  <span class="zzz-char">z</span>
+                  <span class="zzz-char">z</span>
+                  <span class="zzz-char">Z</span>
+                </div>
+                <picture>
+                  <source srcset="assets/cookie-sleep.webp" type="image/webp">
+                  <img src="assets/cookie-sleep.png" alt="Cookie sleeping peacefully" id="sleepyCatImg" width="200" height="200" loading="lazy">
+                </picture>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- Moments with Cookie (Authentic Expressions Showcase) -->
-    <section class="moments-section" id="moments">
+    <!-- Story Chapter 4: "Pick her up. Pet her back." -->
+    <section class="story-chapter" id="story-drag-pet">
       <div class="container">
-        <div class="editorial-header">
-          <h2>Living with Cookie.</h2>
-          <p>Throughout the day, Cookie transitions through natural moods, expressions, and poses.</p>
-        </div>
-
-        <div class="moments-grid">
-          <div class="moment-card">
-            <picture>
-              <source srcset="assets/cookie-walk.webp" type="image/webp">
-              <img src="assets/cookie-walk.png" alt="Cookie walking" width="120" height="120" loading="lazy">
-            </picture>
-            <h4>Wandering Stroll</h4>
-            <span>Pacing along the screen</span>
+        <div class="story-grid reverse">
+          <div class="story-text-column">
+            <span class="story-eyebrow">04 / Natural Interaction</span>
+            <h2 class="story-title">Pick her up. Pet her back.</h2>
+            <p class="story-lead">
+              Need her in a different corner? Pick Cookie up with your cursor and gently set her down anywhere on your workspace.
+            </p>
+            <p class="story-detail-note">
+              Try dragging Cookie inside the desk sandbox below. Click her to pet her and trigger her happy purrs. She navigates multiple monitors seamlessly.
+            </p>
           </div>
 
-          <div class="moment-card">
-            <picture>
-              <source srcset="assets/cookie-sleep.webp" type="image/webp">
-              <img src="assets/cookie-sleep.png" alt="Cookie sleeping" width="120" height="120" loading="lazy">
-            </picture>
-            <h4>Deep Nap</h4>
-            <span>Curled up warmly</span>
-          </div>
-
-          <div class="moment-card">
-            <picture>
-              <source srcset="assets/cookie-hungry.webp" type="image/webp">
-              <img src="assets/cookie-hungry.png" alt="Cookie hungry" width="120" height="120" loading="lazy">
-            </picture>
-            <h4>Snack Hopeful</h4>
-            <span>Waiting patiently for treats</span>
-          </div>
-
-          <div class="moment-card">
-            <picture>
-              <source srcset="assets/cookie-shy.webp" type="image/webp">
-              <img src="assets/cookie-shy.png" alt="Cookie blushing" width="120" height="120" loading="lazy">
-            </picture>
-            <h4>Softly Bashful</h4>
-            <span>Blushing after gentle petting</span>
-          </div>
-
-          <div class="moment-card">
-            <picture>
-              <source srcset="assets/cookie-cool.webp" type="image/webp">
-              <img src="assets/cookie-cool.png" alt="Cookie with sunglasses" width="120" height="120" loading="lazy">
-            </picture>
-            <h4>Tiny Shades</h4>
-            <span>Accessories in Customizer</span>
+          <div class="story-visual-column">
+            <div class="playground-sandbox" id="dragSandbox">
+              <div class="sandbox-desk-mat"></div>
+              <div class="draggable-cookie-actor" id="draggableCookie" title="Drag Cookie around the desk mat">
+                <picture>
+                  <source srcset="assets/cookie.webp" type="image/webp" id="draggableCookieWebp">
+                  <img src="assets/cookie.png" alt="Draggable Cookie" id="draggableCookieImg" width="140" height="140">
+                </picture>
+              </div>
+              <p class="sandbox-hint">Click &amp; drag Cookie around the desk mat • Drop her anywhere</p>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Care, Play & Treats Section -->
-    <section class="care-section" id="care">
+    <!-- Story Chapter 5: "Care, play & little treats." -->
+    <section class="story-chapter" id="story-interact">
       <div class="container">
-        <div class="editorial-header">
-          <h2>Care, play &amp; little treats.</h2>
-          <p>
-            Right-click Cookie anytime or click her menu bar icon to offer her favorite foods and toys.
-          </p>
-        </div>
-
-        <div class="tray-container">
-          <div class="tray-title">Try offering something to Cookie:</div>
-          <div class="tray-subtitle">Click any treat or toy to see how she responds</div>
-
-          <div class="items-row">
-            <button class="item-chip active" data-item="fish" type="button">🐟 Fresh Fish</button>
-            <button class="item-chip" data-item="tuna" type="button">🥫 Tuna Can</button>
-            <button class="item-chip" data-item="cookie" type="button">🍪 Cat Biscuit</button>
-            <button class="item-chip" data-item="catnip" type="button">🌿 Catnip</button>
-            <button class="item-chip" data-item="box" type="button">📦 Cardboard Box</button>
-            <button class="item-chip" data-item="yarn" type="button">🧶 Yarn Ball</button>
-            <button class="item-chip" data-item="feather" type="button">🪶 Feather Wand</button>
-            <button class="item-chip" data-item="bell" type="button">🔔 Bell Toy</button>
+        <div class="story-grid">
+          <div class="story-text-column">
+            <span class="story-eyebrow">05 / Feed &amp; Play</span>
+            <h2 class="story-title">Care, play &amp; little treats.</h2>
+            <p class="story-lead">
+              Toss her fresh fish, open a can of tuna, or dangle a feather wand. Cookie has authentic reactions to every snack and toy.
+            </p>
+            <p class="story-detail-note">
+              Accessible anytime from the macOS menu bar or right-clicking Cookie. Treat her whenever you need a mindful break from work.
+            </p>
           </div>
 
-          <div class="reaction-box">
-            <span class="reaction-icon" id="reactionIcon" aria-hidden="true">🐟</span>
-            <span class="reaction-text" id="reactionText">Cookie's ears perk up immediately. She scampers over and chomps down happily.</span>
+          <div class="story-visual-column">
+            <div class="treats-showcase-box">
+              <div class="treat-items-grid">
+                <button class="treat-button active" data-item="fish" type="button">
+                  <span class="emoji">🐟</span>
+                  <span>Fresh Fish</span>
+                </button>
+                <button class="treat-button" data-item="tuna" type="button">
+                  <span class="emoji">🥫</span>
+                  <span>Tuna Can</span>
+                </button>
+                <button class="treat-button" data-item="cookie" type="button">
+                  <span class="emoji">🍪</span>
+                  <span>Cat Biscuit</span>
+                </button>
+                <button class="treat-button" data-item="catnip" type="button">
+                  <span class="emoji">🌿</span>
+                  <span>Catnip</span>
+                </button>
+                <button class="treat-button" data-item="yarn" type="button">
+                  <span class="emoji">🧶</span>
+                  <span>Yarn Ball</span>
+                </button>
+                <button class="treat-button" data-item="feather" type="button">
+                  <span class="emoji">🪶</span>
+                  <span>Feather Wand</span>
+                </button>
+                <button class="treat-button" data-item="box" type="button">
+                  <span class="emoji">📦</span>
+                  <span>Box Fort</span>
+                </button>
+                <button class="treat-button" data-item="bell" type="button">
+                  <span class="emoji">🔔</span>
+                  <span>Bell Toy</span>
+                </button>
+              </div>
+
+              <div class="treat-response-card">
+                <div class="cat-avatar">
+                  <picture>
+                    <source srcset="assets/cookie-hungry.webp" type="image/webp" id="treatCatFaceWebp">
+                    <img src="assets/cookie-hungry.png" alt="Cookie reacting" id="treatCatFace" width="52" height="52">
+                  </picture>
+                </div>
+                <div class="treat-speech" id="treatSpeechText">
+                  Cookie's ears perk up immediately! She scampers over and chomps down happily.
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Native Mac Engineering & Privacy -->
-    <section class="specs-section" id="engineering">
+    <!-- Story Chapter 6: "Made to feel like your own." -->
+    <section class="story-chapter" id="story-custom">
       <div class="container">
-        <div class="editorial-header">
-          <h2>Crafted for the Mac.</h2>
-          <p>Built with respect for your privacy, your screen space, and your battery.</p>
-        </div>
-
-        <div class="specs-grid">
-          <div class="spec-column">
-            <h3>System &amp; Architecture</h3>
-            <ul class="spec-list">
-              <li class="spec-item">
-                <span class="label">Operating System</span>
-                <span class="value">macOS 14.0 Sonoma or later</span>
-              </li>
-              <li class="spec-item">
-                <span class="label">Architecture</span>
-                <span class="value">Universal (Apple Silicon &amp; Intel)</span>
-              </li>
-              <li class="spec-item">
-                <span class="label">Rendering Engine</span>
-                <span class="value">Native Apple SpriteKit</span>
-              </li>
-              <li class="spec-item">
-                <span class="label">Display Safety</span>
-                <span class="value">Auto-clamps safely across multi-monitors</span>
-              </li>
-              <li class="spec-item">
-                <span class="label">Battery Impact</span>
-                <span class="value">~0% idle CPU while sleeping</span>
-              </li>
-            </ul>
+        <div class="story-grid reverse">
+          <div class="story-text-column">
+            <span class="story-eyebrow">06 / Atelier &amp; Personalities</span>
+            <h2 class="story-title">Made to feel like your own.</h2>
+            <p class="story-lead">
+              Tune Cookie's personality, choose accessories, and adjust walking tempo to complement your personal screen setup.
+            </p>
+            <p class="story-detail-note">
+              Whether you prefer a calm zen cat that mostly naps or an energetic kitten that explores your screen, Cookie remembers all your preferences locally. 100% private, no cloud accounts.
+            </p>
           </div>
 
-          <div class="spec-column">
-            <h3>Privacy by Design</h3>
-            <ul class="spec-list">
-              <li class="spec-item">
-                <span class="label">Network Permissions</span>
-                <span class="value">Zero (Runs 100% offline)</span>
-              </li>
-              <li class="spec-item">
-                <span class="label">Analytics &amp; Tracking</span>
-                <span class="value">None whatsoever</span>
-              </li>
-              <li class="spec-item">
-                <span class="label">Local Storage</span>
-                <span class="value">~/Library/Application Support/Cookie/</span>
-              </li>
-              <li class="spec-item">
-                <span class="label">License</span>
-                <span class="value">Indie freeware for macOS</span>
-              </li>
-              <li class="spec-item">
-                <span class="label">Accessibility</span>
-                <span class="value">Full Reduced Motion support</span>
-              </li>
-            </ul>
+          <div class="story-visual-column">
+            <div class="customizer-stage">
+              <div class="customizer-preview-area">
+                <div class="customizer-cat-view" id="customizerCatView">
+                  <picture>
+                    <source srcset="assets/cookie.webp" type="image/webp" id="customizerWebp">
+                    <img src="assets/cookie.png" alt="Cookie Customizer Preview" id="customizerImg" width="190" height="190">
+                  </picture>
+                </div>
+              </div>
+
+              <div class="customizer-controls">
+                <div>
+                  <div class="control-row-label">Personality Preset</div>
+                  <div class="pill-group" id="personalityPills">
+                    <button class="style-pill active" data-mood="calm" type="button">Calm &amp; Gentle</button>
+                    <button class="style-pill" data-mood="playful" type="button">Playful &amp; Curious</button>
+                    <button class="style-pill" data-mood="sleepy" type="button">Sleepyhead</button>
+                    <button class="style-pill" data-mood="sassy" type="button">Sassy &amp; Bold</button>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="control-row-label">Look &amp; Accessories</div>
+                  <div class="pill-group" id="accessoryPills">
+                    <button class="style-pill active" data-style="classic" type="button">Classic Cookie</button>
+                    <button class="style-pill" data-style="cool" type="button">Tiny Shades</button>
+                    <button class="style-pill" data-style="shy" type="button">Bashful Blush</button>
+                    <button class="style-pill" data-style="mischief" type="button">Mischievous</button>
+                  </div>
+                </div>
+
+                <div class="customizer-personality-desc" id="customizerDesc">
+                  <strong>Calm &amp; Gentle:</strong> Naps peacefully beside your windows, strolls slowly, and brings quiet focus to your day.
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </section>
+
+    <!-- Story Chapter 7 / Grand Finale: "Always Cookie." -->
+    <section class="finale-section" id="story-always-cookie">
+      <div class="container">
+        <h2 class="finale-headline">Always Cookie.</h2>
+        <p class="finale-subtext">
+          A quiet, warm companion that lives on your Mac. No subscriptions, no ads, no telemetry. Just a tiny cat right on your desktop.
+        </p>
+
+        <div class="finale-actions">
+          <a href="../dist/Cookie-1.0.0.dmg" class="btn-primary" download id="finaleDownloadBtn">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5l-4-4 1.41-1.41L11 13.67V7h2v6.67l2.59-2.58L17 12.5l-5 5z"/>
+            </svg>
+            <span>Download for macOS</span>
+          </a>
+          <a href="https://github.com/MdKasif0/Cookie" class="btn-secondary" target="_blank" rel="noopener">
+            <span>View Source on GitHub</span>
+          </a>
+        </div>
+
+        <p class="finale-note">Free and open source for macOS 14.0 Sonoma and later • Universal Apple Silicon &amp; Intel</p>
+      </div>
+    </section>
+
+    <!-- Minimal Native Mac Craft Strip -->
+    <div class="craft-strip">
+      <div class="container craft-strip-inner">
+        <div class="craft-item">
+          <span class="craft-label">Architecture</span>
+          <span class="craft-val">Universal Binary</span>
+        </div>
+        <div class="craft-item">
+          <span class="craft-label">Operating System</span>
+          <span class="craft-val">macOS 14 Sonoma+</span>
+        </div>
+        <div class="craft-item">
+          <span class="craft-label">Rendering</span>
+          <span class="craft-val">Native SpriteKit</span>
+        </div>
+        <div class="craft-item">
+          <span class="craft-label">Privacy</span>
+          <span class="craft-val">100% Offline &amp; Local</span>
+        </div>
+        <div class="craft-item">
+          <span class="craft-label">Battery Impact</span>
+          <span class="craft-val">~0% Idle CPU</span>
+        </div>
+      </div>
+    </div>
 
     <!-- DMG Installer Preview -->
     <section class="dmg-section">
       <div class="container">
-        <div class="editorial-header">
-          <h2>Simple, clean installation.</h2>
-          <p>No account required. No background daemons. Just drag Cookie into Applications.</p>
-        </div>
+        <h3 style="font-family: var(--font-serif); font-size: 2.1rem; color: var(--charcoal-deep); margin-bottom: 12px; font-weight: 600;">Simple, clean installation.</h3>
+        <p style="color: var(--soft-brown); max-width: 540px; margin: 0 auto;">No accounts, no background daemons. Just drag Cookie into Applications and enjoy.</p>
 
         <div class="dmg-frame">
           <picture>
