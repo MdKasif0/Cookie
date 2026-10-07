@@ -319,60 +319,326 @@
       </div>
     </section>
 
-    <!-- Story Chapter 6: "Made to feel like your own." -->
-    <section class="story-chapter" id="story-custom">
+    <!-- Dedicated Customization Section: "Make Cookie yours." -->
+    <section class="customization-section" id="story-custom">
       <div class="container">
-        <div class="story-grid reverse">
-          <div class="story-text-column">
-            <span class="story-eyebrow">06 / Atelier &amp; Personalities</span>
-            <h2 class="story-title">Made to feel like your own.</h2>
-            <p class="story-lead">
-              Tune Cookie's personality, choose accessories, and adjust walking tempo to complement your personal screen setup.
-            </p>
-            <p class="story-detail-note">
-              Whether you prefer a calm zen cat that mostly naps or an energetic kitten that explores your screen, Cookie remembers all your preferences locally. 100% private, no cloud accounts.
-            </p>
+        
+        <div class="customization-header">
+          <span class="customization-eyebrow">06 / Personalization &amp; Identity</span>
+          <h2 class="customization-headline">Make Cookie yours.</h2>
+          <p class="customization-lead">
+            Every desk is different. Choose Cookie's coat, eyes, accessories, and personality — or give her a whole new name. Everything saves locally on your Mac.
+          </p>
+        </div>
+
+        <!-- Variations Gallery -->
+        <div class="variations-gallery">
+          <div class="variations-gallery-title">Variations in the Wild • Click to Preview</div>
+          <div class="variations-grid">
+            
+            <div class="variation-card active" data-preset="cookie">
+              <div class="variation-avatar">
+                <picture>
+                  <source srcset="assets/cookie.webp" type="image/webp">
+                  <img src="assets/cookie.png" alt="Cookie — Classic White" width="90" height="90" loading="lazy">
+                </picture>
+              </div>
+              <div class="variation-name">Cookie</div>
+              <div class="variation-coat-tag">Warm White • None</div>
+              <span class="variation-mood-badge">Playful</span>
+            </div>
+
+            <div class="variation-card" data-preset="mochi">
+              <div class="variation-avatar">
+                <picture>
+                  <source srcset="assets/cookie-cool.webp" type="image/webp">
+                  <img src="assets/cookie-cool.png" alt="Mochi — Tiny Shades" width="90" height="90" loading="lazy">
+                </picture>
+              </div>
+              <div class="variation-name">Mochi</div>
+              <div class="variation-coat-tag">Charcoal • Tiny Shades</div>
+              <span class="variation-mood-badge">Grumpy</span>
+            </div>
+
+            <div class="variation-card" data-preset="chai">
+              <div class="variation-avatar">
+                <picture>
+                  <source srcset="assets/cookie-shy.webp" type="image/webp">
+                  <img src="assets/cookie-shy.png" alt="Chai — Bashful Blush" width="90" height="90" loading="lazy">
+                </picture>
+              </div>
+              <div class="variation-name">Chai</div>
+              <div class="variation-coat-tag">Warm Peach • Bashful</div>
+              <span class="variation-mood-badge">Affectionate</span>
+            </div>
+
+            <div class="variation-card" data-preset="matcha">
+              <div class="variation-avatar">
+                <picture>
+                  <source srcset="assets/cookie-mischievous.webp" type="image/webp">
+                  <img src="assets/cookie-mischievous.png" alt="Matcha — Mischief" width="90" height="90" loading="lazy">
+                </picture>
+              </div>
+              <div class="variation-name">Matcha</div>
+              <div class="variation-coat-tag">Muted Sage • Sparkles</div>
+              <span class="variation-mood-badge">Curious</span>
+            </div>
+
+            <div class="variation-card" data-preset="bao">
+              <div class="variation-avatar">
+                <picture>
+                  <source srcset="assets/cookie-sleep.webp" type="image/webp">
+                  <img src="assets/cookie-sleep.png" alt="Bao — Sleepyhead" width="90" height="90" loading="lazy">
+                </picture>
+              </div>
+              <div class="variation-name">Bao</div>
+              <div class="variation-coat-tag">Cream • Cozy Nap</div>
+              <span class="variation-mood-badge">Sleepy</span>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Polished Native macOS Customizer Window Mockup -->
+        <div class="mac-app-window" id="macCustomizerWindow">
+          
+          <!-- Window Titlebar -->
+          <div class="mac-window-titlebar">
+            <div class="traffic-dots">
+              <span class="dot close"></span>
+              <span class="dot min"></span>
+              <span class="dot zoom"></span>
+            </div>
+            <div class="mac-window-title">Cookie — Appearance &amp; Profile</div>
+            <div class="mac-window-status">
+              <span class="status-dot"></span>
+              <span>Saved Locally</span>
+            </div>
           </div>
 
-          <div class="story-visual-column">
-            <div class="customizer-stage">
-              <div class="customizer-preview-area">
-                <div class="customizer-cat-view" id="customizerCatView">
-                  <picture>
-                    <source srcset="assets/cookie.webp" type="image/webp" id="customizerWebp">
-                    <img src="assets/cookie.png" alt="Cookie Customizer Preview" id="customizerImg" width="190" height="190">
-                  </picture>
+          <!-- Window Body (Sidebar + Content Workspace) -->
+          <div class="mac-window-body">
+            
+            <!-- Left Sidebar Navigation matching native app -->
+            <aside class="mac-window-sidebar" aria-label="Customization Categories">
+              <div class="sidebar-header">Preferences</div>
+              <button class="mac-sidebar-item active" data-tab="appearance" type="button">
+                <span class="sidebar-icon">🎨</span>
+                <span>Appearance</span>
+              </button>
+              <button class="mac-sidebar-item" data-tab="accessories" type="button">
+                <span class="sidebar-icon">👑</span>
+                <span>Accessories</span>
+              </button>
+              <button class="mac-sidebar-item" data-tab="personality" type="button">
+                <span class="sidebar-icon">😸</span>
+                <span>Personality</span>
+              </button>
+              <button class="mac-sidebar-item" data-tab="name" type="button">
+                <span class="sidebar-icon">✏️</span>
+                <span>Identity &amp; Name</span>
+              </button>
+            </aside>
+
+            <!-- Main Workspace -->
+            <div class="mac-window-content">
+              
+              <!-- Live Preview Card inside the window -->
+              <div class="mac-preview-card">
+                <div class="preview-stage-frame">
+                  <div class="preview-cat-actor" id="previewCatActor">
+                    <picture>
+                      <source srcset="assets/cookie.webp" type="image/webp" id="previewCatWebp">
+                      <img src="assets/cookie.png" alt="Customized Cookie Preview" id="previewCatImg" width="180" height="180">
+                    </picture>
+                    <!-- Real multiply coat tint layer -->
+                    <div class="fur-tint-layer" id="furTintLayer" aria-hidden="true"></div>
+                    <!-- Soft coat pattern overlay layer -->
+                    <div class="pattern-overlay-layer" id="patternOverlayLayer" aria-hidden="true"></div>
+                  </div>
                 </div>
+
+                <div class="preview-badge-row">
+                  <span class="preview-name" id="previewCatName">Cookie</span>
+                  <span class="preview-badge" id="previewCatPersonality">Playful</span>
+                </div>
+                <p class="preview-summary" id="previewCatSummary">Little games and occasional bursts of mischief.</p>
               </div>
 
-              <div class="customizer-controls">
-                <div>
-                  <div class="control-row-label">Personality Preset</div>
-                  <div class="pill-group" id="personalityPills">
-                    <button class="style-pill active" data-mood="calm" type="button">Calm &amp; Gentle</button>
-                    <button class="style-pill" data-mood="playful" type="button">Playful &amp; Curious</button>
-                    <button class="style-pill" data-mood="sleepy" type="button">Sleepyhead</button>
-                    <button class="style-pill" data-mood="sassy" type="button">Sassy &amp; Bold</button>
+              <!-- Switchable Settings Panes -->
+              <div class="mac-panes-wrap">
+                
+                <!-- Pane 1: Appearance (Coat Color, Pattern, Eyes) -->
+                <div class="mac-pane active" id="paneAppearance">
+                  <div class="setting-group">
+                    <label class="setting-label">Fur Coat Color</label>
+                    <div class="swatch-grid" id="furColorGrid">
+                      <button class="swatch-btn active" data-color="warmWhite" style="background-color: #faf6ee;" title="Warm White" type="button">
+                        <span class="swatch-check">✓</span>
+                      </button>
+                      <button class="swatch-btn" data-color="cream" style="background-color: #f7e8c7;" title="Cream" type="button"></button>
+                      <button class="swatch-btn" data-color="ivory" style="background-color: #fcf5e3;" title="Ivory" type="button"></button>
+                      <button class="swatch-btn" data-color="softBeige" style="background-color: #e8d6b5;" title="Soft Beige" type="button"></button>
+                      <button class="swatch-btn" data-color="mutedSage" style="background-color: #b8c4a4;" title="Muted Sage" type="button"></button>
+                      <button class="swatch-btn" data-color="warmPeach" style="background-color: #f5caaa;" title="Warm Peach" type="button"></button>
+                      <button class="swatch-btn" data-color="softOrange" style="background-color: #efb07b;" title="Soft Orange" type="button"></button>
+                      <button class="swatch-btn" data-color="mutedBrown" style="background-color: #8c704f;" title="Muted Brown" type="button"></button>
+                      <button class="swatch-btn" data-color="charcoal" style="background-color: #4a4540;" title="Charcoal" type="button"></button>
+                    </div>
+                    <span class="swatch-name-display" id="furColorLabel">Warm White</span>
+                  </div>
+
+                  <div class="setting-group">
+                    <label class="setting-label">Coat Pattern</label>
+                    <div class="mac-segmented-control" id="patternControl">
+                      <button class="segment-btn active" data-pattern="none" type="button">None</button>
+                      <button class="segment-btn" data-pattern="tabby" type="button">Tabby</button>
+                      <button class="segment-btn" data-pattern="tuxedo" type="button">Tuxedo</button>
+                      <button class="segment-btn" data-pattern="points" type="button">Points</button>
+                    </div>
+                  </div>
+
+                  <div class="setting-group">
+                    <label class="setting-label">Eye Expression</label>
+                    <div class="mac-segmented-control" id="eyeStyleControl">
+                      <button class="segment-btn active" data-eyestyle="round" type="button">Round</button>
+                      <button class="segment-btn" data-eyestyle="sleepy" type="button">Sleepy</button>
+                      <button class="segment-btn" data-eyestyle="sparkle" type="button">Sparkle</button>
+                    </div>
+                  </div>
+
+                  <div class="setting-group">
+                    <label class="setting-label">Eye Color</label>
+                    <div class="pill-options" id="eyeColorControl">
+                      <button class="mini-pill active" data-eyecolor="charcoal" type="button">Charcoal</button>
+                      <button class="mini-pill" data-eyecolor="warmBrown" type="button">Warm Brown</button>
+                      <button class="mini-pill" data-eyecolor="honey" type="button">Honey</button>
+                      <button class="mini-pill" data-eyecolor="moss" type="button">Moss</button>
+                      <button class="mini-pill" data-eyecolor="rust" type="button">Rust</button>
+                    </div>
                   </div>
                 </div>
 
-                <div>
-                  <div class="control-row-label">Look &amp; Accessories</div>
-                  <div class="pill-group" id="accessoryPills">
-                    <button class="style-pill active" data-style="classic" type="button">Classic Cookie</button>
-                    <button class="style-pill" data-style="cool" type="button">Tiny Shades</button>
-                    <button class="style-pill" data-style="shy" type="button">Bashful Blush</button>
-                    <button class="style-pill" data-style="mischief" type="button">Mischievous</button>
+                <!-- Pane 2: Accessories -->
+                <div class="mac-pane" id="paneAccessories">
+                  <div class="setting-group">
+                    <label class="setting-label">Choose Accessory</label>
+                    <div class="accessory-cards-grid" id="accessoryCards">
+                      <button class="accessory-card active" data-acc="classic" type="button">
+                        <span class="acc-icon">✨</span>
+                        <span class="acc-title">Classic</span>
+                        <span class="acc-sub">Natural coat</span>
+                      </button>
+                      <button class="accessory-card" data-acc="glasses" type="button">
+                        <span class="acc-icon">🕶️</span>
+                        <span class="acc-title">Tiny Shades</span>
+                        <span class="acc-sub">Unflappable cool</span>
+                      </button>
+                      <button class="accessory-card" data-acc="shy" type="button">
+                        <span class="acc-icon">🌸</span>
+                        <span class="acc-title">Bashful Blush</span>
+                        <span class="acc-sub">Sweet cheeks</span>
+                      </button>
+                      <button class="accessory-card" data-acc="mischief" type="button">
+                        <span class="acc-icon">⭐</span>
+                        <span class="acc-title">Mischief Paws</span>
+                        <span class="acc-sub">Playful sparkles</span>
+                      </button>
+                      <button class="accessory-card" data-acc="scarf" type="button">
+                        <span class="acc-icon">🧣</span>
+                        <span class="acc-title">Winter Scarf</span>
+                        <span class="acc-sub">Cozy wool wrap</span>
+                      </button>
+                      <button class="accessory-card" data-acc="collar" type="button">
+                        <span class="acc-icon">🔔</span>
+                        <span class="acc-title">Bell Collar</span>
+                        <span class="acc-sub">Subtle brass bell</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
 
-                <div class="customizer-personality-desc" id="customizerDesc">
-                  <strong>Calm &amp; Gentle:</strong> Naps peacefully beside your windows, strolls slowly, and brings quiet focus to your day.
+                <!-- Pane 3: Personality -->
+                <div class="mac-pane" id="panePersonality">
+                  <div class="setting-group">
+                    <label class="setting-label">Temperament</label>
+                    <div class="personality-list" id="personalityList">
+                      <button class="personality-row active" data-personality="playful" type="button">
+                        <div class="personality-indicator"></div>
+                        <div class="personality-info">
+                          <div class="personality-name">Playful</div>
+                          <div class="personality-desc">Little games and occasional bursts of mischief. Loves toys.</div>
+                        </div>
+                      </button>
+                      <button class="personality-row" data-personality="affectionate" type="button">
+                        <div class="personality-indicator"></div>
+                        <div class="personality-info">
+                          <div class="personality-name">Affectionate</div>
+                          <div class="personality-desc">Likes being near you; follows the cursor and nearly never tires of petting.</div>
+                        </div>
+                      </button>
+                      <button class="personality-row" data-personality="sleepy" type="button">
+                        <div class="personality-indicator"></div>
+                        <div class="personality-info">
+                          <div class="personality-name">Sleepy</div>
+                          <div class="personality-desc">Naps often beside windows, but always up for gentle company.</div>
+                        </div>
+                      </button>
+                      <button class="personality-row" data-personality="energetic" type="button">
+                        <div class="personality-indicator"></div>
+                        <div class="personality-info">
+                          <div class="personality-name">Energetic</div>
+                          <div class="personality-desc">Always trotting off somewhere new. Quick strolling speed across monitors.</div>
+                        </div>
+                      </button>
+                      <button class="personality-row" data-personality="curious" type="button">
+                        <div class="personality-indicator"></div>
+                        <div class="personality-info">
+                          <div class="personality-name">Curious</div>
+                          <div class="personality-desc">Watches everything, investigates moving cursors, tilts her head.</div>
+                        </div>
+                      </button>
+                      <button class="personality-row" data-personality="grumpy" type="button">
+                        <div class="personality-indicator"></div>
+                        <div class="personality-info">
+                          <div class="personality-name">Grumpy</div>
+                          <div class="personality-desc">Judgmental, but secretly fond of you. Short fuse if over-petted.</div>
+                        </div>
+                      </button>
+                    </div>
+                  </div>
                 </div>
+
+                <!-- Pane 4: Identity & Name -->
+                <div class="mac-pane" id="paneName">
+                  <div class="setting-group">
+                    <label class="setting-label" for="catNameInput">Companion Name</label>
+                    <div class="mac-input-wrap">
+                      <input type="text" id="catNameInput" class="mac-text-input" value="Cookie" maxlength="16" placeholder="Name your cat…">
+                    </div>
+                    <p class="setting-hint">Appears in the macOS menu bar, notifications, and profile settings.</p>
+                  </div>
+
+                  <div class="setting-group">
+                    <label class="setting-label">Quick Ideas</label>
+                    <div class="name-chips-row" id="nameChips">
+                      <button class="name-chip" type="button">Cookie</button>
+                      <button class="name-chip" type="button">Mochi</button>
+                      <button class="name-chip" type="button">Matcha</button>
+                      <button class="name-chip" type="button">Chai</button>
+                      <button class="name-chip" type="button">Biscuit</button>
+                      <button class="name-chip" type="button">Bao</button>
+                      <button class="name-chip" type="button">Nutmeg</button>
+                      <button class="name-chip" type="button">Ollie</button>
+                    </div>
+                  </div>
+                </div>
+
               </div>
             </div>
           </div>
         </div>
+
       </div>
     </section>
 

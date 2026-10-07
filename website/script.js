@@ -308,88 +308,322 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ------------------------------------------------------------------------
-  // 7. Chapter 6: Customizer Atelier (Personalities & Looks)
+  // 7. Dedicated "Make Cookie yours." Native Mac Customizer Window Logic
   // ------------------------------------------------------------------------
-  const customizerCatView = document.getElementById("customizerCatView");
-  const customizerImg = document.getElementById("customizerImg");
-  const customizerWebp = document.getElementById("customizerWebp");
-  const customizerDesc = document.getElementById("customizerDesc");
+  const macSidebarItems = document.querySelectorAll(".mac-sidebar-item");
+  const macPanes = document.querySelectorAll(".mac-pane");
 
-  const personalityPills = document.querySelectorAll("#personalityPills .style-pill");
-  const accessoryPills = document.querySelectorAll("#accessoryPills .style-pill");
+  const previewCatActor = document.getElementById("previewCatActor");
+  const previewCatImg = document.getElementById("previewCatImg");
+  const previewCatWebp = document.getElementById("previewCatWebp");
+  const furTintLayer = document.getElementById("furTintLayer");
+  const patternOverlayLayer = document.getElementById("patternOverlayLayer");
+  const previewCatName = document.getElementById("previewCatName");
+  const previewCatPersonality = document.getElementById("previewCatPersonality");
+  const previewCatSummary = document.getElementById("previewCatSummary");
 
-  let currentMood = "calm";
-  let currentStyle = "classic";
+  const furColorBtns = document.querySelectorAll("#furColorGrid .swatch-btn");
+  const furColorLabel = document.getElementById("furColorLabel");
+  const patternBtns = document.querySelectorAll("#patternControl .segment-btn");
+  const eyeStyleBtns = document.querySelectorAll("#eyeStyleControl .segment-btn");
+  const eyeColorBtns = document.querySelectorAll("#eyeColorControl .mini-pill");
+  const accessoryCards = document.querySelectorAll("#accessoryCards .accessory-card");
+  const personalityRows = document.querySelectorAll("#personalityList .personality-row");
+  const catNameInput = document.getElementById("catNameInput");
+  const nameChips = document.querySelectorAll("#nameChips .name-chip");
+  const variationCards = document.querySelectorAll(".variation-card");
 
-  const personalityDescriptions = {
-    "calm": "<strong>Calm & Gentle:</strong> Naps peacefully beside your windows, strolls slowly, and brings quiet focus to your day.",
-    "playful": "<strong>Playful & Curious:</strong> Loves following your cursor, chases yarn balls, and trots around your workspace with curiosity.",
-    "sleepy": "<strong>Sleepyhead:</strong> A master of naps. Spends cozy hours curled up next to cardboard boxes, conserving CPU.",
-    "sassy": "<strong>Sassy & Bold:</strong> Independent and proud. Swishes her tail, bats at toys, and commands your desktop presence."
+  // State
+  let customState = {
+    name: "Cookie",
+    color: "warmWhite",
+    pattern: "none",
+    eyeStyle: "round",
+    eyeColor: "charcoal",
+    accessory: "classic",
+    personality: "playful"
   };
 
-  const styleDescriptions = {
-    "classic": "<strong>Classic Cookie:</strong> Warm, minimal, and timeless. The pure 2D desktop companion experience.",
-    "cool": "<strong>Tiny Shades:</strong> Unflappable cool. Cookie sports dark sunglasses as she strolls along your active windows.",
-    "shy": "<strong>Bashful Blush:</strong> Sweet and delicate. Blushes softly whenever your cursor glides close to say hello.",
-    "mischief": "<strong>Mischievous:</strong> Spirited and playful. Always looking for yarn balls to bat and fun trouble to stir up."
+  const furColorMap = {
+    "warmWhite": { name: "Warm White", color: "transparent" },
+    "cream": { name: "Cream", color: "rgba(247, 232, 199, 0.72)" },
+    "ivory": { name: "Ivory", color: "rgba(252, 245, 227, 0.65)" },
+    "softBeige": { name: "Soft Beige", color: "rgba(232, 214, 181, 0.72)" },
+    "mutedSage": { name: "Muted Sage", color: "rgba(184, 196, 164, 0.68)" },
+    "warmPeach": { name: "Warm Peach", color: "rgba(245, 202, 170, 0.68)" },
+    "softOrange": { name: "Soft Orange", color: "rgba(239, 176, 123, 0.68)" },
+    "mutedBrown": { name: "Muted Brown", color: "rgba(140, 112, 79, 0.65)" },
+    "charcoal": { name: "Charcoal", color: "rgba(74, 69, 64, 0.62)" }
   };
 
-  const updateCustomizerView = (lastChanged) => {
-    // Choose appropriate sprite based on style preference first, then mood
-    let spriteName = "cookie";
+  const personalityMap = {
+    "playful": { title: "Playful", summary: "Little games and occasional bursts of mischief. Loves toys." },
+    "affectionate": { title: "Affectionate", summary: "Likes being near you; follows the cursor and nearly never tires of petting." },
+    "sleepy": { title: "Sleepy", summary: "Naps often beside windows, but always up for gentle company." },
+    "energetic": { title: "Energetic", summary: "Always trotting off somewhere new. Quick strolling speed across monitors." },
+    "curious": { title: "Curious", summary: "Watches everything, investigates moving cursors, tilts her head." },
+    "grumpy": { title: "Grumpy", summary: "Judgmental, but secretly fond of you. Short fuse if over-petted." }
+  };
 
-    if (currentStyle === "cool") {
-      spriteName = "cookie-cool";
-    } else if (currentStyle === "shy") {
-      spriteName = "cookie-shy";
-    } else if (currentStyle === "mischief") {
-      spriteName = "cookie-mischievous";
+  const updatePreview = () => {
+    // 1. Sprite resolution based on accessory / eye expression
+    let sprite = "cookie";
+    if (customState.accessory === "glasses") {
+      sprite = "cookie-cool";
+    } else if (customState.accessory === "shy") {
+      sprite = "cookie-shy";
+    } else if (customState.accessory === "mischief") {
+      sprite = "cookie-mischievous";
     } else {
-      // Classic look, reflect mood
-      if (currentMood === "sleepy") spriteName = "cookie-sleep";
-      else if (currentMood === "playful") spriteName = "cookie-walk";
-      else if (currentMood === "sassy") spriteName = "cookie-angry";
-      else spriteName = "cookie";
-    }
-
-    if (customizerImg && customizerWebp) {
-      customizerImg.src = `assets/${spriteName}.png`;
-      customizerWebp.srcset = `assets/${spriteName}.webp`;
-
-      // Tactile bounce on avatar switch
-      if (customizerCatView) {
-        customizerCatView.style.transform = "scale(1.08) translateY(-4px)";
-        setTimeout(() => {
-          customizerCatView.style.transform = "";
-        }, 200);
+      if (customState.eyeStyle === "sleepy") {
+        sprite = "cookie-sleep";
+      } else if (customState.eyeStyle === "sparkle") {
+        sprite = "cookie-mischievous";
+      } else if (customState.personality === "grumpy") {
+        sprite = "cookie-angry";
+      } else {
+        sprite = "cookie";
       }
     }
 
-    if (customizerDesc) {
-      if (lastChanged === "style" && styleDescriptions[currentStyle]) {
-        customizerDesc.innerHTML = styleDescriptions[currentStyle];
-      } else if (personalityDescriptions[currentMood]) {
-        customizerDesc.innerHTML = personalityDescriptions[currentMood];
+    if (previewCatImg && previewCatWebp) {
+      previewCatImg.src = `assets/${sprite}.png`;
+      previewCatWebp.srcset = `assets/${sprite}.webp`;
+    }
+
+    // 2. Fur color tint
+    if (furTintLayer) {
+      const colorInfo = furColorMap[customState.color] || furColorMap.warmWhite;
+      furTintLayer.style.backgroundColor = colorInfo.color;
+    }
+    if (furColorLabel) {
+      furColorLabel.textContent = furColorMap[customState.color]?.name || "Warm White";
+    }
+
+    // 3. Pattern
+    if (patternOverlayLayer) {
+      patternOverlayLayer.className = "pattern-overlay-layer";
+      if (customState.pattern !== "none") {
+        patternOverlayLayer.classList.add(customState.pattern);
       }
+    }
+
+    // 4. Name and Personality
+    if (previewCatName) {
+      previewCatName.textContent = customState.name || "Cookie";
+    }
+    if (previewCatPersonality) {
+      previewCatPersonality.textContent = personalityMap[customState.personality]?.title || "Playful";
+    }
+    if (previewCatSummary) {
+      previewCatSummary.textContent = personalityMap[customState.personality]?.summary || "";
+    }
+
+    // Bounce preview cat
+    if (previewCatActor) {
+      previewCatActor.style.transform = "scale(1.06) translateY(-4px)";
+      setTimeout(() => {
+        previewCatActor.style.transform = "";
+      }, 160);
     }
   };
 
-  personalityPills.forEach((pill) => {
-    pill.addEventListener("click", () => {
-      personalityPills.forEach((p) => p.classList.remove("active"));
-      pill.classList.add("active");
-      currentMood = pill.getAttribute("data-mood") || "calm";
-      updateCustomizerView("mood");
+  // Sync UI controls with customState
+  const syncControls = () => {
+    furColorBtns.forEach((btn) => {
+      const isMatch = btn.getAttribute("data-color") === customState.color;
+      btn.classList.toggle("active", isMatch);
+      let check = btn.querySelector(".swatch-check");
+      if (isMatch && !check) {
+        check = document.createElement("span");
+        check.className = "swatch-check";
+        check.textContent = "✓";
+        btn.appendChild(check);
+      } else if (!isMatch && check) {
+        check.remove();
+      }
+    });
+
+    patternBtns.forEach((btn) => {
+      btn.classList.toggle("active", btn.getAttribute("data-pattern") === customState.pattern);
+    });
+
+    eyeStyleBtns.forEach((btn) => {
+      btn.classList.toggle("active", btn.getAttribute("data-eyestyle") === customState.eyeStyle);
+    });
+
+    eyeColorBtns.forEach((btn) => {
+      btn.classList.toggle("active", btn.getAttribute("data-eyecolor") === customState.eyeColor);
+    });
+
+    accessoryCards.forEach((card) => {
+      card.classList.toggle("active", card.getAttribute("data-acc") === customState.accessory);
+    });
+
+    personalityRows.forEach((row) => {
+      row.classList.toggle("active", row.getAttribute("data-personality") === customState.personality);
+    });
+
+    if (catNameInput) {
+      catNameInput.value = customState.name;
+    }
+  };
+
+  // Sidebar Tabs
+  macSidebarItems.forEach((item) => {
+    item.addEventListener("click", () => {
+      macSidebarItems.forEach((i) => i.classList.remove("active"));
+      item.classList.add("active");
+
+      const targetTab = item.getAttribute("data-tab");
+      macPanes.forEach((pane) => {
+        const isMatch = (targetTab === "appearance" && pane.id === "paneAppearance") ||
+                        (targetTab === "accessories" && pane.id === "paneAccessories") ||
+                        (targetTab === "personality" && pane.id === "panePersonality") ||
+                        (targetTab === "name" && pane.id === "paneName");
+        pane.classList.toggle("active", isMatch);
+      });
     });
   });
 
-  accessoryPills.forEach((pill) => {
-    pill.addEventListener("click", () => {
-      accessoryPills.forEach((p) => p.classList.remove("active"));
-      pill.classList.add("active");
-      currentStyle = pill.getAttribute("data-style") || "classic";
-      updateCustomizerView("style");
+  // Fur Color Swatches
+  furColorBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      customState.color = btn.getAttribute("data-color") || "warmWhite";
+      syncControls();
+      updatePreview();
     });
   });
+
+  // Patterns
+  patternBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      customState.pattern = btn.getAttribute("data-pattern") || "none";
+      syncControls();
+      updatePreview();
+    });
+  });
+
+  // Eye Style
+  eyeStyleBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      customState.eyeStyle = btn.getAttribute("data-eyestyle") || "round";
+      syncControls();
+      updatePreview();
+    });
+  });
+
+  // Eye Color
+  eyeColorBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      customState.eyeColor = btn.getAttribute("data-eyecolor") || "charcoal";
+      syncControls();
+      updatePreview();
+    });
+  });
+
+  // Accessories
+  accessoryCards.forEach((card) => {
+    card.addEventListener("click", () => {
+      customState.accessory = card.getAttribute("data-acc") || "classic";
+      syncControls();
+      updatePreview();
+    });
+  });
+
+  // Personality
+  personalityRows.forEach((row) => {
+    row.addEventListener("click", () => {
+      customState.personality = row.getAttribute("data-personality") || "playful";
+      syncControls();
+      updatePreview();
+    });
+  });
+
+  // Name Input
+  if (catNameInput) {
+    catNameInput.addEventListener("input", (e) => {
+      const val = e.target.value.trim();
+      customState.name = val.length > 0 ? val : "Cookie";
+      if (previewCatName) previewCatName.textContent = customState.name;
+    });
+  }
+
+  // Quick Name Chips
+  nameChips.forEach((chip) => {
+    chip.addEventListener("click", () => {
+      const chosen = chip.textContent.trim();
+      customState.name = chosen;
+      syncControls();
+      updatePreview();
+    });
+  });
+
+  // Variations Gallery Presets
+  const presets = {
+    "cookie": {
+      name: "Cookie",
+      color: "warmWhite",
+      pattern: "none",
+      accessory: "classic",
+      eyeStyle: "round",
+      eyeColor: "charcoal",
+      personality: "playful"
+    },
+    "mochi": {
+      name: "Mochi",
+      color: "charcoal",
+      pattern: "tuxedo",
+      accessory: "glasses",
+      eyeStyle: "round",
+      eyeColor: "charcoal",
+      personality: "grumpy"
+    },
+    "chai": {
+      name: "Chai",
+      color: "warmPeach",
+      pattern: "none",
+      accessory: "shy",
+      eyeStyle: "round",
+      eyeColor: "warmBrown",
+      personality: "affectionate"
+    },
+    "matcha": {
+      name: "Matcha",
+      color: "mutedSage",
+      pattern: "tabby",
+      accessory: "mischief",
+      eyeStyle: "sparkle",
+      eyeColor: "moss",
+      personality: "curious"
+    },
+    "bao": {
+      name: "Bao",
+      color: "cream",
+      pattern: "none",
+      accessory: "classic",
+      eyeStyle: "sleepy",
+      eyeColor: "warmBrown",
+      personality: "sleepy"
+    }
+  };
+
+  variationCards.forEach((card) => {
+    card.addEventListener("click", () => {
+      variationCards.forEach((c) => c.classList.remove("active"));
+      card.classList.add("active");
+
+      const presetKey = card.getAttribute("data-preset");
+      const chosen = presets[presetKey];
+      if (chosen) {
+        customState = { ...chosen };
+        syncControls();
+        updatePreview();
+      }
+    });
+  });
+
+  // Initial Sync
+  syncControls();
+  updatePreview();
 });
