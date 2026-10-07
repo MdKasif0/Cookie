@@ -23,8 +23,14 @@ final class CompanionPanelController: NSWindowController {
                height: Self.baseSize.height * store.profile.settings.cookieSize)
     }
 
-    init(store: CookieStore, behaviorEngine: CookieBehaviorEngine, audioManager: AudioManager) {
+    private let menuProvider: (() -> NSMenu?)?
+
+    init(store: CookieStore,
+         behaviorEngine: CookieBehaviorEngine,
+         audioManager: AudioManager,
+         menuProvider: (() -> NSMenu?)? = nil) {
         self.store = store
+        self.menuProvider = menuProvider
         let size = CGSize(width: Self.baseSize.width * store.profile.settings.cookieSize,
                           height: Self.baseSize.height * store.profile.settings.cookieSize)
         let saved = store.profile.settings.rememberPosition ? store.profile.companionPosition : nil
@@ -51,6 +57,7 @@ final class CompanionPanelController: NSWindowController {
             store: store,
             behaviorEngine: behaviorEngine,
             audioManager: audioManager,
+            menuProvider: menuProvider,
             onPositionSettled: { [weak self] _ in
                 self?.savePosition()
             }
