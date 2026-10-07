@@ -55,37 +55,46 @@ final class CompanionPanelController: NSWindowController {
             }
         )
 
-        let center = NotificationCenter.default
-        screenObservers.append(center.addObserver(
+        defaultScreenObserver = NotificationCenter.default.addObserver(
             forName: NSApplication.didChangeScreenParametersNotification,
             object: nil, queue: .main
         ) { [weak self] _ in
             MainActor.assumeIsolated {
                 self?.recoverVisiblePosition()
             }
-        })
-        screenObservers.append(NSWorkspace.shared.notificationCenter.addObserver(
+        }
+        workspaceScreenObserver = NSWorkspace.shared.notificationCenter.addObserver(
             forName: NSWorkspace.screensDidWakeNotification,
             object: nil, queue: .main
         ) { [weak self] _ in
             MainActor.assumeIsolated {
                 self?.recoverVisiblePosition()
             }
-        })
+        }
     }
+
+    private var defaultScreenObserver: NSObjectProtocol?
+    private var workspaceScreenObserver: NSObjectProtocol?
 
     required init?(coder: NSCoder) { nil }
 
     deinit {
-        screenObservers.forEach(NotificationCenter.default.removeObserver)
+        if let defaultScreenObserver {
+            NotificationCenter.default.removeObserver(defaultScreenObserver)
+        }
+        if let workspaceScreenObserver {
+            NSWorkspace.shared.notificationCenter.removeObserver(workspaceScreenObserver)
+        }
     }
 
     func show() {
+        (window?.contentViewController?.view as? SKView)?.isPaused = false
         window?.orderFrontRegardless()
         log.debug("Companion panel shown")
     }
 
     func hide() {
+        (window?.contentViewController?.view as? SKView)?.isPaused = true
         window?.orderOut(nil)
         log.debug("Companion panel hidden")
     }
