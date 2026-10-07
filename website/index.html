@@ -28,7 +28,7 @@
           <li><a href="#story-sleepy">Sleepy</a></li>
           <li><a href="#story-drag-pet">Play &amp; Drag</a></li>
           <li><a href="#story-custom">Customize</a></li>
-          <li><a href="downloads/Cookie-1.0.0.dmg" class="nav-cta" download>Download</a></li>
+          <li><a href="#download" class="nav-cta">Download</a></li>
         </ul>
       </nav>
     </div>
@@ -692,19 +692,219 @@
       </div>
     </div>
 
-    <!-- DMG Installer Preview -->
-    <section class="dmg-section">
+    <!-- Dedicated Download Section -->
+    <section class="download-section" id="download">
       <div class="container">
-        <h3 style="font-family: var(--font-serif); font-size: 2.1rem; color: var(--charcoal-deep); margin-bottom: 12px; font-weight: 600;">Simple, clean installation.</h3>
-        <p style="color: var(--soft-brown); max-width: 540px; margin: 0 auto;">No accounts, no background daemons. Just drag Cookie into Applications and enjoy.</p>
-
-        <div class="dmg-frame">
-          <picture>
-            <source srcset="assets/dmg_preview@2x.webp" type="image/webp">
-            <img src="assets/dmg_preview@2x.png" alt="Cookie DMG Drag and Drop Installer" width="700" height="480" loading="lazy">
-          </picture>
+        
+        <div class="download-header">
+          <div class="download-badge">
+            <span class="status-dot"></span>
+            <span>Cookie for macOS • Version 1.0.0</span>
+          </div>
+          <h2 class="download-headline">Cookie for macOS</h2>
+          <p class="download-subhead">
+            A quiet desktop companion crafted with native Mac technologies. Download the disk image below to get started.
+          </p>
         </div>
-        <p class="dmg-note">Self-contained 13 MB disk image distribution</p>
+
+        <!-- Main Download Action Box -->
+        <div class="download-hero-card">
+          <div class="download-app-identity">
+            <picture>
+              <source srcset="assets/app_icon.webp" type="image/webp">
+              <img src="assets/app_icon.png" alt="Cookie App Icon" class="download-icon" width="88" height="88">
+            </picture>
+            <div class="download-app-meta">
+              <div class="download-app-title">Cookie</div>
+              <div class="download-app-version">Version 1.0.0 • Released for macOS</div>
+              <div class="download-app-specs-inline">
+                <span>~15 MB Disk Image</span>
+                <span class="meta-separator">•</span>
+                <span>Universal (Apple Silicon &amp; Intel)</span>
+                <span class="meta-separator">•</span>
+                <span>macOS 14 Sonoma+</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="download-cta-wrap">
+            <a href="downloads/Cookie-1.0.0.dmg" class="btn-primary btn-download-hero" download id="mainDownloadBtn">
+              <svg viewBox="0 0 24 24" aria-hidden="true" width="20" height="20">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5l-4-4 1.41-1.41L11 13.67V7h2v6.67l2.59-2.58L17 12.5l-5 5z"/>
+              </svg>
+              <span>Download Cookie</span>
+            </a>
+            <span class="download-cta-note">Direct DMG download • Free &amp; Open Source</span>
+          </div>
+        </div>
+
+        <!-- System Requirements & Hardware Compatibility Grid -->
+        <div class="compatibility-grid">
+          <div class="compat-card">
+            <div class="compat-icon-wrap">
+              <span class="compat-icon">⚡</span>
+            </div>
+            <div class="compat-content">
+              <h3 class="compat-title">Apple Silicon</h3>
+              <p class="compat-desc">Native <code>arm64</code> binary. Optimized for M1, M2, M3, and M4 Macs with near-zero idle CPU and gentle battery usage.</p>
+              <span class="compat-pill">Native Universal</span>
+            </div>
+          </div>
+
+          <div class="compat-card">
+            <div class="compat-icon-wrap">
+              <span class="compat-icon">💻</span>
+            </div>
+            <div class="compat-content">
+              <h3 class="compat-title">Intel Compatibility</h3>
+              <p class="compat-desc">Full 64-bit Intel Mac support. Runs smoothly on all supported Intel MacBook and desktop models.</p>
+              <span class="compat-pill">Supported (x86_64)</span>
+            </div>
+          </div>
+
+          <div class="compat-card">
+            <div class="compat-icon-wrap">
+              <span class="compat-icon">🖥️</span>
+            </div>
+            <div class="compat-content">
+              <h3 class="compat-title">System Requirements</h3>
+              <p class="compat-desc">Requires <strong>macOS 14.0 Sonoma or later</strong> (including macOS 15 Sequoia). No external runtimes or drivers needed.</p>
+              <span class="compat-pill">macOS 14.0+</span>
+            </div>
+          </div>
+
+          <div class="compat-card">
+            <div class="compat-icon-wrap">
+              <span class="compat-icon">📦</span>
+            </div>
+            <div class="compat-content">
+              <h3 class="compat-title">Download Size</h3>
+              <p class="compat-desc">Self-contained <strong>~15 MB</strong> disk image distribution. No extra downloads, background updaters, or hidden payloads.</p>
+              <span class="compat-pill">~15 MB DMG</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Installation Instructions (5 Steps) -->
+        <div class="install-guide-block">
+          <div class="section-subheading">
+            <span class="subheading-pip"></span>
+            <h3>Installation Instructions</h3>
+          </div>
+          <p class="install-subtext">Setting up Cookie takes less than ten seconds:</p>
+
+          <div class="install-steps-list">
+            <div class="install-step-card">
+              <div class="step-number">1</div>
+              <div class="step-body">
+                <h4 class="step-title">Download Cookie</h4>
+                <p class="step-text">Click the <strong>Download Cookie</strong> button above to download the <code>Cookie-1.0.0.dmg</code> disk image installer directly to your Mac.</p>
+              </div>
+            </div>
+
+            <div class="install-step-card">
+              <div class="step-number">2</div>
+              <div class="step-body">
+                <h4 class="step-title">Open the DMG</h4>
+                <p class="step-text">Locate the downloaded file in your <code>Downloads</code> folder (or Safari downloads list) and double-click to mount it.</p>
+              </div>
+            </div>
+
+            <div class="install-step-card">
+              <div class="step-number">3</div>
+              <div class="step-body">
+                <h4 class="step-title">Drag Cookie into Applications</h4>
+                <p class="step-text">In the installer window, drag the Cookie icon onto the Applications folder shortcut to copy the application to your Mac.</p>
+              </div>
+            </div>
+
+            <div class="install-step-card">
+              <div class="step-number">4</div>
+              <div class="step-body">
+                <h4 class="step-title">Open Cookie</h4>
+                <p class="step-text">Eject the disk image and open Cookie from your Applications folder, Launchpad, or Spotlight search (<code>⌘ Space</code>).</p>
+              </div>
+            </div>
+
+            <div class="install-step-card">
+              <div class="step-number">5</div>
+              <div class="step-body">
+                <h4 class="step-title">Meet your new desktop companion</h4>
+                <p class="step-text">Cookie immediately steps onto your desktop, ready to walk around, rest beside your active windows, and keep you company.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- DMG Visual Frame -->
+          <div class="dmg-frame">
+            <picture>
+              <source srcset="assets/dmg_preview@2x.webp" type="image/webp">
+              <img src="assets/dmg_preview@2x.png" alt="Cookie DMG Drag and Drop Installer Preview" width="700" height="480" loading="lazy">
+            </picture>
+            <div class="dmg-caption">Standard drag-and-drop macOS disk image installer</div>
+          </div>
+        </div>
+
+        <!-- First Launch Behavior & Gatekeeper Information Grid -->
+        <div class="launch-info-grid">
+          
+          <!-- First Launch Behavior -->
+          <div class="launch-card">
+            <div class="card-tag">First Launch</div>
+            <h3 class="card-heading">What happens on first launch</h3>
+            <ul class="launch-points">
+              <li>
+                <span class="point-bullet">🐾</span>
+                <div>
+                  <strong>Desktop Appearance:</strong> Cookie appears right on your wallpaper and gently takes her first steps across your display.
+                </div>
+              </li>
+              <li>
+                <span class="point-bullet">🖥️</span>
+                <div>
+                  <strong>Menu Bar Companion:</strong> A tiny cat silhouette icon sits discreetly in your macOS menu bar. Click it anytime to open Preferences, toggle sound, send Cookie to sleep, or customize appearance.
+                </div>
+              </li>
+              <li>
+                <span class="point-bullet">🔒</span>
+                <div>
+                  <strong>100% Local &amp; Private:</strong> Cookie does not ask for network permissions, accounts, or telemetry. All settings are saved locally in your user preferences.
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Direct Distribution & Gatekeeper Note -->
+          <div class="launch-card">
+            <div class="card-tag">Direct Distribution</div>
+            <h3 class="card-heading">A note on direct distribution &amp; macOS Gatekeeper</h3>
+            <p class="gatekeeper-intro">
+              Cookie is an indie desktop app distributed directly from the developer rather than through the Mac App Store.
+            </p>
+            <div class="gatekeeper-notice-box">
+              <div class="gatekeeper-badge">Standard macOS Security Note</div>
+              <p class="gatekeeper-text">
+                Because Cookie is downloaded outside the App Store, macOS Gatekeeper may display a standard prompt on first launch:
+              </p>
+              <blockquote class="gatekeeper-dialog-quote">
+                “Cookie is an app downloaded from the internet. Are you sure you want to open it?”
+              </blockquote>
+              <p class="gatekeeper-text">
+                Simply click <strong>Open</strong> to proceed. If your Mac requires confirmation under stricter security policies:
+              </p>
+              <ol class="gatekeeper-steps">
+                <li>In Finder, open your <strong>Applications</strong> folder.</li>
+                <li><strong>Control-click</strong> (or right-click) <strong>Cookie</strong> and select <strong>Open</strong>.</li>
+                <li>Click <strong>Open</strong> in the confirmation prompt (or approve in <em>System Settings → Privacy &amp; Security</em>).</li>
+              </ol>
+              <p class="open-source-assurance">
+                Cookie is 100% open source under the MIT license. You can inspect every line of the Swift codebase and build it yourself from source on <a href="https://github.com/MdKasif0/Cookie" target="_blank" rel="noopener">GitHub</a>.
+              </p>
+            </div>
+          </div>
+
+        </div>
+
       </div>
     </section>
   </main>
@@ -716,7 +916,7 @@
         <strong>Cookie 1.0.0</strong> — Crafted with care by Md Kasif Uddin for macOS.
       </div>
       <ul class="footer-links">
-        <li><a href="downloads/Cookie-1.0.0.dmg" download>Download</a></li>
+        <li><a href="#download">Download</a></li>
         <li><a href="https://github.com/MdKasif0/Cookie" target="_blank" rel="noopener">GitHub</a></li>
         <li><a href="#hero">Back to Top ↑</a></li>
       </ul>
