@@ -8,9 +8,11 @@ import SpriteKit
 /// so the panel never blocks the desktop around her.
 final class CompanionSKView: SKView {
     private var hitTester: CookieHitTester?
+    private let menuProvider: (() -> NSMenu?)?
 
-    init(hitTester: CookieHitTester?) {
+    init(hitTester: CookieHitTester?, menuProvider: (() -> NSMenu?)? = nil) {
         self.hitTester = hitTester
+        self.menuProvider = menuProvider
         super.init(frame: NSRect(x: 0, y: 0, width: 180, height: 180))
     }
 
@@ -24,6 +26,10 @@ final class CompanionSKView: SKView {
 
     override func acceptsFirstMouse(for event: NSEvent?) -> Bool {
         true
+    }
+
+    override func menu(for event: NSEvent) -> NSMenu? {
+        menuProvider?()
     }
 
     override func hitTest(_ point: NSPoint) -> NSView? {
@@ -64,15 +70,18 @@ final class CompanionViewController: NSViewController {
     private let store: CookieStore
     private let behaviorEngine: CookieBehaviorEngine
     private let audioManager: AudioManager
+    private let menuProvider: (() -> NSMenu?)?
     private let onPositionSettled: ((NSPoint) -> Void)?
 
     init(store: CookieStore,
          behaviorEngine: CookieBehaviorEngine,
          audioManager: AudioManager,
+         menuProvider: (() -> NSMenu?)? = nil,
          onPositionSettled: ((NSPoint) -> Void)? = nil) {
         self.store = store
         self.behaviorEngine = behaviorEngine
         self.audioManager = audioManager
+        self.menuProvider = menuProvider
         self.onPositionSettled = onPositionSettled
         super.init(nibName: nil, bundle: nil)
     }
@@ -81,7 +90,7 @@ final class CompanionViewController: NSViewController {
 
     override func loadView() {
         let hitTester = CookieHitTester(canvasSize: CookieSpriteRenderer.canvasSize)
-        let skView = CompanionSKView(hitTester: hitTester)
+        let skView = CompanionSKView(hitTester: hitTester, menuProvider: menuProvider)
         skView.autoresizingMask = [.width, .height]
         skView.allowsTransparency = true
         let scene = CookieScene(
@@ -90,6 +99,7 @@ final class CompanionViewController: NSViewController {
             behaviorEngine: behaviorEngine,
             audioManager: audioManager,
             hitTester: hitTester,
+            menuProvider: menuProvider,
             onPositionSettled: onPositionSettled
         )
         skView.presentScene(scene)
