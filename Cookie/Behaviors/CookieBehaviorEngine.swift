@@ -808,6 +808,11 @@ final class CookieBehaviorEngine: ObservableObject {
     private func handleArrived() {
         plan = nil
         locomotionVelocity = 0
+        if sessionTargetX != nil || !sequenceQueue.isEmpty {
+            sessionTargetX = nil
+            stateExpired()
+            return
+        }
         switch state {
         case .followingCursor:
             enter(.curious) // arrived near you — look up
