@@ -48,6 +48,12 @@ echo "==> 5. Mounting disk image for Finder styling..."
 DEVICE=$(hdiutil attach -readwrite -noverify -noautoopen "${TEMP_DMG}" | awk 'NR==1{print $1}')
 sleep 2
 
+# Set custom volume icon attribute
+if [[ -f "/Volumes/${VOL_NAME}/.VolumeIcon.icns" ]]; then
+    /usr/bin/SetFile -a C "/Volumes/${VOL_NAME}" || true
+    /usr/bin/SetFile -a V "/Volumes/${VOL_NAME}/.VolumeIcon.icns" || true
+fi
+
 echo "==> 6. Applying minimal premium Finder presentation..."
 osascript <<APPLESCRIPT || true
 tell application "Finder"
