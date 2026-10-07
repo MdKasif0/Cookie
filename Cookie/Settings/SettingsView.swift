@@ -257,7 +257,9 @@ struct AboutSettingsTab: View {
     @EnvironmentObject private var store: CookieStore
 
     private var version: String {
-        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0"
+        let short = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0.0"
+        let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "1"
+        return "\(short) (Build \(build))"
     }
 
     private var projectURL: URL {
