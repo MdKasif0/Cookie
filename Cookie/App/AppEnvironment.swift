@@ -10,6 +10,7 @@ final class AppEnvironment: ObservableObject {
     let audioManager: AudioManager
     let behaviorEngine: CookieBehaviorEngine
     let windows: WindowManager
+    private(set) var menuBarController: MenuBarController?
 
     private let log = Logger(subsystem: "com.cookie.mac", category: "App")
 
@@ -26,6 +27,9 @@ final class AppEnvironment: ObservableObject {
     /// Called once at launch. Returning users go straight to the desktop
     /// companion; first-time users meet Cookie in the welcome window.
     func start() {
+        if menuBarController == nil {
+            menuBarController = MenuBarController(environment: self, store: store)
+        }
         store.statistics.recordLaunch()
         applySystemSettings()
         if store.profile.hasCompletedWelcome {
