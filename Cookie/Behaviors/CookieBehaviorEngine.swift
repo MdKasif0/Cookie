@@ -674,6 +674,10 @@ final class CookieBehaviorEngine: ObservableObject {
     }
 
     private func pickNextState() {
+        let date = now()
+        if maybeTriggerSpecialEvent(date: date) { return }
+        if maybeTriggerAutonomousToy(date: date) { return }
+
         let weights = behaviorWeights()
         let total = weights.values.reduce(0, +)
         guard total > 0 else {
@@ -840,17 +844,24 @@ final class CookieBehaviorEngine: ObservableObject {
             target = clampX(lastCursorX)
         default:
             guard visibleXRange() != nil else { return nil }
-            var candidate: CGFloat
-            if now() < sulksUntil, let lastCursorX {
-                // Sulking: if she moves at all, she drifts away from you.
-                candidate = lastKnownX + (lastCursorX > lastKnownX ? -340 : 340)
+            if let sessionTarget = sessionTargetX {
+                let isBox = worldItem?.kind.isBox ?? false
+                let offset: CGFloat = isBox ? 0 : 36
+                let candidate = sessionTarget + (lastKnownX < sessionTarget ? -offset : offset)
+                target = clampX(candidate)
             } else {
-                candidate = lastKnownX + CGFloat.random(in: -420...420)
-                if abs(candidate - lastKnownX) < 140 {
-                    candidate = lastKnownX + (candidate >= lastKnownX ? 220 : -220)
+                var candidate: CGFloat
+                if now() < sulksUntil, let lastCursorX {
+                    // Sulking: if she moves at all, she drifts away from you.
+                    candidate = lastKnownX + (lastCursorX > lastKnownX ? -340 : 340)
+                } else {
+                    candidate = lastKnownX + CGFloat.random(in: -420...420)
+                    if abs(candidate - lastKnownX) < 140 {
+                        candidate = lastKnownX + (candidate >= lastKnownX ? 220 : -220)
+                    }
                 }
+                target = clampX(candidate)
             }
-            target = clampX(candidate)
         }
         if abs(target - lastKnownX) < 24 {
             return nil // nowhere interesting to go
@@ -880,6 +891,9 @@ final class CookieBehaviorEngine: ObservableObject {
         case .beingDragged: base = 0...0
         case .reacting: base = 1.2...1.8
         case .special: base = 1.2...1.6
+        case .investigating: base = 1.8...3.0
+        case .tired: base = 2.4...4.0
+        case .inBox: base = 16...28
         }
         var value = Double.random(in: base)
         if state == .idle { value /= max(0.5, store.profile.settings.activity.idleDurationFactor) }
