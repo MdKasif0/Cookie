@@ -56,7 +56,10 @@ final class CookieInteractionTests: XCTestCase {
         XCTAssertEqual(engine.state, .walking, "Cookie should walk toward the toy")
 
         // Reach the toy location
-        let target = engine.worldItem!.x
+        guard let target = engine.worldItem?.x else {
+            XCTFail("Missing world item")
+            return
+        }
         advanceTime(by: 0.2, x: target - 30) // within threshold
         XCTAssertEqual(engine.state, .investigating, "Cookie should investigate the toy upon arrival")
 
@@ -96,7 +99,10 @@ final class CookieInteractionTests: XCTestCase {
             XCTAssertEqual(engine.state, .walking)
 
             // Arrive at food
-            let target = engine.worldItem!.x
+            guard let target = engine.worldItem?.x else {
+                XCTFail("Missing food item")
+                return
+            }
             advanceTime(by: 0.2, x: target - 30)
             XCTAssertEqual(engine.state, .investigating)
 
@@ -129,7 +135,10 @@ final class CookieInteractionTests: XCTestCase {
         XCTAssertEqual(engine.state, .walking)
 
         // Arrive at box
-        let boxX = engine.worldItem!.x
+        guard let boxX = engine.worldItem?.x else {
+            XCTFail("Missing box item")
+            return
+        }
         advanceTime(by: 0.2, x: boxX)
         XCTAssertEqual(engine.state, .investigating)
 
@@ -232,7 +241,10 @@ final class CookieInteractionTests: XCTestCase {
     @MainActor
     func testItemPositionCanBeUpdatedOnDrag() {
         engine.handleOfferToy(.feather)
-        let initialX = engine.worldItem!.x
+        guard let initialX = engine.worldItem?.x else {
+            XCTFail("Missing feather item")
+            return
+        }
         let newX = initialX + 80
         engine.updateWorldItemPosition(newX: newX)
         XCTAssertEqual(engine.worldItem?.x, newX, "Item x position should update when dragged")

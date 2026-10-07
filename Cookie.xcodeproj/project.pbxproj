@@ -39,6 +39,7 @@
 		92F4E8FB639E2CD642A197C8 /* ExpressionArtSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0ED0D19E3B07DA7B1231A4 /* ExpressionArtSource.swift */; };
 		94B286277D51F093C96D6693 /* AppEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BCB2E11C61DF6D031CFBA22 /* AppEnvironment.swift */; };
 		9538BABBD1EDA6970B836D9B /* ExpressionArt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14CEB413BAD769F6723619AA /* ExpressionArt.swift */; };
+		9662A7AFE3D7E0D4C546723F /* CookieMultiDisplayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBBA93F76B12629BDAFC7946 /* CookieMultiDisplayTests.swift */; };
 		9BA77548E1C37D692D1C6D30 /* CookiePose.swift in Sources */ = {isa = PBXBuildFile; fileRef = 779501F6B071E7E2651115BD /* CookiePose.swift */; };
 		A140A648479AA4A84A741F27 /* CompanionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 975A9064828C80542840C9AC /* CompanionViewController.swift */; };
 		A46A56D1CFE236BD1DFDA9B4 /* MotionSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD5BB00064481F7484AA0282 /* MotionSettings.swift */; };
@@ -56,6 +57,7 @@
 		D7F2D955D6917AA84555E0E8 /* CustomizationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0481870F29B62BF73D6D8DCA /* CustomizationView.swift */; };
 		DEDFB19C3E8AED84E4DE4562 /* DesktopWindowScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4514BA6F0CCB5A84B5A4CA5F /* DesktopWindowScanner.swift */; };
 		E67568E5D520C3E9FDE9A171 /* CookieStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7CBD9626E2243F075587141 /* CookieStore.swift */; };
+		E8E31096D8E2F5F973BE859B /* CookieStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D73954CEA6321E099B7E814 /* CookieStoreTests.swift */; };
 		EA63057604B4A8C098A2BFDA /* CookieApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D56AE459069F97085CE459DB /* CookieApp.swift */; };
 		EFE3003C6C3BF75867316551 /* SpriteAnimationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA085C2C2832438FF2316878 /* SpriteAnimationController.swift */; };
 /* End PBXBuildFile section */
@@ -89,6 +91,7 @@
 		4EA9D51FCB1BB96A519098EA /* CookieScreenGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieScreenGeometry.swift; sourceTree = "<group>"; };
 		508F241ABBC1FB1CDF92DC68 /* WorldItemPanelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldItemPanelController.swift; sourceTree = "<group>"; };
 		54D828731AF146F68B1F4290 /* CookieAnimationId.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieAnimationId.swift; sourceTree = "<group>"; };
+		5D73954CEA6321E099B7E814 /* CookieStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieStoreTests.swift; sourceTree = "<group>"; };
 		76760163CA6BE3BAC37C0381 /* CookieInteractionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieInteractionTests.swift; sourceTree = "<group>"; };
 		779501F6B071E7E2651115BD /* CookiePose.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookiePose.swift; sourceTree = "<group>"; };
 		7D22F26FDBDFCA2AC60FC0A0 /* ReferenceImageSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReferenceImageSource.swift; sourceTree = "<group>"; };
@@ -120,6 +123,7 @@
 		D80EF6B30682B627D283E04C /* CookiePersonality.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookiePersonality.swift; sourceTree = "<group>"; };
 		DB2F49350312D645C76361AC /* CookieSpriteRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieSpriteRenderer.swift; sourceTree = "<group>"; };
 		DE40BE58C3D3DB0B217D9757 /* CookieTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CookieTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		EBBA93F76B12629BDAFC7946 /* CookieMultiDisplayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieMultiDisplayTests.swift; sourceTree = "<group>"; };
 		ECDBFE2411725781FE4EA6BD /* CookieCustomization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieCustomization.swift; sourceTree = "<group>"; };
 		F1BFA316970DD8EE9919220A /* CookiePoseCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookiePoseCatalog.swift; sourceTree = "<group>"; };
 		F7CBD9626E2243F075587141 /* CookieStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieStore.swift; sourceTree = "<group>"; };
@@ -295,6 +299,8 @@
 			isa = PBXGroup;
 			children = (
 				76760163CA6BE3BAC37C0381 /* CookieInteractionTests.swift */,
+				EBBA93F76B12629BDAFC7946 /* CookieMultiDisplayTests.swift */,
+				5D73954CEA6321E099B7E814 /* CookieStoreTests.swift */,
 			);
 			path = CookieTests;
 			sourceTree = "<group>";
@@ -473,6 +479,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				303C49FAF4196BC343E55D6E /* CookieInteractionTests.swift in Sources */,
+				9662A7AFE3D7E0D4C546723F /* CookieMultiDisplayTests.swift in Sources */,
+				E8E31096D8E2F5F973BE859B /* CookieStoreTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

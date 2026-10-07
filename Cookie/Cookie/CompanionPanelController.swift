@@ -1,4 +1,5 @@
 import AppKit
+import SpriteKit
 import os
 
 /// Cookie's home on the desktop: a transparent, focus-free floating panel
