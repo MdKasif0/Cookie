@@ -18,15 +18,15 @@ echo "==> 1. Ensuring clean distribution directories..."
 rm -rf "${DIST_DIR}"
 mkdir -p "${DIST_DIR}" "${STAGING_DIR}"
 
-echo "==> 2. Verifying Release application bundle..."
-if [[ ! -d "${RELEASE_APP}" ]]; then
-    echo "Release app bundle not found at ${RELEASE_APP}. Building now..."
-    DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild -scheme Cookie -configuration Release -derivedDataPath "${PROJECT_ROOT}/.build/DerivedData" build
-fi
+echo "==> 2. Building fresh Release application bundle..."
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild -scheme Cookie -configuration Release -derivedDataPath "${PROJECT_ROOT}/.build/DerivedData" build
 
 echo "==> 3. Populating staging directory..."
 cp -R "${RELEASE_APP}" "${STAGING_DIR}/${APP_NAME}.app"
 ln -s /Applications "${STAGING_DIR}/Applications"
+
+# Custom DMG Volume Icon
+cp "${PROJECT_ROOT}/Cookie/Resources/AppIcon.icns" "${STAGING_DIR}/.VolumeIcon.icns"
 
 # Background artwork
 mkdir -p "${STAGING_DIR}/.background"
