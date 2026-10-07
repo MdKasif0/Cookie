@@ -10,13 +10,5 @@ struct CookieApp: App {
                 .environmentObject(appDelegate.environment)
                 .environmentObject(appDelegate.environment.store)
         }
-        MenuBarExtra {
-            MenuBarContent()
-                .environmentObject(appDelegate.environment)
-                .environmentObject(appDelegate.environment.store)
-        } label: {
-            Image(systemName: "cat.fill")
-        }
-        .menuBarExtraStyle(.menu)
     }
 }
