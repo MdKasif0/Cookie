@@ -37,40 +37,59 @@
   <main>
     <!-- Hero Section (Editorial, Spacious & Crafted) -->
     <section class="hero-section" id="hero">
-      <div class="container">
+      <div class="container hero-container">
         
+        <!-- Small Product Metadata Badge -->
         <div class="hero-eyebrow">
           <span class="eyebrow-pip" aria-hidden="true"></span>
-          <span>A Desktop Companion for macOS Sonoma &amp; Later</span>
+          <span>A Desktop Companion for macOS</span>
         </div>
 
-        <h1 class="hero-headline">Meet Cookie.</h1>
+        <!-- Dominant Editorial Headline & Subtitle -->
+        <h1 class="hero-headline">
+          Meet Cookie<span class="hero-dot">.</span>
+        </h1>
         <p class="hero-supporting">A tiny cat that lives on your Mac.</p>
 
+        <!-- Primary & Secondary CTA Group -->
         <div class="hero-actions">
-          <a href="downloads/Cookie-1.0.0.dmg" class="btn-primary" download id="downloadBtn">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5l-4-4 1.41-1.41L11 13.67V7h2v6.67l2.59-2.58L17 12.5l-5 5z"/>
+          <a href="downloads/Cookie-1.0.0.dmg" class="btn-primary hero-btn-primary" download id="downloadBtn">
+            <svg class="hero-btn-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.5" stroke-opacity="0.32"/>
+              <path d="M10 5.5v7m0 0l-3-3m3 3l3-3M6.5 14.5h7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
             <span>Download for macOS</span>
           </a>
-          <a href="#story-always-there" class="btn-secondary">
+          <a href="#story-always-there" class="btn-secondary hero-btn-secondary">
             <span>Meet Cookie</span>
+            <svg class="hero-btn-arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M6 3.5L10.5 8L6 12.5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
           </a>
         </div>
 
-        <p class="hero-release-tag">Version 1.0.0 • 13 MB Disk Image • Universal Apple Silicon &amp; Intel</p>
+        <!-- Quiet, Refined Version Metadata -->
+        <p class="hero-release-tag">
+          Version 1.0.0 <span class="meta-dot">·</span> 13 MB Disk Image <span class="meta-dot">·</span> Apple Silicon &amp; Intel
+        </p>
 
-        <!-- Prominent Interactive Cookie Artwork Stage -->
+        <!-- Centerpiece: Cookie Character Grounded on the Wooden Desk -->
         <div class="hero-stage">
           <div class="cookie-actor-wrap" id="cookieActor" title="Click to pet Cookie">
+            <!-- Subtle Playful Whiskers / Sparkle Accent (matching art direction mockup) -->
+            <div class="cookie-sparkle" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" width="22" height="22">
+                <path d="M5 13C8 12 9 10 9 7M8 17C11 16 12 14 12 11" stroke="#E87920" stroke-width="2.2" stroke-linecap="round"/>
+              </svg>
+            </div>
+
             <!-- Base Sprite: Open Eyes -->
             <picture>
               <source srcset="assets/hero-cookie-open.webp" type="image/webp">
               <img src="assets/hero-cookie-open.png" 
-                   alt="Cookie sitting calmly on your desktop" 
+                   alt="Cookie, the cute desktop cat companion for macOS." 
                    class="cookie-sprite-layer cookie-open-layer" 
-                   width="500" height="500" 
+                   width="320" height="320" 
                    fetchpriority="high">
             </picture>
 
@@ -80,7 +99,7 @@
               <img src="assets/hero-cookie-blink.png" 
                    alt="" 
                    class="cookie-sprite-layer cookie-blink-layer" 
-                   width="500" height="500" 
+                   width="320" height="320" 
                    aria-hidden="true">
             </picture>
 
@@ -88,8 +107,8 @@
             <div class="pet-toast" id="petToast" aria-hidden="true">purr… 🐾</div>
           </div>
 
+          <!-- Soft Natural Contact Shadow on the Wooden Desk Tabletop -->
           <div class="stage-ground-shadow" aria-hidden="true"></div>
-          <p class="stage-caption">Click Cookie to say hello • Blinks, breathes, and strolls on your desktop</p>
         </div>
 
       </div>
