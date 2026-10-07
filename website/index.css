@@ -8,32 +8,32 @@
 
 :root {
   /* Warm Foundations */
-  --canvas: #faf8f5;
-  --canvas-subtle: #f5efe6;
+  --canvas: #fbf9f5;
+  --canvas-subtle: #f8f5ef;
   --surface: #ffffff;
-  --surface-warm: #fcfaf7;
+  --surface-warm: #fffdf9;
   --cream: #f6f0e4;
   --ivory: #fffff8;
   --sand: #eee6d8;
   --beige: #e5dacb;
 
   /* Typography & Structure */
-  --charcoal: #27211c;
-  --charcoal-deep: #1a1613;
+  --charcoal: #262421;
+  --charcoal-deep: #1c1b19;
   --muted-brown: #5d4d40;
-  --soft-brown: #7a6859;
-  --neutral-gray: #8c8175;
+  --soft-brown: #75695d;
+  --neutral-gray: #8b7d70;
   --light-gray: #b8aea3;
   --border-subtle: rgba(140, 120, 100, 0.16);
   --border-strong: rgba(120, 100, 80, 0.28);
 
   /* Warm Accents (Amber, Sage, Terracotta) */
-  --amber: #d97724;
-  --amber-hover: #c26517;
+  --amber: #e87920;
+  --amber-hover: #d66d17;
   --amber-soft: #fef5ec;
   --amber-border: #f0caa3;
   
-  --sage: #5b6e58;
+  --sage: #75856f;
   --sage-light: #eff4ee;
   --sage-border: #c4d4c2;
 
@@ -101,16 +101,16 @@ img {
 }
 
 /* ==========================================================================
-   Site Masthead
+   Site Masthead (Refined & Cohesive)
    ========================================================================== */
 .site-header {
   position: sticky;
   top: 0;
   z-index: 100;
-  background-color: rgba(250, 248, 245, 0.90);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border-subtle);
+  background-color: rgba(251, 249, 245, 0.82);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid rgba(139, 125, 112, 0.14);
   transition: background-color 0.2s ease;
 }
 
@@ -124,11 +124,11 @@ img {
 .brand-mark {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 11px;
   font-weight: 700;
   font-size: 1.15rem;
   letter-spacing: -0.01em;
-  color: var(--charcoal-deep);
+  color: #1c1b19;
 }
 
 .brand-icon {
@@ -145,7 +145,7 @@ img {
   list-style: none;
   font-size: 0.92rem;
   font-weight: 500;
-  color: var(--soft-brown);
+  color: #75695d;
 }
 
 .nav-menu a {
@@ -153,164 +153,246 @@ img {
 }
 
 .nav-menu a:hover {
-  color: var(--charcoal-deep);
+  color: #1c1b19;
 }
 
 .nav-cta {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background-color: var(--charcoal-deep);
-  color: var(--ivory) !important;
+  background-color: #1c1b19;
+  color: #fbf9f5 !important;
   font-size: 0.88rem;
   font-weight: 600;
-  padding: 8px 18px;
+  padding: 7px 18px;
   border-radius: var(--radius-full);
+  box-shadow: 0 2px 8px rgba(28, 27, 25, 0.12);
   transition: all 0.2s ease;
 }
 
 .nav-cta:hover {
-  background-color: var(--muted-brown);
+  background-color: #383430;
   transform: translateY(-1px);
 }
 
 /* ==========================================================================
-   Hero Section (Editorial, Spacious & Crafted)
+   Hero Section (Editorial Art Direction & Desk Scene)
    ========================================================================== */
 .hero-section {
-  padding: 104px 0 88px;
+  position: relative;
+  background-color: #f8f5ef;
+  background-image: linear-gradient(180deg, rgba(251, 249, 245, 0.45) 0%, rgba(251, 249, 245, 0.08) 20%, rgba(248, 245, 239, 0) 42%),
+                    url('assets/hero-desk-bg.webp');
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  background-size: cover;
+  min-height: calc(100vh - 64px);
+  max-height: 960px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: clamp(48px, 6vh, 66px) 24px 0;
   text-align: center;
+  overflow: hidden;
 }
 
+.hero-container {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+/* Small Product Metadata Badge */
 .hero-eyebrow {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background-color: var(--cream);
-  border: 1px solid var(--beige);
-  padding: 6px 16px;
+  background-color: rgba(255, 253, 249, 0.88);
+  border: 1px solid rgba(139, 125, 112, 0.22);
+  padding: 5px 14px;
   border-radius: var(--radius-full);
-  font-size: 0.84rem;
-  font-weight: 600;
-  color: var(--muted-brown);
-  letter-spacing: 0.02em;
-  margin-bottom: 28px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #75695d;
+  letter-spacing: 0.01em;
+  margin-bottom: clamp(18px, 2.8vh, 28px);
+  box-shadow: 0 1px 4px rgba(40, 30, 20, 0.04);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .hero-eyebrow .eyebrow-pip {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
-  background-color: var(--sage);
+  background-color: #75856f;
+  box-shadow: 0 0 0 2px rgba(117, 133, 111, 0.22);
 }
 
+/* Dominant Editorial Headline */
 .hero-headline {
   font-family: var(--font-serif);
-  font-size: clamp(3.4rem, 7.5vw, 5rem);
+  font-size: clamp(3.4rem, 6.2vw, 4.8rem);
   font-weight: 600;
-  line-height: 1.06;
+  line-height: 1.05;
   letter-spacing: -0.025em;
-  color: var(--charcoal-deep);
-  margin-bottom: 18px;
+  color: #1c1b19;
+  margin-bottom: clamp(12px, 1.8vh, 18px);
 }
 
+.hero-dot {
+  color: #e87920;
+  display: inline-block;
+}
+
+/* Refined Supporting Subtitle */
 .hero-supporting {
-  font-size: clamp(1.3rem, 2.8vw, 1.65rem);
+  font-size: clamp(1.2rem, 2.1vw, 1.45rem);
   font-weight: 400;
-  color: var(--soft-brown);
-  max-width: var(--max-w-narrow);
-  margin: 0 auto 38px;
-  line-height: 1.45;
+  color: #75695d;
+  max-width: 520px;
+  margin: 0 auto clamp(22px, 3.4vh, 32px);
+  line-height: 1.42;
+  letter-spacing: -0.01em;
 }
 
+/* CTA Button Group */
 .hero-actions {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 16px;
-  margin-bottom: 24px;
+  gap: 14px;
+  margin-bottom: clamp(16px, 2.4vh, 22px);
 }
 
-.btn-primary {
+/* Primary Download CTA: Warm Orange */
+.hero-btn-primary {
+  background-color: #e87920;
+  color: #ffffff !important;
+  font-size: 0.98rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  padding: 13px 26px;
+  border-radius: var(--radius-full);
+  box-shadow: 0 4px 14px rgba(232, 121, 32, 0.28);
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  background-color: var(--amber);
-  color: #ffffff;
-  font-size: 1.05rem;
-  font-weight: 600;
-  padding: 14px 28px;
-  border-radius: var(--radius-full);
-  box-shadow: 0 4px 16px rgba(217, 119, 36, 0.30);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  gap: 9px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s ease, background-color 0.18s ease;
 }
 
-.btn-primary:hover {
-  background-color: var(--amber-hover);
+.hero-btn-primary:hover {
+  background-color: #d66d17;
   transform: translateY(-2px);
-  box-shadow: 0 6px 22px rgba(217, 119, 36, 0.40);
+  box-shadow: 0 6px 20px rgba(232, 121, 32, 0.38);
 }
 
-.btn-primary svg {
+.hero-btn-primary:active {
+  transform: translateY(1px) scale(0.99);
+  box-shadow: 0 2px 8px rgba(232, 121, 32, 0.2);
+}
+
+.hero-btn-icon {
   width: 18px;
   height: 18px;
-  fill: currentColor;
+  flex-shrink: 0;
 }
 
-.btn-secondary {
+/* Secondary CTA: Warm Off-White / Ivory */
+.hero-btn-secondary {
+  background-color: rgba(255, 253, 249, 0.88);
+  color: #262421;
+  border: 1px solid rgba(139, 125, 112, 0.32);
+  padding: 13px 24px;
+  border-radius: var(--radius-full);
+  font-size: 0.98rem;
+  font-weight: 600;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background-color: var(--surface);
-  color: var(--charcoal);
-  font-size: 1.05rem;
-  font-weight: 600;
-  padding: 14px 26px;
-  border-radius: var(--radius-full);
-  border: 1px solid var(--border-strong);
-  transition: all 0.2s ease;
-  box-shadow: var(--shadow-subtle);
+  box-shadow: 0 1px 4px rgba(40, 30, 20, 0.04);
+  transition: all 0.18s ease;
 }
 
-.btn-secondary:hover {
-  background-color: var(--canvas-subtle);
-  border-color: var(--neutral-gray);
+.hero-btn-secondary:hover {
+  background-color: #faf4eb;
+  border-color: rgba(139, 125, 112, 0.5);
   transform: translateY(-1px);
 }
 
+.hero-btn-arrow {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+  transition: transform 0.18s ease;
+}
+
+.hero-btn-secondary:hover .hero-btn-arrow {
+  transform: translateX(2px);
+}
+
+/* Quiet Version Metadata */
 .hero-release-tag {
-  font-size: 0.86rem;
-  color: var(--neutral-gray);
-  margin-bottom: 56px;
+  font-size: 0.82rem;
+  color: #8b7d70;
+  letter-spacing: 0.01em;
+  margin-bottom: clamp(18px, 3vh, 32px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.hero-release-tag .meta-dot {
+  color: #b8aea3;
+  font-size: 0.75rem;
 }
 
 /* ==========================================================================
-   Hero Stage (Blinking, Idle & Purr)
+   Hero Stage: Cookie Grounded on the Wooden Desk
    ========================================================================== */
 .hero-stage {
   position: relative;
-  max-width: 520px;
+  width: 290px;
+  height: 270px;
   margin: 0 auto;
-  padding-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
 }
 
 .cookie-actor-wrap {
   position: relative;
-  width: 380px;
-  height: 380px;
-  max-width: 85vw;
-  max-height: 85vw;
-  margin: 0 auto;
+  width: 270px;
+  height: 270px;
   cursor: pointer;
   user-select: none;
   transform-origin: 50% 90%;
-  animation: cookieIdle 5.2s ease-in-out infinite;
-  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: cookieGentleIdle 6.5s ease-in-out infinite;
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .cookie-actor-wrap:active {
-  transform: scale(0.96) translateY(4px);
+  transform: scale(0.96) translateY(3px);
+}
+
+/* Subtle Playful Sparkles */
+.cookie-sparkle {
+  position: absolute;
+  top: 18%;
+  left: -4px;
+  width: 22px;
+  height: 22px;
+  pointer-events: none;
+  animation: sparkleFloat 3.8s ease-in-out infinite;
 }
 
 .cookie-sprite-layer {
@@ -329,15 +411,36 @@ img {
   animation: cookieBlink 5.6s infinite;
 }
 
-@keyframes cookieIdle {
+/* Soft Natural Contact Shadow on the Wooden Desk Tabletop */
+.stage-ground-shadow {
+  width: 240px;
+  height: 20px;
+  margin: -12px auto 0;
+  background: radial-gradient(ellipse at center, rgba(60, 42, 24, 0.42) 0%, rgba(60, 42, 24, 0.18) 45%, rgba(60, 42, 24, 0.04) 65%, transparent 80%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+@keyframes cookieGentleIdle {
   0%, 100% {
     transform: translateY(0px) scale(1) rotate(0deg);
   }
-  30% {
-    transform: translateY(-5px) scale(1.008, 0.992) rotate(0.4deg);
+  35% {
+    transform: translateY(-4px) scale(1.006, 0.994) rotate(0.3deg);
   }
-  65% {
-    transform: translateY(-2px) scale(0.994, 1.006) rotate(-0.4deg);
+  70% {
+    transform: translateY(-1px) scale(0.996, 1.004) rotate(-0.3deg);
+  }
+}
+
+@keyframes sparkleFloat {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: translateY(-4px) scale(1.1);
+    opacity: 1;
   }
 }
 
@@ -348,15 +451,6 @@ img {
   94.5%, 97% {
     opacity: 1;
   }
-}
-
-.stage-ground-shadow {
-  width: 280px;
-  height: 18px;
-  margin: -14px auto 16px;
-  background: radial-gradient(ellipse at center, rgba(80, 60, 40, 0.18) 0%, rgba(80, 60, 40, 0.05) 55%, transparent 75%);
-  border-radius: 50%;
-  pointer-events: none;
 }
 
 .pet-toast {
@@ -374,20 +468,16 @@ img {
   box-shadow: var(--shadow-warm);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
   white-space: nowrap;
+  z-index: 20;
 }
 
 .pet-toast.active {
   opacity: 1;
-  transform: translateX(-50%) translateY(-18px) scale(1);
+  transform: translateX(-50%) translateY(0) scale(1);
 }
 
-.stage-caption {
-  font-size: 0.88rem;
-  color: var(--neutral-gray);
-  margin-top: 8px;
-}
 
 /* ==========================================================================
    Story Vignettes: Visual Storytelling System

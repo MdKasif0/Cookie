@@ -42,6 +42,41 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Subtle interactive glance toward cursor in hero
+  const heroSection = document.getElementById("hero");
+  if (heroSection && cookieActor) {
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (!prefersReducedMotion) {
+      let isHeroHovered = false;
+
+      heroSection.addEventListener("mousemove", (e) => {
+        isHeroHovered = true;
+        const rect = cookieActor.getBoundingClientRect();
+        const catCenterX = rect.left + rect.width / 2;
+        const catCenterY = rect.top + rect.height / 2;
+
+        const diffX = e.clientX - catCenterX;
+        const diffY = e.clientY - catCenterY;
+
+        // Very subtle glance: max 5px translation, max 2.5deg head tilt
+        const maxShift = 5;
+        const shiftX = Math.max(-maxShift, Math.min(maxShift, diffX * 0.012));
+        const shiftY = Math.max(-maxShift, Math.min(maxShift, diffY * 0.01));
+        const tiltDeg = Math.max(-2.5, Math.min(2.5, diffX * 0.006));
+
+        cookieActor.style.transform = `translate(${shiftX}px, ${shiftY}px) rotate(${tiltDeg}deg)`;
+      });
+
+      heroSection.addEventListener("mouseleave", () => {
+        if (isHeroHovered) {
+          cookieActor.style.transform = "";
+          isHeroHovered = false;
+        }
+      });
+    }
+  }
+
   // ------------------------------------------------------------------------
   // 2. Desktop Window Scene: Cookie Click Reaction
   // ------------------------------------------------------------------------
