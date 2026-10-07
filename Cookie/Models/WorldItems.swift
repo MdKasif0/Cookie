@@ -23,6 +23,19 @@ enum ToyKind: String, CaseIterable, Codable, Identifiable {
         case .box: return "Cardboard Box"
         }
     }
+
+    var emoji: String {
+        switch self {
+        case .yarnBall: return "🧶"
+        case .feather: return "🪶"
+        case .toyMouse: return "🐭"
+        case .fishToy: return "🐟"
+        case .ball: return "🎾"
+        case .box: return "📦"
+        }
+    }
+
+    var isBox: Bool { self == .box }
 }
 
 /// The foods the user can offer Cookie from the menu bar.
@@ -43,6 +56,15 @@ enum FoodKind: String, CaseIterable, Codable, Identifiable {
         }
     }
 
+    var emoji: String {
+        switch self {
+        case .fish: return "🐟"
+        case .milk: return "🥛"
+        case .chicken: return "🍗"
+        case .cookie: return "🍪"
+        }
+    }
+
     var symbolName: String {
         switch self {
         case .fish: return "fish"
@@ -51,6 +73,8 @@ enum FoodKind: String, CaseIterable, Codable, Identifiable {
         case .cookie: return "circle.hexagongrid"
         }
     }
+
+    var isLiquid: Bool { self == .milk }
 }
 
 /// Anything placed on Cookie's desktop for a while.
@@ -59,7 +83,40 @@ enum WorldItemKind: Equatable, Codable {
     case food(FoodKind)
     case box
 
-    var isBox: Bool { self == .box }
+    var isBox: Bool {
+        switch self {
+        case .box: return true
+        case .toy(let kind): return kind == .box
+        default: return false
+        }
+    }
+
+    var isFood: Bool {
+        if case .food = self { return true }
+        return false
+    }
+
+    var isToy: Bool {
+        if case .toy = self { return true }
+        if case .box = self { return true }
+        return false
+    }
+
+    var displayName: String {
+        switch self {
+        case .toy(let toy): return toy.displayName
+        case .food(let food): return food.displayName
+        case .box: return "Cardboard Box"
+        }
+    }
+
+    var emoji: String {
+        switch self {
+        case .toy(let toy): return toy.emoji
+        case .food(let food): return food.emoji
+        case .box: return "📦"
+        }
+    }
 }
 
 /// A spawned world item: what it is and where its center sits on screen.
@@ -68,11 +125,15 @@ enum WorldItemKind: Equatable, Codable {
 struct WorldItem: Equatable, Identifiable {
     let id: UUID
     let kind: WorldItemKind
-    let x: CGFloat
+    var x: CGFloat
+    var isConsumed: Bool = false
+    var isInteracting: Bool = false
 
-    init(kind: WorldItemKind, x: CGFloat) {
-        self.id = UUID()
+    init(id: UUID = UUID(), kind: WorldItemKind, x: CGFloat, isConsumed: Bool = false, isInteracting: Bool = false) {
+        self.id = id
         self.kind = kind
         self.x = x
+        self.isConsumed = isConsumed
+        self.isInteracting = isInteracting
     }
 }
