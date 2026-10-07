@@ -2186,10 +2186,10 @@ img {
 
 .download-cta-wrap {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
   gap: 12px;
   flex-shrink: 0;
+  flex-wrap: wrap;
 }
 
 .btn-download-hero {
@@ -2200,19 +2200,20 @@ img {
   color: var(--canvas);
   font-size: 0.94rem;
   font-weight: 600;
-  padding: 13px 28px;
+  padding: 12px 26px;
   border-radius: var(--radius-full);
   border: 1px solid var(--charcoal-deep);
-  box-shadow: 0 2px 8px rgba(28, 27, 25, 0.18), 0 1px 0 rgba(255,255,255,0.06) inset;
+  box-shadow: 0 2px 8px rgba(28, 27, 25, 0.18), 0 1px 0 rgba(255, 255, 255, 0.08) inset;
   letter-spacing: -0.01em;
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
 }
 
 .btn-download-hero:hover {
   background-color: var(--charcoal-deep);
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(28, 27, 25, 0.28);
+  box-shadow: 0 6px 20px rgba(28, 27, 25, 0.26);
 }
 
 .btn-download-hero:active {
@@ -2220,24 +2221,46 @@ img {
   box-shadow: 0 1px 4px rgba(28, 27, 25, 0.18);
 }
 
-.download-github-link {
+.btn-github-hero {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-size: 0.82rem;
-  font-weight: 500;
-  color: var(--soft-brown);
-  text-decoration: none;
-  padding: 4px 0;
-  transition: color 0.15s ease;
-}
-
-.download-github-link:hover {
+  gap: 8px;
+  background-color: var(--surface);
   color: var(--charcoal-deep);
+  font-size: 0.94rem;
+  font-weight: 600;
+  padding: 12px 22px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-strong);
+  box-shadow: 0 1px 3px rgba(45, 32, 20, 0.05);
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
 }
 
-.download-cta-note {
-  font-size: 0.78rem;
+.btn-github-hero svg {
+  color: var(--charcoal);
+  transition: transform 0.2s ease, color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.btn-github-hero:hover {
+  background-color: var(--canvas-subtle);
+  border-color: rgba(120, 100, 80, 0.4);
+  color: var(--charcoal-deep);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(45, 32, 20, 0.08);
+}
+
+.btn-github-hero:hover svg {
+  transform: scale(1.08);
+}
+
+.btn-github-hero:active {
+  transform: scale(0.98) translateY(0);
+  box-shadow: 0 1px 2px rgba(45, 32, 20, 0.04);
+}
   color: var(--neutral-gray);
 }
 
@@ -2402,11 +2425,14 @@ img {
   }
 
   .download-cta-wrap {
-    align-items: flex-start;
     width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
   }
 
-  .btn-download-hero {
+  .btn-download-hero,
+  .btn-github-hero {
     width: 100%;
     justify-content: center;
   }
