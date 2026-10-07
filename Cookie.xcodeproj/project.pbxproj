@@ -16,6 +16,7 @@
 		28EC22B8DC1864F99309E225 /* WorldItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA64B52E068713421CB908E2 /* WorldItemView.swift */; };
 		2E1766FDB9E264CD72F5EB92 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82D8641805F78FBEF35E59DB /* AppDelegate.swift */; };
 		2E9356EE81B3E75ED15253CB /* SpriteProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0550502DB31F161C2B875C18 /* SpriteProviding.swift */; };
+		303C49FAF4196BC343E55D6E /* CookieInteractionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76760163CA6BE3BAC37C0381 /* CookieInteractionTests.swift */; };
 		3873AC3359C0EBB51FDE655B /* WorldItemPanelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508F241ABBC1FB1CDF92DC68 /* WorldItemPanelController.swift */; };
 		3B6C6F3392700BA5B1CFF284 /* CookieSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15328F6492CADC407F9935A4 /* CookieSettings.swift */; };
 		3E3C863DEB21A842A439B102 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BC6B895FFF0816B8909B8F5D /* Assets.xcassets */; };
@@ -58,6 +59,16 @@
 		EFE3003C6C3BF75867316551 /* SpriteAnimationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA085C2C2832438FF2316878 /* SpriteAnimationController.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		124FC80018E14A6B2D926BB6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1DEF12A8EA9011540A345A44 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 04A5FCCC0AB455E61AD14C3B;
+			remoteInfo = Cookie;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		0481870F29B62BF73D6D8DCA /* CustomizationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomizationView.swift; sourceTree = "<group>"; };
 		0550502DB31F161C2B875C18 /* SpriteProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpriteProviding.swift; sourceTree = "<group>"; };
@@ -76,6 +87,7 @@
 		4EA9D51FCB1BB96A519098EA /* CookieScreenGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieScreenGeometry.swift; sourceTree = "<group>"; };
 		508F241ABBC1FB1CDF92DC68 /* WorldItemPanelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldItemPanelController.swift; sourceTree = "<group>"; };
 		54D828731AF146F68B1F4290 /* CookieAnimationId.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieAnimationId.swift; sourceTree = "<group>"; };
+		76760163CA6BE3BAC37C0381 /* CookieInteractionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieInteractionTests.swift; sourceTree = "<group>"; };
 		779501F6B071E7E2651115BD /* CookiePose.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookiePose.swift; sourceTree = "<group>"; };
 		7D22F26FDBDFCA2AC60FC0A0 /* ReferenceImageSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReferenceImageSource.swift; sourceTree = "<group>"; };
 		7DDDA556F5DF54B178912C38 /* Sounds */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Sounds; path = Cookie/Resources/Sounds; sourceTree = SOURCE_ROOT; };
@@ -105,6 +117,7 @@
 		D6A4C9CA132970A998D329F2 /* MenuBarContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarContent.swift; sourceTree = "<group>"; };
 		D80EF6B30682B627D283E04C /* CookiePersonality.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookiePersonality.swift; sourceTree = "<group>"; };
 		DB2F49350312D645C76361AC /* CookieSpriteRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieSpriteRenderer.swift; sourceTree = "<group>"; };
+		DE40BE58C3D3DB0B217D9757 /* CookieTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CookieTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		ECDBFE2411725781FE4EA6BD /* CookieCustomization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieCustomization.swift; sourceTree = "<group>"; };
 		F1BFA316970DD8EE9919220A /* CookiePoseCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookiePoseCatalog.swift; sourceTree = "<group>"; };
 		F7CBD9626E2243F075587141 /* CookieStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieStore.swift; sourceTree = "<group>"; };
@@ -204,6 +217,7 @@
 			isa = PBXGroup;
 			children = (
 				A162D6507B6CA1898F1DEC73 /* Cookie */,
+				EBB4D8C0F5D2FC98C51E6ED9 /* CookieTests */,
 				E503855C6D4BC57F663A09EE /* Products */,
 			);
 			sourceTree = "<group>";
@@ -269,8 +283,17 @@
 			isa = PBXGroup;
 			children = (
 				CA97B56C89CF6D05039E4F73 /* Cookie.app */,
+				DE40BE58C3D3DB0B217D9757 /* CookieTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		EBB4D8C0F5D2FC98C51E6ED9 /* CookieTests */ = {
+			isa = PBXGroup;
+			children = (
+				76760163CA6BE3BAC37C0381 /* CookieInteractionTests.swift */,
+			);
+			path = CookieTests;
 			sourceTree = "<group>";
 		};
 		F0D39C7F903D943CAF2EDE29 /* Animation */ = {
@@ -317,6 +340,24 @@
 			productReference = CA97B56C89CF6D05039E4F73 /* Cookie.app */;
 			productType = "com.apple.product-type.application";
 		};
+		E0D0ED8BBE6AF1D097AE99CC /* CookieTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 49E56AEF1FA73CC317D721AA /* Build configuration list for PBXNativeTarget "CookieTests" */;
+			buildPhases = (
+				FF9E8C0581FCCC873BADFA99 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				2AC6AAC9F0F965A936504B92 /* PBXTargetDependency */,
+			);
+			name = CookieTests;
+			packageProductDependencies = (
+			);
+			productName = CookieTests;
+			productReference = DE40BE58C3D3DB0B217D9757 /* CookieTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -327,6 +368,10 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					04A5FCCC0AB455E61AD14C3B = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Manual;
+					};
+					E0D0ED8BBE6AF1D097AE99CC = {
 						DevelopmentTeam = "";
 						ProvisioningStyle = Manual;
 					};
@@ -347,6 +392,7 @@
 			projectRoot = "";
 			targets = (
 				04A5FCCC0AB455E61AD14C3B /* Cookie */,
+				E0D0ED8BBE6AF1D097AE99CC /* CookieTests */,
 			);
 		};
 /* End PBXProject section */
@@ -418,7 +464,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		FF9E8C0581FCCC873BADFA99 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				303C49FAF4196BC343E55D6E /* CookieInteractionTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		2AC6AAC9F0F965A936504B92 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 04A5FCCC0AB455E61AD14C3B /* Cookie */;
+			targetProxy = 124FC80018E14A6B2D926BB6 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		13A03E1C22990AD360C5BF48 /* Debug */ = {
@@ -506,6 +568,26 @@
 			};
 			name = Release;
 		};
+		897D2B7430DCFA167A15AC8E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = NO;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.cookie.mac.tests;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Cookie.app/Contents/MacOS/Cookie";
+			};
+			name = Release;
+		};
 		A9C43733021E4FDDE538EFD1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -565,6 +647,26 @@
 			};
 			name = Release;
 		};
+		D68D7442DD262BA5A0B64106 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = NO;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.cookie.mac.tests;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Cookie.app/Contents/MacOS/Cookie";
+			};
+			name = Debug;
+		};
 		E3BD18268C3E42F7EDA70634 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -587,6 +689,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		49E56AEF1FA73CC317D721AA /* Build configuration list for PBXNativeTarget "CookieTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D68D7442DD262BA5A0B64106 /* Debug */,
+				897D2B7430DCFA167A15AC8E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		90F7A45B24D51D1C0B5B8A6B /* Build configuration list for PBXNativeTarget "Cookie" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

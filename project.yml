@@ -42,10 +42,30 @@ targets:
         ENABLE_HARDENED_RUNTIME: "NO"
         COMBINE_HIDPI_IMAGES: "YES"
 
+  CookieTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: CookieTests
+    dependencies:
+      - target: Cookie
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.cookie.mac.tests
+        CODE_SIGN_STYLE: Manual
+        CODE_SIGN_IDENTITY: "-"
+        DEVELOPMENT_TEAM: ""
+        ENABLE_HARDENED_RUNTIME: "NO"
+
 schemes:
   Cookie:
     build:
       targets:
         Cookie: all
+        CookieTests: [test]
     run:
       config: Debug
+    test:
+      config: Debug
+      targets:
+        - CookieTests
