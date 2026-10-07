@@ -281,10 +281,12 @@ struct AccessoriesPane: View {
                         .frame(width: 44, alignment: .leading)
                     Slider(value: binding.scale, in: 0.75...1.3)
                         .controlSize(.small)
+                        .accessibilityLabel("\(kind.displayName) Size")
                     Text("Height")
                         .frame(width: 44, alignment: .trailing)
                     Slider(value: binding.offsetY, in: -0.08...0.08)
                         .controlSize(.small)
+                        .accessibilityLabel("\(kind.displayName) Vertical Position")
                 }
             }
         }
