@@ -102,6 +102,14 @@ enum WorldItemKind: Equatable, Codable {
         return false
     }
 
+    var toyKind: ToyKind? {
+        switch self {
+        case .toy(let toy): return toy
+        case .box: return .box
+        default: return nil
+        }
+    }
+
     var displayName: String {
         switch self {
         case .toy(let toy): return toy.displayName

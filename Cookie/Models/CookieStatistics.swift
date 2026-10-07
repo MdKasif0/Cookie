@@ -10,6 +10,7 @@ struct CookieStatistics: Codable, Equatable {
     var treatsGiven: Int = 0
     var toysPlayedWith: Int = 0
     var boxVisits: Int = 0
+    var toyPlayCounts: [String: Int] = [:]
 
     init() {}
 
@@ -19,9 +20,27 @@ struct CookieStatistics: Codable, Equatable {
         launchCount += 1
     }
 
+    mutating func recordToyPlayed(_ toy: ToyKind) {
+        toysPlayedWith += 1
+        toyPlayCounts[toy.rawValue, default: 0] += 1
+    }
+
+    /// The toy Cookie has played with the most, if any.
+    var favoriteToy: ToyKind? {
+        guard let maxEntry = toyPlayCounts.max(by: { $0.value < $1.value }), maxEntry.value > 0 else {
+            return nil
+        }
+        return ToyKind(rawValue: maxEntry.key)
+    }
+
+    /// Total sum of direct interactions across petting, feeding, and play.
+    var totalInteractions: Int {
+        petsReceived + treatsGiven + toysPlayedWith + boxVisits
+    }
+
     private enum CodingKeys: String, CodingKey {
         case firstLaunchedAt, lastLaunchedAt, launchCount, petsReceived, affection
-        case treatsGiven, toysPlayedWith, boxVisits
+        case treatsGiven, toysPlayedWith, boxVisits, toyPlayCounts
     }
 
     init(from decoder: Decoder) throws {
@@ -34,5 +53,6 @@ struct CookieStatistics: Codable, Equatable {
         treatsGiven = try container.decodeIfPresent(Int.self, forKey: .treatsGiven) ?? 0
         toysPlayedWith = try container.decodeIfPresent(Int.self, forKey: .toysPlayedWith) ?? 0
         boxVisits = try container.decodeIfPresent(Int.self, forKey: .boxVisits) ?? 0
+        toyPlayCounts = try container.decodeIfPresent([String: Int].self, forKey: .toyPlayCounts) ?? [:]
     }
 }
