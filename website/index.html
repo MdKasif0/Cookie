@@ -3,222 +3,326 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cookie — A Delightful Desktop Companion for macOS</title>
-  <meta name="description" content="Cookie is a calm, handcrafted little cat that lives on your macOS desktop. Offline, private, low CPU usage, and delightfully indie.">
+  <title>Cookie — A tiny cat that lives on your Mac</title>
+  <meta name="description" content="Cookie is a cute 2D desktop cat companion for macOS. A handcrafted, calm indie Mac application. Offline, private, and zero CPU drain.">
   <link rel="stylesheet" href="index.css">
   <link rel="icon" type="image/png" href="assets/app_icon.png">
 </head>
 <body>
 
-  <!-- Navigation -->
-  <header>
+  <!-- Site Masthead Navigation -->
+  <header class="site-header">
     <div class="container nav-wrapper">
-      <a href="#" class="brand">
-        <img src="assets/app_icon.png" alt="Cookie App Icon" width="38" height="38">
+      <a href="#" class="brand-mark" aria-label="Cookie Home">
+        <picture>
+          <source srcset="assets/app_icon.webp" type="image/webp">
+          <img src="assets/app_icon.png" alt="Cookie App Icon" class="brand-icon" width="32" height="32">
+        </picture>
         <span>Cookie</span>
       </a>
-      <nav>
-        <ul class="nav-links">
-          <li><a href="#features">Features</a></li>
-          <li><a href="#install">Installation</a></li>
-          <li><a href="#specs">Specs & Privacy</a></li>
-          <li><a href="../dist/Cookie-1.0.0.dmg" class="nav-cta" download>Download v1.0.0</a></li>
+
+      <nav aria-label="Main Navigation">
+        <ul class="nav-menu">
+          <li><a href="#story">About</a></li>
+          <li><a href="#moments">Moments</a></li>
+          <li><a href="#care">Care &amp; Play</a></li>
+          <li><a href="#engineering">Details</a></li>
+          <li><a href="../dist/Cookie-1.0.0.dmg" class="nav-cta" download>Download</a></li>
         </ul>
       </nav>
     </div>
   </header>
 
-  <!-- Hero -->
-  <section class="hero">
-    <div class="container">
-      <div class="hero-badge">
-        <span class="dot"></span>
-        <span>Version 1.0.0 is now available for macOS</span>
+  <main>
+    <!-- Hero Section (Editorial, Spacious & Crafted) -->
+    <section class="hero-section" id="hero">
+      <div class="container">
+        
+        <div class="hero-eyebrow">
+          <span class="eyebrow-pip" aria-hidden="true"></span>
+          <span>A Desktop Companion for macOS Sonoma &amp; Later</span>
+        </div>
+
+        <h1 class="hero-headline">Meet Cookie.</h1>
+        <p class="hero-supporting">A tiny cat that lives on your Mac.</p>
+
+        <div class="hero-actions">
+          <a href="../dist/Cookie-1.0.0.dmg" class="btn-primary" download id="downloadBtn">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5l-4-4 1.41-1.41L11 13.67V7h2v6.67l2.59-2.58L17 12.5l-5 5z"/>
+            </svg>
+            <span>Download for macOS</span>
+          </a>
+          <a href="#story" class="btn-secondary">
+            <span>Meet Cookie</span>
+          </a>
+        </div>
+
+        <p class="hero-release-tag">Version 1.0.0 • 13 MB Disk Image • Universal Apple Silicon &amp; Intel</p>
+
+        <!-- Prominent Interactive Cookie Artwork Stage -->
+        <div class="hero-stage">
+          <div class="cookie-actor-wrap" id="cookieActor" title="Click to pet Cookie">
+            <!-- Base Sprite: Open Eyes -->
+            <picture>
+              <source srcset="assets/hero-cookie-open.webp" type="image/webp">
+              <img src="assets/hero-cookie-open.png" 
+                   alt="Cookie sitting calmly on your desktop" 
+                   class="cookie-sprite-layer cookie-open-layer" 
+                   width="500" height="500" 
+                   fetchpriority="high">
+            </picture>
+
+            <!-- Blinking Layer: Closed Eyes -->
+            <picture>
+              <source srcset="assets/hero-cookie-blink.webp" type="image/webp">
+              <img src="assets/hero-cookie-blink.png" 
+                   alt="" 
+                   class="cookie-sprite-layer cookie-blink-layer" 
+                   width="500" height="500" 
+                   aria-hidden="true">
+            </picture>
+
+            <!-- Interactive Purr Bubble -->
+            <div class="pet-toast" id="petToast" aria-hidden="true">purr… 🐾</div>
+          </div>
+
+          <div class="stage-ground-shadow" aria-hidden="true"></div>
+          <p class="stage-caption">Click Cookie to say hello • Blinks, breathes, and strolls on your desktop</p>
+        </div>
+
       </div>
+    </section>
 
-      <div class="hero-icon-container">
-        <img src="assets/app_icon.png" alt="Cookie Cat Face" class="hero-app-icon" width="140" height="140">
-      </div>
+    <!-- Editorial Philosophy Section -->
+    <section class="philosophy-section" id="story">
+      <div class="container">
+        <div class="editorial-header">
+          <h2>A quiet presence on your desktop.</h2>
+          <p>
+            Cookie isn’t a game with scores, and she isn’t another productivity app demanding your attention. 
+            She is simply a companion who keeps you company while you write, design, code, and browse.
+          </p>
+        </div>
 
-      <h1>Meet your new<br>desktop companion.</h1>
-      <p class="lead">
-        Cookie is a calm, handcrafted little cat who lives gently on your desktop.
-        She snoozes softly, glances up when you work, and hops over when you say hello.
-      </p>
+        <div class="philosophy-grid">
+          <div class="philosophy-card">
+            <span class="card-num">01</span>
+            <h3>Gentle Company</h3>
+            <p>
+              Cookie naps in warm corners of your display, stretches after long stretches of silence, 
+              and looks up with gentle curiosity whenever your cursor glides past.
+            </p>
+          </div>
 
-      <div class="hero-actions">
-        <a href="../dist/Cookie-1.0.0.dmg" class="btn-primary" download>
-          <span>Download Cookie 1.0.0</span>
-          <span>(13 MB DMG)</span>
-        </a>
-        <a href="#install" class="btn-secondary">
-          <span>Installation Guide</span>
-        </a>
-      </div>
+          <div class="philosophy-card">
+            <span class="card-num">02</span>
+            <h3>Zero Interruptions</h3>
+            <p>
+              Never plays unexpected loud sounds during meetings, never sends push notifications, 
+              and never asks for a review. When you need absolute stillness, she rests quietly.
+            </p>
+          </div>
 
-      <p class="hero-meta">Requires macOS 14.0 Sonoma or later • Universal Apple Silicon &amp; Intel • 100% Free &amp; Offline</p>
-
-      <!-- DMG Installer Presentation Showcase -->
-      <div class="showcase">
-        <div class="dmg-preview-card">
-          <img src="assets/dmg_preview@2x.png" alt="Cookie DMG Installation Presentation" width="800" height="550">
-          <div class="dmg-caption">
-            Standard macOS drag-and-drop disk image with minimal, warm presentation.
+          <div class="philosophy-card">
+            <span class="card-num">03</span>
+            <h3>Handcrafted for Mac</h3>
+            <p>
+              Built strictly with Swift and SpriteKit. When she falls asleep, CPU usage drops to virtually 0%, 
+              preserving every drop of battery life on MacBooks.
+            </p>
           </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Features Section -->
-  <section id="features" class="features-section">
-    <div class="container">
-      <div class="section-header">
-        <h2>Crafted with love for macOS</h2>
-        <p>Built exclusively with Swift, SwiftUI, and SpriteKit to feel right at home on your Mac.</p>
-      </div>
-
-      <div class="features-grid">
-        <div class="feature-card">
-          <div class="feature-icon">🌿</div>
-          <h3>Gentle Presence</h3>
-          <p>Cookie wanders quietly, stretches in the sun, and curls up for cozy naps. She never demands your attention or interrupts your focus.</p>
+    <!-- Moments with Cookie (Authentic Expressions Showcase) -->
+    <section class="moments-section" id="moments">
+      <div class="container">
+        <div class="editorial-header">
+          <h2>Living with Cookie.</h2>
+          <p>Throughout the day, Cookie transitions through natural moods, expressions, and poses.</p>
         </div>
 
-        <div class="feature-card">
-          <div class="feature-icon">🐟</div>
-          <h3>Care &amp; Play</h3>
-          <p>Treat her to tuna, salmon, cat cookies, or catnip. Drop a ball of yarn, a feather wand, or a cardboard box on the desk and watch her explore.</p>
-        </div>
+        <div class="moments-grid">
+          <div class="moment-card">
+            <picture>
+              <source srcset="assets/cookie-walk.webp" type="image/webp">
+              <img src="assets/cookie-walk.png" alt="Cookie walking" width="120" height="120" loading="lazy">
+            </picture>
+            <h4>Wandering Stroll</h4>
+            <span>Pacing along the screen</span>
+          </div>
 
-        <div class="feature-card">
-          <div class="feature-icon">🎨</div>
-          <h3>Fully Customizable</h3>
-          <p>Personalize Cookie's fur coat, tabby patterns, eye color, and charming accessories. Adjust size, liveliness, and animation intensity in Settings.</p>
-        </div>
+          <div class="moment-card">
+            <picture>
+              <source srcset="assets/cookie-sleep.webp" type="image/webp">
+              <img src="assets/cookie-sleep.png" alt="Cookie sleeping" width="120" height="120" loading="lazy">
+            </picture>
+            <h4>Deep Nap</h4>
+            <span>Curled up warmly</span>
+          </div>
 
-        <div class="feature-card">
-          <div class="feature-icon">⚡️</div>
-          <h3>Low CPU &amp; Power</h3>
-          <p>SpriteKit animation drops to ~0% CPU usage while Cookie is sleeping. Zero runaway timers, zero battery drain on laptops.</p>
-        </div>
+          <div class="moment-card">
+            <picture>
+              <source srcset="assets/cookie-hungry.webp" type="image/webp">
+              <img src="assets/cookie-hungry.png" alt="Cookie hungry" width="120" height="120" loading="lazy">
+            </picture>
+            <h4>Snack Hopeful</h4>
+            <span>Waiting patiently for treats</span>
+          </div>
 
-        <div class="feature-card">
-          <div class="feature-icon">🖥️</div>
-          <h3>Multi-Display Aware</h3>
-          <p>Cookie moves gracefully between external monitors and spaces. If you unplug a screen, safe screen clamping keeps her right within reach.</p>
-        </div>
+          <div class="moment-card">
+            <picture>
+              <source srcset="assets/cookie-shy.webp" type="image/webp">
+              <img src="assets/cookie-shy.png" alt="Cookie blushing" width="120" height="120" loading="lazy">
+            </picture>
+            <h4>Softly Bashful</h4>
+            <span>Blushing after gentle petting</span>
+          </div>
 
-        <div class="feature-card">
-          <div class="feature-icon">🔒</div>
-          <h3>Private by Design</h3>
-          <p>Everything runs strictly on your machine. Cookie has no network permissions, zero third-party telemetry, and zero tracking.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Installation Guide -->
-  <section id="install" class="install-section">
-    <div class="container">
-      <div class="section-header">
-        <h2>Getting Started</h2>
-        <p>Three simple steps to welcome Cookie onto your desktop.</p>
-      </div>
-
-      <div class="steps-grid">
-        <div class="step-card">
-          <div class="step-num">1</div>
-          <h4>Download the DMG</h4>
-          <p>Grab the compressed disk image (<span style="font-weight: 600;">Cookie-1.0.0.dmg</span>). It is lightweight and self-contained.</p>
-        </div>
-
-        <div class="step-card">
-          <div class="step-num">2</div>
-          <h4>Drag to Applications</h4>
-          <p>Open the disk image and drag <span style="font-weight: 600;">Cookie.app</span> into the Applications folder shortcut.</p>
-        </div>
-
-        <div class="step-card">
-          <div class="step-num">3</div>
-          <h4>Meet Cookie</h4>
-          <p>Launch Cookie from Applications or Spotlight. Choose her name, set her personality, and bring her home!</p>
+          <div class="moment-card">
+            <picture>
+              <source srcset="assets/cookie-cool.webp" type="image/webp">
+              <img src="assets/cookie-cool.png" alt="Cookie with sunglasses" width="120" height="120" loading="lazy">
+            </picture>
+            <h4>Tiny Shades</h4>
+            <span>Accessories in Customizer</span>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Specs & Privacy -->
-  <section id="specs" class="specs-section">
-    <div class="container">
-      <div class="specs-grid">
-        <div class="spec-box">
-          <h3>System Requirements</h3>
-          <ul>
-            <li>
-              <span class="label">Operating System</span>
-              <span class="val">macOS 14.0 Sonoma or later</span>
-            </li>
-            <li>
-              <span class="label">Architecture</span>
-              <span class="val">Apple Silicon &amp; Intel (Universal)</span>
-            </li>
-            <li>
-              <span class="label">Distribution Size</span>
-              <span class="val">13 MB compressed DMG</span>
-            </li>
-            <li>
-              <span class="label">Technologies</span>
-              <span class="val">Swift 5.0, SwiftUI, SpriteKit, AppKit</span>
-            </li>
-            <li>
-              <span class="label">Category</span>
-              <span class="val">Desktop Companion / Entertainment</span>
-            </li>
-          </ul>
+    <!-- Care, Play & Treats Section -->
+    <section class="care-section" id="care">
+      <div class="container">
+        <div class="editorial-header">
+          <h2>Care, play &amp; little treats.</h2>
+          <p>
+            Right-click Cookie anytime or click her menu bar icon to offer her favorite foods and toys.
+          </p>
         </div>
 
-        <div class="spec-box">
-          <h3>Privacy &amp; Data Safety</h3>
-          <ul>
-            <li>
-              <span class="label">Network Requests</span>
-              <span class="val">Zero (100% offline)</span>
-            </li>
-            <li>
-              <span class="label">Telemetry &amp; Tracking</span>
-              <span class="val">None</span>
-            </li>
-            <li>
-              <span class="label">Local Data Storage</span>
-              <span class="val">~/Library/Application Support/Cookie/</span>
-            </li>
-            <li>
-              <span class="label">Data Safety</span>
-              <span class="val">Atomic write, automatic quarantine &amp; schema migration</span>
-            </li>
-            <li>
-              <span class="label">License</span>
-              <span class="val">Indie Freeware</span>
-            </li>
-          </ul>
+        <div class="tray-container">
+          <div class="tray-title">Try offering something to Cookie:</div>
+          <div class="tray-subtitle">Click any treat or toy to see how she responds</div>
+
+          <div class="items-row">
+            <button class="item-chip active" data-item="fish" type="button">🐟 Fresh Fish</button>
+            <button class="item-chip" data-item="tuna" type="button">🥫 Tuna Can</button>
+            <button class="item-chip" data-item="cookie" type="button">🍪 Cat Biscuit</button>
+            <button class="item-chip" data-item="catnip" type="button">🌿 Catnip</button>
+            <button class="item-chip" data-item="box" type="button">📦 Cardboard Box</button>
+            <button class="item-chip" data-item="yarn" type="button">🧶 Yarn Ball</button>
+            <button class="item-chip" data-item="feather" type="button">🪶 Feather Wand</button>
+            <button class="item-chip" data-item="bell" type="button">🔔 Bell Toy</button>
+          </div>
+
+          <div class="reaction-box">
+            <span class="reaction-icon" id="reactionIcon" aria-hidden="true">🐟</span>
+            <span class="reaction-text" id="reactionText">Cookie's ears perk up immediately. She scampers over and chomps down happily.</span>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Footer -->
-  <footer>
-    <div class="container">
-      <div class="footer-links">
-        <a href="../dist/Cookie-1.0.0.dmg" download>Download</a>
-        <a href="#features">Features</a>
-        <a href="#specs">Privacy</a>
-        <a href="https://github.com/MdKasif0/Cookie" target="_blank" rel="noopener">GitHub</a>
+    <!-- Native Mac Engineering & Privacy -->
+    <section class="specs-section" id="engineering">
+      <div class="container">
+        <div class="editorial-header">
+          <h2>Crafted for the Mac.</h2>
+          <p>Built with respect for your privacy, your screen space, and your battery.</p>
+        </div>
+
+        <div class="specs-grid">
+          <div class="spec-column">
+            <h3>System &amp; Architecture</h3>
+            <ul class="spec-list">
+              <li class="spec-item">
+                <span class="label">Operating System</span>
+                <span class="value">macOS 14.0 Sonoma or later</span>
+              </li>
+              <li class="spec-item">
+                <span class="label">Architecture</span>
+                <span class="value">Universal (Apple Silicon &amp; Intel)</span>
+              </li>
+              <li class="spec-item">
+                <span class="label">Rendering Engine</span>
+                <span class="value">Native Apple SpriteKit</span>
+              </li>
+              <li class="spec-item">
+                <span class="label">Display Safety</span>
+                <span class="value">Auto-clamps safely across multi-monitors</span>
+              </li>
+              <li class="spec-item">
+                <span class="label">Battery Impact</span>
+                <span class="value">~0% idle CPU while sleeping</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="spec-column">
+            <h3>Privacy by Design</h3>
+            <ul class="spec-list">
+              <li class="spec-item">
+                <span class="label">Network Permissions</span>
+                <span class="value">Zero (Runs 100% offline)</span>
+              </li>
+              <li class="spec-item">
+                <span class="label">Analytics &amp; Tracking</span>
+                <span class="value">None whatsoever</span>
+              </li>
+              <li class="spec-item">
+                <span class="label">Local Storage</span>
+                <span class="value">~/Library/Application Support/Cookie/</span>
+              </li>
+              <li class="spec-item">
+                <span class="label">License</span>
+                <span class="value">Indie freeware for macOS</span>
+              </li>
+              <li class="spec-item">
+                <span class="label">Accessibility</span>
+                <span class="value">Full Reduced Motion support</span>
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
-      <p>© 2026 Md Kasif Uddin. All rights reserved. Crafted with care for macOS.</p>
+    </section>
+
+    <!-- DMG Installer Preview -->
+    <section class="dmg-section">
+      <div class="container">
+        <div class="editorial-header">
+          <h2>Simple, clean installation.</h2>
+          <p>No account required. No background daemons. Just drag Cookie into Applications.</p>
+        </div>
+
+        <div class="dmg-frame">
+          <picture>
+            <source srcset="assets/dmg_preview@2x.webp" type="image/webp">
+            <img src="assets/dmg_preview@2x.png" alt="Cookie DMG Drag and Drop Installer" width="700" height="480" loading="lazy">
+          </picture>
+        </div>
+        <p class="dmg-note">Self-contained 13 MB disk image distribution</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Editorial Footer -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-copy">
+        <strong>Cookie 1.0.0</strong> — Crafted with care by Md Kasif Uddin for macOS.
+      </div>
+      <ul class="footer-links">
+        <li><a href="../dist/Cookie-1.0.0.dmg" download>Download</a></li>
+        <li><a href="https://github.com/MdKasif0/Cookie" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="#hero">Back to Top ↑</a></li>
+      </ul>
     </div>
   </footer>
 
+  <script src="script.js"></script>
 </body>
 </html>
