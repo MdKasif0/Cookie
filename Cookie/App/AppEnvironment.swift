@@ -99,8 +99,12 @@ final class AppEnvironment: ObservableObject {
 
     // Menu bar companion commands.
     func petCookie() { behaviorEngine.handleMenuPet() }
-    func feedCookie() { behaviorEngine.handleFeed() }
+    func feedCookie(food: FoodKind? = nil) { behaviorEngine.handleFeed(food: food) }
+    func offerToy(_ toy: ToyKind) { behaviorEngine.handleOfferToy(toy) }
     func playWithCookie() { behaviorEngine.handlePlayCommand() }
+    func clearWorldItem() { behaviorEngine.clearWorldItem() }
+    var hasActiveWorldItem: Bool { behaviorEngine.worldItem != nil }
+    func triggerSpecialEvent(_ event: SpecialEventKind) { behaviorEngine.triggerSpecialEvent(event) }
 
     func quit() {
         NSApp.terminate(nil)

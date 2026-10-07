@@ -1,5 +1,6 @@
 import AppKit
 import SwiftUI
+import Combine
 import os
 
 /// Owns every window Cookie shows: the desktop companion panel and the
@@ -13,15 +14,38 @@ final class WindowManager: NSObject, NSWindowDelegate {
     private let behaviorEngine: CookieBehaviorEngine
 
     private(set) var companionController: CompanionPanelController?
+    private(set) var worldItemController: WorldItemPanelController?
     private var welcomeWindow: NSWindow?
     private var customizationWindow: NSWindow?
     private var onWelcomeDismissed: (() -> Void)?
+    private var cancellables: Set<AnyCancellable> = []
 
     init(store: CookieStore, audioManager: AudioManager, behaviorEngine: CookieBehaviorEngine) {
         self.store = store
         self.audioManager = audioManager
         self.behaviorEngine = behaviorEngine
         super.init()
+
+        let itemController = WorldItemPanelController(behaviorEngine: behaviorEngine)
+        self.worldItemController = itemController
+
+        behaviorEngine.$worldItem
+            .combineLatest(behaviorEngine.$state)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] item, state in
+                guard let self else { return }
+                guard self.store.profile.isCompanionVisible else {
+                    itemController.hide()
+                    return
+                }
+                let companionFrame = self.companionController?.window?.frame ?? .zero
+                itemController.update(
+                    item: item,
+                    companionFrame: companionFrame,
+                    isCookieInBox: state == .inBox
+                )
+            }
+            .store(in: &cancellables)
     }
 
     // MARK: - Desktop companion
@@ -36,6 +60,14 @@ final class WindowManager: NSObject, NSWindowDelegate {
         }
         if store.profile.isCompanionVisible {
             companionController?.show()
+            if let item = behaviorEngine.worldItem,
+               let frame = companionController?.window?.frame {
+                worldItemController?.update(
+                    item: item,
+                    companionFrame: frame,
+                    isCookieInBox: behaviorEngine.state == .inBox
+                )
+            }
         }
     }
 
@@ -46,6 +78,7 @@ final class WindowManager: NSObject, NSWindowDelegate {
             showCompanion()
         } else {
             companionController?.hide()
+            worldItemController?.hide()
         }
     }
 
