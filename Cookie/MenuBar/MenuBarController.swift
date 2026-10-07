@@ -274,12 +274,7 @@ final class MenuBarController: NSObject, NSMenuDelegate {
     }
 
     @objc private func settingsAction() {
-        NSApp.activate(ignoringOtherApps: true)
-        if #available(macOS 14.0, *) {
-            NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
-        } else {
-            NSApp.sendAction(Selector(("showPreferencesWindow:")), to: nil, from: nil)
-        }
+        environment.showSettings()
     }
 
     @objc private func quitAction() {

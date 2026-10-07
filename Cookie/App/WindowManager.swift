@@ -17,6 +17,8 @@ final class WindowManager: NSObject, NSWindowDelegate {
     private(set) var worldItemController: WorldItemPanelController?
     private var welcomeWindow: NSWindow?
     private var customizationWindow: NSWindow?
+    private var settingsWindow: NSWindow?
+    weak var environment: AppEnvironment?
     private var onWelcomeDismissed: (() -> Void)?
     private var cancellables: Set<AnyCancellable> = []
 
@@ -150,6 +152,35 @@ final class WindowManager: NSObject, NSWindowDelegate {
         NSApp.activate(ignoringOtherApps: true)
     }
 
+    // MARK: - Settings
+
+    func showSettings() {
+        if let settingsWindow {
+            settingsWindow.makeKeyAndOrderFront(nil)
+            NSApp.activate(ignoringOtherApps: true)
+            return
+        }
+        guard let environment else { return }
+        let window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 540, height: 440),
+            styleMask: [.titled, .closable, .miniaturizable],
+            backing: .buffered,
+            defer: false
+        )
+        window.title = "Cookie Settings"
+        window.isReleasedWhenClosed = false
+        window.delegate = self
+        window.contentViewController = NSHostingController(
+            rootView: SettingsView()
+                .environmentObject(store)
+                .environmentObject(environment)
+        )
+        window.center()
+        settingsWindow = window
+        window.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
     // MARK: - NSWindowDelegate
 
     func windowWillClose(_ notification: Notification) {
@@ -161,6 +192,8 @@ final class WindowManager: NSObject, NSWindowDelegate {
             handler?()
         } else if window === customizationWindow {
             customizationWindow = nil
+        } else if window === settingsWindow {
+            settingsWindow = nil
         }
     }
 }

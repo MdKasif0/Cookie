@@ -25,6 +25,7 @@ final class AppEnvironment: ObservableObject {
         self.audioManager = audioManager
         self.behaviorEngine = behaviorEngine
         self.windows = windows
+        windows.environment = self
         windows.menuProvider = { [weak self] in
             self?.createCookieMenu()
         }
@@ -123,6 +124,10 @@ final class AppEnvironment: ObservableObject {
 
     func showCustomization() {
         windows.showCustomization()
+    }
+
+    func showSettings() {
+        windows.showSettings()
     }
 
     // Menu bar companion commands.
