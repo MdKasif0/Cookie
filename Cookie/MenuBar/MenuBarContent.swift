@@ -18,7 +18,26 @@ struct MenuBarContent: View {
         }
         Divider()
         Button("Pet Cookie") { environment.petCookie() }
-        Button("Feed Cookie") { environment.feedCookie() }
+        Menu("Feed Cookie") {
+            ForEach(FoodKind.allCases) { food in
+                Button("\(food.displayName) \(food.emoji)") {
+                    environment.feedCookie(food: food)
+                }
+            }
+        }
+        Menu("Toys") {
+            ForEach(ToyKind.allCases) { toy in
+                Button("\(toy.displayName) \(toy.emoji)") {
+                    environment.offerToy(toy)
+                }
+            }
+            if environment.hasActiveWorldItem {
+                Divider()
+                Button("Put Toys Away") {
+                    environment.clearWorldItem()
+                }
+            }
+        }
         Button("Play") { environment.playWithCookie() }
         Divider()
         Button("Customize Cookie…") { environment.showCustomization() }
