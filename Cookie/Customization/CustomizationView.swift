@@ -260,7 +260,21 @@ struct AccessoriesPane: View {
     private func accessoryRow(_ kind: AccessoryKind) -> some View {
         let binding = accessoryBinding(kind)
         return VStack(alignment: .leading, spacing: 8) {
-            Toggle(kind.displayName, isOn: binding.isEnabled)
+            HStack {
+                Toggle(kind.displayName, isOn: binding.isEnabled)
+                if kind.isSeasonal {
+                    Spacer()
+                    HStack(spacing: 4) {
+                        Image(systemName: kind.theme.icon)
+                        Text(kind.theme.displayName)
+                    }
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(Capsule().fill(Color.secondary.opacity(0.12)))
+                }
+            }
             if binding.isEnabled.wrappedValue {
                 HStack(spacing: 12) {
                     Text("Size")

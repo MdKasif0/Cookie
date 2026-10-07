@@ -176,12 +176,13 @@ struct BehaviorSettingsTab: View {
             }
             Section {
                 Toggle("Random interactions", isOn: $store.profile.settings.randomInteractions)
+                Toggle("Autonomous toys", isOn: $store.profile.settings.autonomousToys)
                 Toggle("Cursor interaction", isOn: $store.profile.settings.cursorInteraction)
                 Toggle("Window interaction", isOn: $store.profile.settings.windowInteraction)
             } header: {
                 Text("Interactions")
             } footer: {
-                Text("Random interactions let Cookie stretch, play, and wander on her own. Cursor interaction lets her glance at and occasionally follow the pointer.")
+                Text("Random interactions let Cookie stretch, play, and wander on her own. Autonomous toys let her occasionally explore a toy on the desk. All toys are optional.")
             }
             Section {
                 Picker("Sleep behavior", selection: $store.profile.settings.sleepBehavior) {
