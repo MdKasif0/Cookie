@@ -139,15 +139,10 @@ img {
   position: sticky;
   top: 0;
   z-index: 100;
-  background-color: rgba(251, 249, 245, 0.45);
-  background-image: linear-gradient(180deg, rgba(251, 249, 245, 0.52) 0%, rgba(251, 249, 245, 0.38) 100%),
-                    url('assets/hero-desk-bg.webp');
-  background-repeat: no-repeat;
-  background-position: center top;
-  background-size: cover;
-  backdrop-filter: blur(16px) saturate(140%);
-  -webkit-backdrop-filter: blur(16px) saturate(140%);
-  border-bottom: 1px solid rgba(139, 125, 112, 0.16);
+  background-color: rgba(251, 249, 245, 0.55);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  border-bottom: 1px solid rgba(139, 125, 112, 0.14);
   transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
@@ -236,14 +231,9 @@ img {
   top: 64px;
   left: 0;
   right: 0;
-  background-color: rgba(251, 249, 245, 0.72);
-  background-image: linear-gradient(180deg, rgba(251, 249, 245, 0.78) 0%, rgba(248, 244, 238, 0.65) 100%),
-                    url('assets/hero-desk-bg.webp');
-  background-repeat: no-repeat;
-  background-position: center top;
-  background-size: cover;
-  backdrop-filter: blur(20px) saturate(140%);
-  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  background-color: rgba(251, 249, 245, 0.88);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
   border-bottom: 1px solid rgba(139, 125, 112, 0.18);
   padding: 20px 24px 28px;
   box-shadow: var(--shadow-window);
