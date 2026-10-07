@@ -27,6 +27,8 @@ targets:
       - path: Cookie/Resources/Sounds
         type: folder
         buildPhase: resources
+      - path: Cookie/Resources/AppIcon.icns
+        buildPhase: resources
     info:
       path: Cookie/Resources/Info.plist
       properties:

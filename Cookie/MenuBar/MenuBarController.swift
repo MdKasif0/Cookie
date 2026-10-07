@@ -11,6 +11,7 @@ import AppKit
 @MainActor
 final class MenuBarController: NSObject, NSMenuDelegate {
     private var statusItem: NSStatusItem?
+    private let statusMenu = NSMenu()
     private unowned let environment: AppEnvironment
     private let store: CookieStore
 
@@ -38,20 +39,27 @@ final class MenuBarController: NSObject, NSMenuDelegate {
             button.setAccessibilityLabel("Cookie")
         }
 
-        let menu = NSMenu()
-        menu.delegate = self
-        item.menu = menu
+        statusMenu.delegate = self
+        item.menu = statusMenu
         self.statusItem = item
-        buildMenu(menu)
+        buildMenu(statusMenu)
     }
 
     func menuNeedsUpdate(_ menu: NSMenu) {
         buildMenu(menu)
     }
 
+    /// Creates a fresh, fully wired menu for contextual display (e.g., clicking on Cookie or Dock icon).
+    func createMenu() -> NSMenu {
+        let menu = NSMenu(title: "Cookie")
+        buildMenu(menu)
+        return menu
+    }
+
     // MARK: - Menu Builder
 
-    private func buildMenu(_ menu: NSMenu) {
+    @discardableResult
+    func buildMenu(_ menu: NSMenu) -> NSMenu {
         menu.removeAllItems()
 
         // 1. Profile display name header
