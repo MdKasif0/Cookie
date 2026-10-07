@@ -396,17 +396,182 @@ final class CookieBehaviorEngine: ObservableObject {
         }
     }
 
-    func handleFeed() {
+    // MARK: - Feeding, Toys, and Special Interactions
+
+    /// Offers Cookie food: she notices, walks over, eats, purrs, and grooms.
+    func handleFeed(food: FoodKind? = nil) {
         guard isRunning, state != .beingDragged else { return }
+        clearSession()
         sequenceQueue = []
-        enter(.eating)
+        let chosenFood = food ?? FoodKind.allCases.randomElement() ?? .fish
+        let offset: CGFloat = facing == .right ? 110 : -110
+        let targetX = clampX(lastKnownX + offset)
+        worldItem = WorldItem(kind: .food(chosenFood), x: targetX)
+        sessionTargetX = targetX
+        setFacing(targetX >= lastKnownX ? .right : .left)
+
+        let eatState: CookieState = chosenFood == .milk ? .drinking : .eating
+        enter(.curious, sequence: [
+            (.walking, nil),
+            (.investigating, 1.8),
+            (eatState, 3.8),
+            (.reacting, 1.8),
+            (.grooming, 2.2),
+            (.sitting, 4.0)
+        ], duration: 1.2)
+    }
+
+    /// Offers Cookie a toy to play with or a box to explore.
+    func handleOfferToy(_ toy: ToyKind) {
+        guard isRunning, state != .beingDragged else { return }
+        clearSession()
+        sequenceQueue = []
+        let offset: CGFloat = facing == .right ? 120 : -120
+        let targetX = clampX(lastKnownX + offset)
+        let kind: WorldItemKind = toy == .box ? .box : .toy(toy)
+        worldItem = WorldItem(kind: kind, x: targetX)
+        sessionTargetX = targetX
+        setFacing(targetX >= lastKnownX ? .right : .left)
+
+        if toy == .box {
+            enter(.curious, sequence: [
+                (.walking, nil),
+                (.investigating, 2.0),
+                (.inBox, Double.random(in: 18...30)),
+                (.stretching, 2.2),
+                (.sitting, 4.0)
+            ], duration: 1.4)
+        } else {
+            enter(.curious, sequence: [
+                (.walking, nil),
+                (.investigating, 2.0),
+                (.playing, Double.random(in: 4.2...6.8)),
+                (.tired, Double.random(in: 2.6...4.0)),
+                (.sitting, Double.random(in: 4...8))
+            ], duration: 1.4)
+        }
+    }
+
+    /// Clears any active toy or food item from the desktop.
+    func clearWorldItem() {
+        clearSession()
+        if state == .inBox {
+            enter(.stretching, duration: 2.0)
+        } else if state == .investigating || state == .playing {
+            enter(.idle)
+        }
+    }
+
+    /// Updates item location when the user drags the toy across the desk.
+    func updateWorldItemPosition(newX: CGFloat) {
+        let clamped = clampX(newX)
+        worldItem?.x = clamped
+        if sessionTargetX != nil {
+            sessionTargetX = clamped
+            setFacing(clamped >= lastKnownX ? .right : .left)
+        }
     }
 
     func handlePlayCommand() {
+        handleOfferToy(.yarnBall)
+    }
+
+    /// Triggers one of the rare random events directly (for tests or autonomous rolls).
+    func triggerSpecialEvent(_ event: SpecialEventKind) {
         guard isRunning, state != .beingDragged else { return }
+        log.info("Triggering rare special event: \(event.rawValue, privacy: .public)")
         sequenceQueue = []
-        if isOverPetted(now()) { reactAnnoyed() }
-        enter(.playing, duration: Double.random(in: 2.4...3.6))
+        clearSession()
+        let date = now()
+        specialCooldownUntil = date.addingTimeInterval(Double.random(in: 240...480))
+
+        switch event {
+        case .zoomies:
+            reaction = .surprised
+            enter(.curious, sequence: [
+                (.running, 2.8),
+                (.tired, 3.2),
+                (.sitting, 6.0)
+            ], duration: 0.8)
+
+        case .toyChase:
+            let targetX = clampX(lastKnownX + (facing == .right ? 220 : -220))
+            let toy = [ToyKind.yarnBall, .ball, .toyMouse].randomElement() ?? .yarnBall
+            worldItem = WorldItem(kind: .toy(toy), x: targetX)
+            sessionTargetX = targetX
+            setFacing(targetX >= lastKnownX ? .right : .left)
+            enter(.curious, sequence: [
+                (.running, nil),
+                (.investigating, 1.5),
+                (.playing, 5.0),
+                (.tired, 3.0),
+                (.sitting, 5.0)
+            ], duration: 1.2)
+
+        case .acrobatics:
+            reaction = .surprised
+            enter(.curious, sequence: [
+                (.special, 1.5),
+                (.reacting, 1.8),
+                (.idle, 4.0)
+            ], duration: 1.0)
+
+        case .watchCursor:
+            watchingCursorUntil = date.addingTimeInterval(7.0)
+            if let lastCursorX {
+                setFacing(lastCursorX >= lastKnownX ? .right : .left)
+            }
+            enter(.curious, sequence: [
+                (.sitting, 5.0),
+                (.idle, 3.0)
+            ], duration: 2.0)
+
+        case .unusualNap:
+            let farTarget = clampX(lastKnownX + (Double.random(in: 0...1) > 0.5 ? 280 : -280))
+            sessionTargetX = farTarget
+            enter(.walking, sequence: [
+                (.stretching, 2.0),
+                (.yawning, 2.0),
+                (.sleeping, sampledSleepDuration())
+            ], duration: nil)
+
+        case .boxAdventure:
+            handleOfferToy(.box)
+        }
+    }
+
+    private func maybeTriggerSpecialEvent(date: Date) -> Bool {
+        guard store.profile.settings.randomInteractions,
+              date >= specialCooldownUntil,
+              date >= sulksUntil,
+              state != .beingDragged,
+              worldItem == nil,
+              !isPressed else { return false }
+        guard Double.random(in: 0...1) < 0.035 else {
+            specialCooldownUntil = date.addingTimeInterval(Double.random(in: 30...60))
+            return false
+        }
+        guard let event = SpecialEventKind.allCases.randomElement() else { return false }
+        triggerSpecialEvent(event)
+        return true
+    }
+
+    private func maybeTriggerAutonomousToy(date: Date) -> Bool {
+        guard store.profile.settings.autonomousToys,
+              store.profile.settings.randomInteractions,
+              date >= autonomousToyCooldownUntil,
+              date >= sulksUntil,
+              state != .beingDragged,
+              worldItem == nil,
+              !isPressed else { return false }
+        guard Double.random(in: 0...1) < 0.025 else {
+            autonomousToyCooldownUntil = date.addingTimeInterval(Double.random(in: 45...90))
+            return false
+        }
+        autonomousToyCooldownUntil = date.addingTimeInterval(Double.random(in: 400...800))
+        let randomToy = ToyKind.allCases.randomElement() ?? .yarnBall
+        handleOfferToy(randomToy)
+        return true
     }
 
     func handleEdgeReached(_ edge: CookieEdge) {
@@ -432,6 +597,24 @@ final class CookieBehaviorEngine: ObservableObject {
     // MARK: - State machine internals
 
     private func stateExpired() {
+        switch state {
+        case .eating, .drinking:
+            store.statistics.treatsGiven += 1
+            store.statistics.affection += 2
+            reaction = .happy
+            worldItem?.isConsumed = true
+        case .playing:
+            store.statistics.toysPlayedWith += 1
+            store.statistics.affection += 1
+            reaction = .happy
+        case .inBox:
+            store.statistics.boxVisits += 1
+            store.statistics.affection += 1
+            clearSession()
+        default:
+            break
+        }
+
         if !sequenceQueue.isEmpty {
             let (next, duration) = sequenceQueue.removeFirst()
             enter(next, duration: duration)
@@ -442,7 +625,7 @@ final class CookieBehaviorEngine: ObservableObject {
         pickNextState()
     }
 
-    private func clearSession() {
+    func clearSession() {
         worldItem = nil
         sessionTargetX = nil
         isPeeking = false
