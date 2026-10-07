@@ -32,6 +32,39 @@ struct CookieSettings: Codable, Equatable {
     var windowInteraction: Bool = false
     /// "normal", "longer", or "none".
     var sleepBehavior: String = SleepBehavior.normal.rawValue
+    /// Whether Cookie occasionally explores toys on her own (always optional).
+    var autonomousToys: Bool = true
+
+    init() {}
+
+    private enum CodingKeys: String, CodingKey {
+        case launchAtLogin, showOnStartup, rememberPosition
+        case cookieSize, animationIntensity, reducedMotionMode
+        case soundEnabled, masterVolume, meowVolume, interactionSounds, purringSounds
+        case activityLevel, randomInteractions, cursorInteraction, windowInteraction, sleepBehavior
+        case autonomousToys
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        launchAtLogin = try container.decodeIfPresent(Bool.self, forKey: .launchAtLogin) ?? false
+        showOnStartup = try container.decodeIfPresent(Bool.self, forKey: .showOnStartup) ?? true
+        rememberPosition = try container.decodeIfPresent(Bool.self, forKey: .rememberPosition) ?? true
+        cookieSize = try container.decodeIfPresent(Double.self, forKey: .cookieSize) ?? 1.0
+        animationIntensity = try container.decodeIfPresent(Double.self, forKey: .animationIntensity) ?? 1.0
+        reducedMotionMode = try container.decodeIfPresent(String.self, forKey: .reducedMotionMode) ?? ReducedMotionMode.system.rawValue
+        soundEnabled = try container.decodeIfPresent(Bool.self, forKey: .soundEnabled) ?? true
+        masterVolume = try container.decodeIfPresent(Double.self, forKey: .masterVolume) ?? 0.7
+        meowVolume = try container.decodeIfPresent(Double.self, forKey: .meowVolume) ?? 0.8
+        interactionSounds = try container.decodeIfPresent(Bool.self, forKey: .interactionSounds) ?? true
+        purringSounds = try container.decodeIfPresent(Bool.self, forKey: .purringSounds) ?? true
+        activityLevel = try container.decodeIfPresent(String.self, forKey: .activityLevel) ?? ActivityLevel.balanced.rawValue
+        randomInteractions = try container.decodeIfPresent(Bool.self, forKey: .randomInteractions) ?? true
+        cursorInteraction = try container.decodeIfPresent(Bool.self, forKey: .cursorInteraction) ?? true
+        windowInteraction = try container.decodeIfPresent(Bool.self, forKey: .windowInteraction) ?? false
+        sleepBehavior = try container.decodeIfPresent(String.self, forKey: .sleepBehavior) ?? SleepBehavior.normal.rawValue
+        autonomousToys = try container.decodeIfPresent(Bool.self, forKey: .autonomousToys) ?? true
+    }
 
     var reducedMotion: ReducedMotionMode {
         ReducedMotionMode(rawValue: reducedMotionMode) ?? .system

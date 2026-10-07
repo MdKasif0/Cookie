@@ -10,7 +10,7 @@ final class CookieAccessoryLayer: SKNode {
         removeAllChildren()
         let art = ReferenceImageSource.artRect(canvas: CookieSpriteRenderer.canvasSize)
 
-        let order: [AccessoryKind] = [.scarf, .bandana, .collar, .bow, .hat, .crown, .glasses]
+        let order: [AccessoryKind] = [.scarf, .bandana, .collar, .bow, .hat, .pumpkin, .santaHat, .crown, .glasses]
         for kind in order {
             let accessory = config.accessory(for: kind)
             guard accessory.isEnabled, let node = makeNode(kind, art: art) else { continue }
@@ -165,6 +165,80 @@ final class CookieAccessoryLayer: SKNode {
             knot.fillColor = SKColor(srgbRed: 0.91, green: 0.66, blue: 0.47, alpha: 1)
             knot.position = CGPoint(x: 0, y: h * 0.008)
             node.addChild(knot)
+            return node
+
+        case .pumpkin:
+            let node = SKNode()
+            let body = SKShapeNode(ellipseOf: CGSize(width: w * 0.16, height: h * 0.12))
+            body.fillColor = SKColor(srgbRed: 0.94, green: 0.52, blue: 0.18, alpha: 1)
+            body.strokeColor = SKColor(srgbRed: 0.68, green: 0.32, blue: 0.10, alpha: 1)
+            body.lineWidth = 1.4
+            node.addChild(body)
+
+            for dx in [-1.0, 1.0] as [CGFloat] {
+                let rib = SKShapeNode(ellipseOf: CGSize(width: w * 0.08, height: h * 0.115))
+                rib.fillColor = .clear
+                rib.strokeColor = SKColor(srgbRed: 0.78, green: 0.38, blue: 0.12, alpha: 0.7)
+                rib.lineWidth = 1.0
+                rib.position = CGPoint(x: dx * w * 0.035, y: 0)
+                node.addChild(rib)
+            }
+
+            let stemPath = CGMutablePath()
+            stemPath.move(to: CGPoint(x: -w * 0.012, y: h * 0.055))
+            stemPath.addCurve(to: CGPoint(x: w * 0.018, y: h * 0.095),
+                              control1: CGPoint(x: -w * 0.01, y: h * 0.08),
+                              control2: CGPoint(x: w * 0.01, y: h * 0.09))
+            stemPath.addLine(to: CGPoint(x: w * 0.008, y: h * 0.055))
+            stemPath.closeSubpath()
+            let stem = SKShapeNode(path: stemPath)
+            stem.fillColor = SKColor(srgbRed: 0.38, green: 0.32, blue: 0.18, alpha: 1)
+            stem.strokeColor = SKColor(srgbRed: 0.26, green: 0.20, blue: 0.10, alpha: 1)
+            stem.lineWidth = 1
+            node.addChild(stem)
+
+            for side in [-1.0, 1.0] as [CGFloat] {
+                let eye = SKShapeNode(rectOf: CGSize(width: w * 0.016, height: h * 0.016), cornerRadius: 1)
+                eye.fillColor = SKColor(srgbRed: 0.98, green: 0.88, blue: 0.42, alpha: 0.95)
+                eye.strokeColor = .clear
+                eye.position = CGPoint(x: side * w * 0.032, y: h * 0.008)
+                node.addChild(eye)
+            }
+            let smile = SKShapeNode(rectOf: CGSize(width: w * 0.045, height: h * 0.012), cornerRadius: 2)
+            smile.fillColor = SKColor(srgbRed: 0.98, green: 0.88, blue: 0.42, alpha: 0.95)
+            smile.strokeColor = .clear
+            smile.position = CGPoint(x: 0, y: -h * 0.02)
+            node.addChild(smile)
+            return node
+
+        case .santaHat:
+            let node = SKNode()
+            let conePath = CGMutablePath()
+            conePath.move(to: CGPoint(x: -w * 0.075, y: -h * 0.01))
+            conePath.addCurve(to: CGPoint(x: w * 0.075, y: h * 0.075),
+                              control1: CGPoint(x: -w * 0.05, y: h * 0.08),
+                              control2: CGPoint(x: w * 0.04, y: h * 0.09))
+            conePath.addLine(to: CGPoint(x: w * 0.07, y: -h * 0.01))
+            conePath.closeSubpath()
+            let cone = SKShapeNode(path: conePath)
+            cone.fillColor = SKColor(srgbRed: 0.88, green: 0.22, blue: 0.22, alpha: 1)
+            cone.strokeColor = SKColor(srgbRed: 0.62, green: 0.14, blue: 0.14, alpha: 1)
+            cone.lineWidth = 1.4
+            node.addChild(cone)
+
+            let brim = SKShapeNode(rectOf: CGSize(width: w * 0.16, height: h * 0.036), cornerRadius: h * 0.018)
+            brim.fillColor = SKColor(srgbRed: 0.98, green: 0.98, blue: 0.96, alpha: 1)
+            brim.strokeColor = SKColor(srgbRed: 0.82, green: 0.82, blue: 0.80, alpha: 1)
+            brim.lineWidth = 1.2
+            brim.position = CGPoint(x: 0, y: -h * 0.012)
+            node.addChild(brim)
+
+            let pompom = SKShapeNode(circleOfRadius: w * 0.024)
+            pompom.fillColor = SKColor(srgbRed: 0.98, green: 0.98, blue: 0.96, alpha: 1)
+            pompom.strokeColor = SKColor(srgbRed: 0.82, green: 0.82, blue: 0.80, alpha: 1)
+            pompom.lineWidth = 1.2
+            pompom.position = CGPoint(x: w * 0.078, y: h * 0.072)
+            node.addChild(pompom)
             return node
         }
     }

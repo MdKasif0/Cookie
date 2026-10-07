@@ -7,6 +7,9 @@ struct CookieStatistics: Codable, Equatable {
     var launchCount: Int = 0
     var petsReceived: Int = 0
     var affection: Int = 0
+    var treatsGiven: Int = 0
+    var toysPlayedWith: Int = 0
+    var boxVisits: Int = 0
 
     init() {}
 
@@ -18,6 +21,7 @@ struct CookieStatistics: Codable, Equatable {
 
     private enum CodingKeys: String, CodingKey {
         case firstLaunchedAt, lastLaunchedAt, launchCount, petsReceived, affection
+        case treatsGiven, toysPlayedWith, boxVisits
     }
 
     init(from decoder: Decoder) throws {
@@ -27,5 +31,8 @@ struct CookieStatistics: Codable, Equatable {
         launchCount = try container.decodeIfPresent(Int.self, forKey: .launchCount) ?? 0
         petsReceived = try container.decodeIfPresent(Int.self, forKey: .petsReceived) ?? 0
         affection = try container.decodeIfPresent(Int.self, forKey: .affection) ?? 0
+        treatsGiven = try container.decodeIfPresent(Int.self, forKey: .treatsGiven) ?? 0
+        toysPlayedWith = try container.decodeIfPresent(Int.self, forKey: .toysPlayedWith) ?? 0
+        boxVisits = try container.decodeIfPresent(Int.self, forKey: .boxVisits) ?? 0
     }
 }
