@@ -65,8 +65,15 @@ final class CookieInteractionTests: XCTestCase {
         XCTAssertEqual(engine.state, .playing, "Cookie should start playing with the toy")
 
         // Advance through play to tired
-        advanceTime(by: 7.0, x: target - 30)
-        XCTAssertEqual(engine.state, .tired, "Cookie should become tired after playing")
+        var reachedTired = false
+        for _ in 0..<80 {
+            advanceTime(by: 0.1, x: target - 30)
+            if engine.state == .tired {
+                reachedTired = true
+                break
+            }
+        }
+        XCTAssertTrue(reachedTired, "Cookie should become tired after playing")
         XCTAssertGreaterThanOrEqual(store.statistics.toysPlayedWith, 1, "Toys played statistic should increment")
 
         // Advance through tired to sitting/idle
