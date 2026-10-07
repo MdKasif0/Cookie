@@ -604,7 +604,11 @@ final class CookieBehaviorEngine: ObservableObject {
             reaction = .happy
             worldItem?.isConsumed = true
         case .playing:
-            store.statistics.toysPlayedWith += 1
+            if let toy = worldItem?.kind.toyKind {
+                store.statistics.recordToyPlayed(toy)
+            } else {
+                store.statistics.toysPlayedWith += 1
+            }
             store.statistics.affection += 1
             reaction = .happy
         case .inBox:

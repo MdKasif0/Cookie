@@ -13,6 +13,7 @@ struct CookieProfile: Codable, Equatable {
     var isCompanionVisible: Bool = true
     var hasCompletedWelcome: Bool = false
     var companionPosition: CGPoint?
+    var lastRestingState: CookieState?
 
     init() {}
 
@@ -27,7 +28,7 @@ struct CookieProfile: Codable, Equatable {
         case accessories, unlockedAccessories
         case legacySoundEnabled = "soundEnabled"
         case legacySoundVolume = "soundVolume"
-        case isCompanionVisible, hasCompletedWelcome, companionPosition
+        case isCompanionVisible, hasCompletedWelcome, companionPosition, lastRestingState
     }
 
     /// Encodes everything except the legacy key, which only exists for
@@ -43,6 +44,7 @@ struct CookieProfile: Codable, Equatable {
         try container.encode(isCompanionVisible, forKey: .isCompanionVisible)
         try container.encode(hasCompletedWelcome, forKey: .hasCompletedWelcome)
         try container.encode(companionPosition, forKey: .companionPosition)
+        try container.encodeIfPresent(lastRestingState, forKey: .lastRestingState)
     }
 
     init(from decoder: Decoder) throws {
@@ -77,5 +79,6 @@ struct CookieProfile: Codable, Equatable {
         isCompanionVisible = try container.decodeIfPresent(Bool.self, forKey: .isCompanionVisible) ?? true
         hasCompletedWelcome = try container.decodeIfPresent(Bool.self, forKey: .hasCompletedWelcome) ?? false
         companionPosition = try container.decodeIfPresent(CGPoint?.self, forKey: .companionPosition) ?? nil
+        lastRestingState = try? container.decodeIfPresent(CookieState.self, forKey: .lastRestingState)
     }
 }
