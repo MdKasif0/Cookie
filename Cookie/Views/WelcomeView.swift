@@ -37,7 +37,7 @@ struct WelcomeView: View {
                             Text(personality.displayName).tag(personality)
                         }
                     }
-                    .pickerStyle(.segmented)
+                    .pickerStyle(.menu)
                     Text(model.personality.summary)
                         .font(.caption)
                         .foregroundStyle(.secondary)

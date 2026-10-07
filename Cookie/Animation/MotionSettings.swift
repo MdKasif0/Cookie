@@ -1,12 +1,17 @@
 import AppKit
 
-/// System Reduced Motion setting, read live. When it is on, the animation
-/// controller keeps every state transition and completion callback
-/// working but renders poses statically, so Cookie remains readable
-/// without non-essential movement. Changes take effect at the next
-/// animation change, never mid-animation.
+/// System Reduced Motion handling with three modes: follow the system
+/// setting, always reduce, or never reduce. When reduced, the animation
+/// controller keeps every state transition and callback working but
+/// renders poses statically.
 enum MotionSettings {
+    static var mode: ReducedMotionMode = .system
+
     static var reduceMotion: Bool {
-        NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
+        switch mode {
+        case .always: return true
+        case .never: return false
+        case .system: return NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
+        }
     }
 }

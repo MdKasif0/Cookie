@@ -15,11 +15,12 @@ final class PlaceholderVectorSource: AnimationFrameSource {
 
     private var cache: [String: [SKTexture]] = [:]
 
-    func textures(for animation: CookieAnimationId, palette: CharacterPalette) -> [SKTexture]? {
+    func textures(for animation: CookieAnimationId, config: CookieAppearanceConfig) -> [SKTexture]? {
+        let palette = CharacterPalette(config: config)
         let sheetName = animation.spec.sheetName
         guard let poses = CookiePoseCatalog.frames(forSheet: sheetName) else { return nil }
 
-        let key = "\(palette.fur.description)|\(sheetName)"
+        let key = "\(config.renderKey)|\(sheetName)"
         if let cached = cache[key] {
             return cached
         }

@@ -7,11 +7,17 @@ import SpriteKit
 /// Transparent pixels pass through to whatever application is beneath,
 /// so the panel never blocks the desktop around her.
 final class CompanionSKView: SKView {
-    private let hitTester: CookieHitTester?
+    private var hitTester: CookieHitTester?
 
     init(hitTester: CookieHitTester?) {
         self.hitTester = hitTester
         super.init(frame: NSRect(x: 0, y: 0, width: 180, height: 180))
+    }
+
+    /// Rebuilds the silhouette for a new panel size (Cookie size changes
+    /// in Settings).
+    func updateHitTester(canvasSize: CGSize) {
+        hitTester = CookieHitTester(canvasSize: canvasSize)
     }
 
     required init?(coder: NSCoder) { nil }
@@ -74,7 +80,8 @@ final class CompanionViewController: NSViewController {
     required init?(coder: NSCoder) { nil }
 
     override func loadView() {
-        let skView = CompanionSKView(hitTester: CookieHitTester(canvasSize: CookieSpriteRenderer.canvasSize))
+        let hitTester = CookieHitTester(canvasSize: CookieSpriteRenderer.canvasSize)
+        let skView = CompanionSKView(hitTester: hitTester)
         skView.autoresizingMask = [.width, .height]
         skView.allowsTransparency = true
         let scene = CookieScene(
@@ -82,6 +89,7 @@ final class CompanionViewController: NSViewController {
             store: store,
             behaviorEngine: behaviorEngine,
             audioManager: audioManager,
+            hitTester: hitTester,
             onPositionSettled: onPositionSettled
         )
         skView.presentScene(scene)

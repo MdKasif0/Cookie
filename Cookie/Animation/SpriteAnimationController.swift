@@ -22,10 +22,14 @@ final class SpriteAnimationController {
     private let sprite: SKSpriteNode
     private let flipContainer: SKNode
     private var sources: [AnimationFrameSource]
-    private var palette: CharacterPalette
+    private var config: CookieAppearanceConfig
 
     private let log = Logger(subsystem: "com.cookie.mac", category: "Animation")
     private var warnedMissing: Set<String> = []
+
+    /// Animation liveliness multiplier from Settings (0.5…1.5): scales
+    /// frame rate and bob amplitudes.
+    var animationIntensity: Double = 1.0
 
     // State machine
     private(set) var currentId: CookieAnimationId?
@@ -43,12 +47,12 @@ final class SpriteAnimationController {
     init(
         sprite: SKSpriteNode,
         flipContainer: SKNode,
-        palette: CharacterPalette,
+        config: CookieAppearanceConfig,
         sources: [AnimationFrameSource]
     ) {
         self.sprite = sprite
         self.flipContainer = flipContainer
-        self.palette = palette
+        self.config = config
         self.sources = sources
     }
 
@@ -115,13 +119,36 @@ final class SpriteAnimationController {
         present(id, completion: currentCompletion)
     }
 
-    /// Switches the palette. Rendered placeholder textures are dropped so
-    /// the next frame of every animation reflects the new colors; bundle
-    /// sheets are untouched by palettes.
-    func updatePalette(_ palette: CharacterPalette) {
-        self.palette = palette
-        for source in sources {
-            (source as? PlaceholderVectorSource)?.invalidate()
+    /// Applies a new customization configuration; the next frame of every
+    /// animation is baked from it (texture caches key on the config).
+    func updateConfig(_ config: CookieAppearanceConfig) {
+        self.config = config
+        refresh()
+    }
+
+    /// Shows a whole-pose expression sticker instead of a frame
+    /// animation. The static pose holds until the next state change;
+    /// a quick fade keeps the swap from snapping. Locomotion stickers
+    /// get a gentle bob so gliding panels still feel alive.
+    func show(_ art: CookieExpressionArt) {
+        guard let texture = ExpressionArtSource.shared.texture(for: art, config: config) else { return }
+        cancelTimers()
+        sprite.removeAction(forKey: CookieAnimationId.actionKey)
+        sprite.removeAction(forKey: "cookie.bob")
+        currentId = nil
+        currentIsLoop = false
+        currentCompletion = nil
+        sprite.texture = texture
+        sprite.alpha = 0.7
+        sprite.run(.fadeAlpha(to: 1, duration: 0.14), withKey: "cookie.fade")
+        if art == .walk {
+            sprite.position.y = 0
+            let amplitude = 1.4 * animationIntensity
+            let up = SKAction.moveBy(x: 0, y: amplitude, duration: 0.3)
+            up.timingMode = .easeInEaseOut
+            let down = SKAction.moveBy(x: 0, y: -amplitude, duration: 0.3)
+            down.timingMode = .easeInEaseOut
+            sprite.run(.repeatForever(.sequence([up, down])), withKey: "cookie.bob")
         }
     }
 
@@ -144,7 +171,7 @@ final class SpriteAnimationController {
         currentIsLoop = spec.isLooping
         currentCompletion = completion
 
-        let frameDuration = 1.0 / spec.fps
+        let frameDuration = 1.0 / (spec.fps * animationIntensity)
         if MotionSettings.reduceMotion {
             sprite.texture = textures.first
             if !spec.isLooping {
@@ -172,6 +199,8 @@ final class SpriteAnimationController {
             }
             sprite.run(.sequence([animate, finish]), withKey: CookieAnimationId.actionKey)
         }
+        sprite.alpha = 0.78
+        sprite.run(.fadeAlpha(to: 1, duration: 0.12), withKey: "cookie.fade")
         scheduleBlinkIfNeeded()
     }
 
@@ -191,6 +220,8 @@ final class SpriteAnimationController {
         guard currentId != nil else { return }
         cancelTimers()
         sprite.removeAction(forKey: CookieAnimationId.actionKey)
+        sprite.removeAction(forKey: "cookie.bob")
+        sprite.position.y = 0
         currentId = nil
         let completion = currentCompletion
         currentCompletion = nil
@@ -201,7 +232,7 @@ final class SpriteAnimationController {
 
     private func resolveTextures(_ id: CookieAnimationId) -> [SKTexture]? {
         for source in sources {
-            if let textures = source.textures(for: id, palette: palette) {
+            if let textures = source.textures(for: id, config: config) {
                 return textures
             }
         }

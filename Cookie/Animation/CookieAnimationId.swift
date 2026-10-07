@@ -26,13 +26,6 @@ enum CookieAnimationCategory: String, CaseIterable {
     case special = "Special"
 }
 
-/// Which way Cookie faces. Directional animations mirror one shared
-/// sheet instead of shipping separate left/right artwork.
-enum CookieDirection {
-    case left
-    case right
-}
-
 /// Everything the animation system needs to know about one animation.
 struct CookieAnimationSpec {
     let category: CookieAnimationCategory

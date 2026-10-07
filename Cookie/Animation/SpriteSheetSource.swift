@@ -47,7 +47,7 @@ final class SpriteSheetSource: AnimationFrameSource {
         load(animation) != nil
     }
 
-    func textures(for animation: CookieAnimationId, palette: CharacterPalette) -> [SKTexture]? {
+    func textures(for animation: CookieAnimationId, config: CookieAppearanceConfig) -> [SKTexture]? {
         load(animation)?.textures
     }
 

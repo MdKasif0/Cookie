@@ -1,13 +1,13 @@
 import SpriteKit
 
-/// Anything that can render Cookie inside a scene. The placeholder cat is
-/// a vector-drawn implementation; when the final sprite sheet arrives, a
-/// new conformer (e.g. `AtlasSpriteProvider` backed by an SKTextureAtlas)
-/// drops in without touching the scene, behavior, or persistence layers.
+/// Anything that can render Cookie inside a scene. The placeholder chain
+/// (bundle sheets → reference artwork → vector cat) sits behind this
+/// protocol; the behavior engine speaks states, and conformers map states
+/// onto animations.
+@MainActor
 protocol SpriteProviding: SKNode {
-    var activity: CookieActivity { get }
+    var state: CookieState { get }
     func startIdling()
-    func setActivity(_ activity: CookieActivity)
-    func playPetReaction()
-    func apply(palette: CharacterPalette)
+    func setState(_ state: CookieState, facing: CookieDirection, reaction: CookieReaction)
+    func apply(config: CookieAppearanceConfig)
 }

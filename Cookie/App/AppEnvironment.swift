@@ -1,4 +1,5 @@
 import AppKit
+import ServiceManagement
 import os
 
 /// Composition root: builds the store, audio, behavior engine, and window
@@ -26,12 +27,39 @@ final class AppEnvironment: ObservableObject {
     /// companion; first-time users meet Cookie in the welcome window.
     func start() {
         store.statistics.recordLaunch()
+        applySystemSettings()
         if store.profile.hasCompletedWelcome {
             log.info("Returning user — starting companion")
-            windows.showCompanion()
+            if store.profile.settings.showOnStartup {
+                windows.showCompanion()
+            }
             behaviorEngine.start()
         } else {
             presentWelcome()
+        }
+    }
+
+    /// Syncs settings that touch the system: launch-at-login state and
+    /// the reduced-motion mode.
+    private func applySystemSettings() {
+        MotionSettings.mode = store.profile.settings.reducedMotion
+        if SMAppService.mainApp.status == .enabled, !store.profile.settings.launchAtLogin {
+            // macOS knows better (registered outside the app) — follow it.
+            store.profile.settings.launchAtLogin = true
+        }
+    }
+
+    func setLaunchAtLogin(_ enabled: Bool) {
+        store.profile.settings.launchAtLogin = enabled
+        guard SMAppService.mainApp.status != .notFound else { return }
+        do {
+            if enabled {
+                try SMAppService.mainApp.register()
+            } else {
+                try SMAppService.mainApp.unregister()
+            }
+        } catch {
+            log.error("Launch-at-login toggle failed: \(error.localizedDescription)")
         }
     }
 
@@ -64,6 +92,15 @@ final class AppEnvironment: ObservableObject {
     func toggleCompanion() {
         windows.toggleCompanion()
     }
+
+    func showCustomization() {
+        windows.showCustomization()
+    }
+
+    // Menu bar companion commands.
+    func petCookie() { behaviorEngine.handleMenuPet() }
+    func feedCookie() { behaviorEngine.handleFeed() }
+    func playWithCookie() { behaviorEngine.handlePlayCommand() }
 
     func quit() {
         NSApp.terminate(nil)

@@ -14,6 +14,7 @@ struct StatsSettingsTab: View {
             }
             Section("Affection") {
                 LabeledContent("Times petted", value: "\(store.statistics.petsReceived)")
+                LabeledContent("Affection", value: "\(store.statistics.affection)")
             }
             Section {
                 Button("Reset Cookie…", role: .destructive) {

@@ -1,16 +1,18 @@
 import AppKit
 
-/// Which vertical boundary Cookie is next to.
-enum CookieEdge {
-    case left
-    case right
-}
-
 /// Pure geometry for keeping Cookie visible across any display setup:
 /// clamping into the union of all screens' visible areas, restoring a
 /// saved position that may no longer be on any display, and the friendly
 /// default spot.
 enum CookieScreenGeometry {
+    /// Base panel edge before the Cookie size setting scales it.
+    static let basePanelDimension: CGFloat = 160
+
+    /// Panel size for a given Cookie size setting.
+    static func basePanelSize(for cookieSize: Double) -> CGSize {
+        CGSize(width: basePanelDimension * cookieSize, height: basePanelDimension * cookieSize)
+    }
+
     static func visibleUnion(of screens: [NSScreen]) -> NSRect? {
         guard var union = screens.first?.visibleFrame else { return nil }
         for screen in screens.dropFirst() {

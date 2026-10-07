@@ -8,22 +8,32 @@ import os
 /// plugged, unplugged, resolution change) can never strand her off screen.
 @MainActor
 final class CompanionPanelController: NSWindowController {
-    static let panelSize = CGSize(width: 180, height: 180)
+    /// Base size; the Settings "Cookie size" slider scales the panel.
+    static let baseSize = CGSize(width: CookieScreenGeometry.basePanelDimension,
+                                 height: CookieScreenGeometry.basePanelDimension)
 
     private let store: CookieStore
     private var screenObservers: [NSObjectProtocol] = []
 
     private let log = Logger(subsystem: "com.cookie.mac", category: "Windows")
 
+    var panelSize: CGSize {
+        CGSize(width: Self.baseSize.width * store.profile.settings.cookieSize,
+               height: Self.baseSize.height * store.profile.settings.cookieSize)
+    }
+
     init(store: CookieStore, behaviorEngine: CookieBehaviorEngine, audioManager: AudioManager) {
         self.store = store
+        let size = CGSize(width: Self.baseSize.width * store.profile.settings.cookieSize,
+                          height: Self.baseSize.height * store.profile.settings.cookieSize)
+        let saved = store.profile.settings.rememberPosition ? store.profile.companionPosition : nil
         let origin = CookieScreenGeometry.restoreOrigin(
-            saved: store.profile.companionPosition,
-            size: Self.panelSize,
+            saved: saved,
+            size: size,
             screens: NSScreen.screens
         )
         let panel = NSPanel(
-            contentRect: NSRect(origin: origin, size: Self.panelSize),
+            contentRect: NSRect(origin: origin, size: size),
             styleMask: [.borderless, .nonactivatingPanel],
             backing: .buffered,
             defer: false
@@ -80,11 +90,14 @@ final class CompanionPanelController: NSWindowController {
         log.debug("Companion panel hidden")
     }
 
-    /// Persists the current panel origin to the store.
+    /// Persists the current panel origin to the store (honoring the
+    /// "Remember position" setting).
     func savePosition() {
-        guard let origin = window?.frame.origin else { return }
+        guard store.profile.settings.rememberPosition,
+              let origin = window?.frame.origin else { return }
         store.profile.companionPosition = CGPoint(x: origin.x, y: origin.y)
     }
+
 
     /// After displays change, make sure Cookie is still reachable.
     func recoverVisiblePosition() {

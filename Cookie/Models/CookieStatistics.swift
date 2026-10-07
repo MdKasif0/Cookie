@@ -6,6 +6,7 @@ struct CookieStatistics: Codable, Equatable {
     var lastLaunchedAt: Date?
     var launchCount: Int = 0
     var petsReceived: Int = 0
+    var affection: Int = 0
 
     init() {}
 
@@ -16,7 +17,7 @@ struct CookieStatistics: Codable, Equatable {
     }
 
     private enum CodingKeys: String, CodingKey {
-        case firstLaunchedAt, lastLaunchedAt, launchCount, petsReceived
+        case firstLaunchedAt, lastLaunchedAt, launchCount, petsReceived, affection
     }
 
     init(from decoder: Decoder) throws {
@@ -25,5 +26,6 @@ struct CookieStatistics: Codable, Equatable {
         lastLaunchedAt = try container.decodeIfPresent(Date.self, forKey: .lastLaunchedAt)
         launchCount = try container.decodeIfPresent(Int.self, forKey: .launchCount) ?? 0
         petsReceived = try container.decodeIfPresent(Int.self, forKey: .petsReceived) ?? 0
+        affection = try container.decodeIfPresent(Int.self, forKey: .affection) ?? 0
     }
 }

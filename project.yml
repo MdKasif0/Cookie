@@ -21,7 +21,10 @@ targets:
         excludes:
           - "Resources/Info.plist"
           - "Resources/Sprites"
+          - "Resources/Sounds"
       - path: Cookie/Resources/Sprites
+        type: folder
+      - path: Cookie/Resources/Sounds
         type: folder
         buildPhase: resources
     info:

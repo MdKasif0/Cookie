@@ -14,6 +14,7 @@ final class WindowManager: NSObject, NSWindowDelegate {
 
     private(set) var companionController: CompanionPanelController?
     private var welcomeWindow: NSWindow?
+    private var customizationWindow: NSWindow?
     private var onWelcomeDismissed: (() -> Void)?
 
     init(store: CookieStore, audioManager: AudioManager, behaviorEngine: CookieBehaviorEngine) {
@@ -84,13 +85,44 @@ final class WindowManager: NSObject, NSWindowDelegate {
         welcomeWindow?.close()
     }
 
+    // MARK: - Customization
+
+    /// The character editor: one window, recreated only when closed.
+    func showCustomization() {
+        if let customizationWindow {
+            customizationWindow.makeKeyAndOrderFront(nil)
+            NSApp.activate(ignoringOtherApps: true)
+            return
+        }
+        let window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 640, height: 520),
+            styleMask: [.titled, .closable, .miniaturizable],
+            backing: .buffered,
+            defer: false
+        )
+        window.title = "Customize Cookie"
+        window.isReleasedWhenClosed = false
+        window.delegate = self
+        window.contentViewController = NSHostingController(
+            rootView: CustomizationView().environmentObject(store)
+        )
+        window.center()
+        customizationWindow = window
+        window.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
     // MARK: - NSWindowDelegate
 
     func windowWillClose(_ notification: Notification) {
-        guard let window = notification.object as? NSWindow, window === welcomeWindow else { return }
-        welcomeWindow = nil
-        let handler = onWelcomeDismissed
-        onWelcomeDismissed = nil
-        handler?()
+        guard let window = notification.object as? NSWindow else { return }
+        if window === welcomeWindow {
+            welcomeWindow = nil
+            let handler = onWelcomeDismissed
+            onWelcomeDismissed = nil
+            handler?()
+        } else if window === customizationWindow {
+            customizationWindow = nil
+        }
     }
 }

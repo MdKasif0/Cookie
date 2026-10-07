@@ -20,12 +20,29 @@ guard let base = CGImageSourceCreateImageAtIndex(source, 0, nil) else {
     print("could not read image"); exit(1)
 }
 
-// Alpha bounding box (measured by analyze_reference.swift)
-let crop = CGRect(x: 89, y: 29, width: 1133, height: 1193)
+// Computes the alpha bounding box so the script works with any pose of
+// the artwork.
+var minX = base.width, maxX = 0, minY = base.height, maxY = 0
+do {
+    let width = base.width, height = base.height
+    let context = CGContext(data: nil, width: width, height: height, bitsPerComponent: 8,
+                            bytesPerRow: width * 4, space: CGColorSpace(name: CGColorSpace.sRGB)!,
+                            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
+    context.draw(base, in: CGRect(x: 0, y: 0, width: width, height: height))
+    guard let data = context.data else { print("crop failed"); exit(1) }
+    let pixels = data.bindMemory(to: UInt8.self, capacity: width * height * 4)
+    for y in 0..<height {
+        for x in 0..<width where pixels[(y * width + x) * 4 + 3] > 24 {
+            minX = min(minX, x); maxX = max(maxX, x)
+            minY = min(minY, y); maxY = max(maxY, y)
+        }
+    }
+}
+let crop = CGRect(x: minX, y: minY, width: maxX - minX + 1, height: maxY - minY + 1)
 guard let trimmed = base.cropping(to: crop) else {
     print("crop failed"); exit(1)
 }
-print("trimmed: \(trimmed.width)x\(trimmed.height)")
+print("trimmed: \(trimmed.width)x\(trimmed.height) from \(crop)")
 
 func writePNG(_ image: CGImage, to url: URL) {
     let dest = CGImageDestinationCreateWithURL(url as CFURL, UTType.png.identifier as CFString, 1, nil)!

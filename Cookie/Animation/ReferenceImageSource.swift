@@ -29,11 +29,14 @@ final class ReferenceImageSource: AnimationFrameSource {
         }
     }
 
-    private static let eyeLeft = Feature(x: 0.309, y: 0.362, rx: 0.036, ry: 0.041)
-    private static let eyeRight = Feature(x: 0.596, y: 0.428, rx: 0.041, ry: 0.042)
-    private static let mouth = Feature(x: 0.431, y: 0.435, rx: 0.045, ry: 0.022)
-    private static let blushLeft = Feature(x: 0.230, y: 0.432, rx: 0.075, ry: 0.075)
-    private static let blushRight = Feature(x: 0.623, y: 0.500, rx: 0.070, ry: 0.070)
+    // Measured from the shipped artwork by scripts/analyze_reference.swift
+    // and scripts/probe reference runs — update these together with the
+    // CookieArt asset.
+    private static let eyeLeft = Feature(x: 0.283, y: 0.395, rx: 0.052, ry: 0.049)
+    private static let eyeRight = Feature(x: 0.646, y: 0.438, rx: 0.053, ry: 0.049)
+    private static let mouth = Feature(x: 0.450, y: 0.464, rx: 0.059, ry: 0.023)
+    private static let blushLeft = Feature(x: 0.170, y: 0.470, rx: 0.075, ry: 0.075)
+    private static let blushRight = Feature(x: 0.740, y: 0.525, rx: 0.072, ry: 0.072)
 
     private enum Overlay {
         case eyesClosed
@@ -179,26 +182,20 @@ final class ReferenceImageSource: AnimationFrameSource {
     private let cache = NSCache<NSString, NSArray>()
     private var sampledColors: SampledColors?
 
-    func textures(for animation: CookieAnimationId, palette: CharacterPalette) -> [SKTexture]? {
+    func textures(for animation: CookieAnimationId, config: CookieAppearanceConfig) -> [SKTexture]? {
         guard let base = Self.loadArtwork(), let plan = Self.plan(for: animation) else { return nil }
         let colors = sampleColors(from: base)
-        let key = "\(palette.fur.description)|\(animation.rawValue)" as NSString
+        let key = "\(config.renderKey)|\(animation.rawValue)" as NSString
         if let cached = cache.object(forKey: key) {
             return cached as? [SKTexture]
         }
         let canvas = CookieSpriteRenderer.canvasSize
         let textures = plan.map { frame in
             SKTexture(cgImage: bake(frame: frame, base: base, colors: colors,
-                                    canvas: canvas, palette: palette))
+                                    canvas: canvas, config: config))
         }
         cache.setObject(textures as NSArray, forKey: key)
         return textures
-    }
-
-    /// Drops cached textures, e.g. when the palette changes.
-    func invalidate() {
-        cache.removeAllObjects()
-        sampledColors = nil
     }
 
     static func loadArtwork() -> CGImage? {
@@ -207,18 +204,17 @@ final class ReferenceImageSource: AnimationFrameSource {
         return image.cgImage(forProposedRect: &rect, context: nil, hints: nil)
     }
 
-    /// The draw rect for the artwork inside the canvas: fitted, anchored
-    /// to the bottom so transforms feel grounded.
-    static func artRect(canvas: CGSize) -> CGRect {
+    /// Fits an image of the given aspect into the canvas, anchored to the
+    /// bottom so poses feel grounded. Shared with the expression stickers.
+    static func fitRect(aspect: Double, canvas: CGSize) -> CGRect {
         let inset = canvas.width * 0.02
         let available = CGSize(width: canvas.width - inset * 2, height: canvas.height - inset * 1.5)
-        let aspect = available.width / available.height
-        let imageAspect = 1133.0 / 1193.0
+        let canvasAspect = available.width / available.height
         var size = available
-        if imageAspect > aspect {
-            size.height = available.width / imageAspect
+        if aspect > canvasAspect {
+            size.height = available.width / aspect
         } else {
-            size.width = available.height * imageAspect
+            size.width = available.height * aspect
         }
         return CGRect(
             x: (canvas.width - size.width) / 2,
@@ -228,42 +224,197 @@ final class ReferenceImageSource: AnimationFrameSource {
         )
     }
 
-    private func bake(frame: Frame, base: CGImage, colors: SampledColors, canvas: CGSize, palette: CharacterPalette) -> CGImage {
+    /// The draw rect for the base artwork inside the canvas.
+    static func artRect(canvas: CGSize) -> CGRect {
+        fitRect(aspect: imageAspect, canvas: canvas)
+    }
+
+    /// Aspect of the shipped artwork, measured once from the asset.
+    private static let imageAspect: Double = {
+        guard let image = loadArtwork() else { return 1050.0 / 1158.0 }
+        return Double(image.width) / Double(image.height)
+    }()
+
+    private func bake(frame: Frame, base: CGImage, colors: SampledColors,
+                      canvas: CGSize, config: CookieAppearanceConfig) -> CGImage {
         let scale = Self.bakeScale
         let pixels = CGSize(width: canvas.width * scale, height: canvas.height * scale)
+
+        // Pass 1: the transformed, customized cat on a transparent canvas.
+        let pass = CGContext(
+            data: nil, width: Int(pixels.width), height: Int(pixels.height),
+            bitsPerComponent: 8, bytesPerRow: 0,
+            space: CGColorSpace(name: CGColorSpace.sRGB)!,
+            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+        )!
+        pass.scaleBy(x: scale, y: scale)
+        pass.interpolationQuality = .high
+
+        let rect = Self.artRect(canvas: canvas)
+        // Anchor at the feet: bottom center of the artwork.
+        let anchor = CGPoint(x: rect.midX, y: rect.minY)
+        pass.saveGState()
+        pass.translateBy(x: anchor.x, y: anchor.y)
+        pass.rotate(by: frame.rotation * .pi / 180)
+        pass.scaleBy(x: frame.scaleX * config.bodyVariation.scale.x,
+                     y: frame.scaleY * config.bodyVariation.scale.y)
+        pass.translateBy(x: -anchor.x, y: -anchor.y - frame.offsetY)
+        let drawRect = rect.offsetBy(dx: frame.offsetX, dy: frame.offsetY)
+
+        pass.draw(base, in: drawRect)
+
+        for overlay in frame.overlays {
+            drawOverlay(overlay, in: pass, base: base, rect: drawRect, colors: colors,
+                        eyeFill: config.eyeColor.renderColor ?? colors.eyeDark)
+        }
+
+        drawPattern(config.furPattern, in: pass, rect: drawRect)
+        drawEyeCustomization(frame: frame, config: config, in: pass, rect: drawRect, colors: colors)
+        pass.restoreGState()
+
+        guard let catImage = pass.makeImage() else { return base }
+
+        // Pass 2: fur color as a multiply tint over the whole canvas, then
+        // a destination-in pass with the full-canvas cat restores the exact
+        // silhouette — multiply scales luminance instead of washing over
+        // it, so the artwork's contrast is preserved.
         let ctx = CGContext(
             data: nil, width: Int(pixels.width), height: Int(pixels.height),
             bitsPerComponent: 8, bytesPerRow: 0,
             space: CGColorSpace(name: CGColorSpace.sRGB)!,
             bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
         )!
-        ctx.scaleBy(x: scale, y: scale)
         ctx.interpolationQuality = .high
+        ctx.draw(catImage, in: CGRect(origin: .zero, size: pixels))
 
-        let rect = Self.artRect(canvas: canvas)
-        // Anchor at the feet: bottom center of the artwork.
-        let anchor = CGPoint(x: rect.midX, y: rect.minY)
-        ctx.translateBy(x: anchor.x, y: anchor.y)
-        ctx.rotate(by: frame.rotation * .pi / 180)
-        ctx.scaleBy(x: frame.scaleX, y: frame.scaleY)
-        ctx.translateBy(x: -anchor.x, y: -anchor.y - frame.offsetY)
-        let drawRect = rect.offsetBy(dx: frame.offsetX, dy: frame.offsetY)
-
-        ctx.draw(base, in: drawRect)
-
-        for overlay in frame.overlays {
-            drawOverlay(overlay, in: ctx, base: base, rect: drawRect, colors: colors)
-        }
-
-        // Very subtle appearance tint, applied only where the cat is.
-        if let tint = palette.artTint {
-            ctx.setBlendMode(.sourceAtop)
-            ctx.setFillColor(tint.cgColor.copy(alpha: 0.12) ?? tint.cgColor)
-            ctx.fill(CGRect(origin: .zero, size: canvas))
+        if let multiply = config.furColor.multiplyColor {
+            ctx.setBlendMode(.multiply)
+            ctx.setFillColor(multiply)
+            ctx.fill(CGRect(origin: .zero, size: pixels))
+            ctx.setBlendMode(.destinationIn)
+            ctx.draw(catImage, in: CGRect(origin: .zero, size: pixels))
             ctx.setBlendMode(.normal)
         }
 
         return ctx.makeImage() ?? base
+    }
+
+    // MARK: - Pattern & eyes
+
+    /// Soft coat patterns, drawn only where the cat is.
+    private func drawPattern(_ pattern: FurPattern, in ctx: CGContext, rect: CGRect) {
+        switch pattern {
+        case .none:
+            return
+        case .tuxedo:
+            // A gently darker chest patch.
+            let center = CGPoint(x: rect.midX, y: rect.minY + rect.height * 0.24)
+            softSpot(ctx, center: center, radiusX: rect.width * 0.30, radiusY: rect.height * 0.20,
+                     color: CGColor(srgbRed: 0.72, green: 0.62, blue: 0.52, alpha: 0.30))
+        case .points:
+            // A softly darker face mask, like a pointed coat.
+            let center = CGPoint(x: rect.minX + rect.width * 0.46, y: rect.minY + rect.height * 0.80)
+            softSpot(ctx, center: center, radiusX: rect.width * 0.40, radiusY: rect.height * 0.22,
+                     color: CGColor(srgbRed: 0.70, green: 0.60, blue: 0.50, alpha: 0.24))
+        case .tabby:
+            // Three little forehead stripes.
+            ctx.setBlendMode(.sourceAtop)
+            ctx.setStrokeColor(CGColor(srgbRed: 0.66, green: 0.53, blue: 0.38, alpha: 0.45))
+            ctx.setLineWidth(rect.width * 0.035)
+            ctx.setLineCap(.round)
+            for (offset, length) in [(0.0, 0.09), (-0.075, 0.06), (0.075, 0.06)] {
+                let x = rect.minX + rect.width * (0.46 + offset)
+                let yTop = rect.minY + rect.height * 0.86
+                ctx.move(to: CGPoint(x: x, y: yTop))
+                ctx.addLine(to: CGPoint(x: x + rect.width * 0.012, y: yTop - rect.height * length))
+            }
+            ctx.strokePath()
+            ctx.setBlendMode(.normal)
+        }
+    }
+
+    private func softSpot(_ ctx: CGContext, center: CGPoint, radiusX: CGFloat, radiusY: CGFloat, color: CGColor) {
+        let space = CGColorSpace(name: CGColorSpace.sRGB)!
+        let gradient = CGGradient(colorsSpace: space, colors: [
+            color, color.copy(alpha: color.alpha * 0.6) ?? color, color.copy(alpha: 0) ?? color
+        ] as CFArray, locations: [0, 0.55, 1])!
+        ctx.setBlendMode(.sourceAtop)
+        ctx.saveGState()
+        ctx.translateBy(x: center.x, y: center.y)
+        ctx.scaleBy(x: radiusX, y: radiusY)
+        ctx.drawRadialGradient(gradient, startCenter: .zero, startRadius: 0,
+                               endCenter: .zero, endRadius: 1, options: [])
+        ctx.restoreGState()
+        ctx.setBlendMode(.normal)
+    }
+
+    /// Eye color and eye style, applied to the base pose when the eyes
+    /// are actually visible. Expression stickers never get these.
+    private func drawEyeCustomization(frame: Frame, config: CookieAppearanceConfig,
+                                      in ctx: CGContext, rect: CGRect, colors: SampledColors) {
+        let eyesCovered = !frame.overlays.contains { overlay in
+            switch overlay {
+            case .eyesClosed, .eyesHappy, .eyesWide, .eyesHalf: return true
+            default: return false
+            }
+        }
+
+        // Color: repaint the open eyes and redraw the glints.
+        if eyesCovered == false, let eyeFill = config.eyeColor.renderColor {
+            for eye in [Self.eyeLeft, Self.eyeRight] {
+                let center = eye.point(in: rect)
+                let size = eye.scaledSize(in: rect)
+                ctx.setFillColor(eyeFill)
+                ctx.fillEllipse(in: CGRect(
+                    x: center.x - size.width * 0.52, y: center.y - size.height * 0.52,
+                    width: size.width * 1.04, height: size.height * 1.04
+                ))
+                ctx.setFillColor(CGColor(srgbRed: 1, green: 1, blue: 1, alpha: 0.96))
+                ctx.fillEllipse(in: CGRect(
+                    x: center.x - size.width * 0.42, y: center.y + size.height * 0.02,
+                    width: size.width * 0.40, height: size.height * 0.40
+                ))
+                ctx.fillEllipse(in: CGRect(
+                    x: center.x + size.width * 0.12, y: center.y - size.height * 0.30,
+                    width: size.width * 0.20, height: size.height * 0.20
+                ))
+            }
+        }
+
+        switch config.eyeStyle {
+        case .round:
+            break
+        case .sleepy where eyesCovered == false:
+            for eye in [Self.eyeLeft, Self.eyeRight] {
+                let center = eye.point(in: rect)
+                let size = eye.scaledSize(in: rect)
+                softSpot(ctx, center: CGPoint(x: center.x, y: center.y + size.height * 0.62),
+                         radiusX: size.width * 0.95, radiusY: size.height * 0.78,
+                         color: colors.fur)
+                ctx.setStrokeColor(colors.eyeDark)
+                ctx.setLineWidth(size.height * 0.16)
+                ctx.setLineCap(.round)
+                ctx.move(to: CGPoint(x: center.x - size.width * 0.5, y: center.y + size.height * 0.18))
+                ctx.addLine(to: CGPoint(x: center.x + size.width * 0.5, y: center.y + size.height * 0.18))
+                ctx.strokePath()
+            }
+        case .sparkle where eyesCovered == false:
+            for eye in [Self.eyeLeft, Self.eyeRight] {
+                let center = eye.point(in: rect)
+                let size = eye.scaledSize(in: rect)
+                ctx.setFillColor(CGColor(srgbRed: 1, green: 1, blue: 1, alpha: 0.92))
+                ctx.fillEllipse(in: CGRect(
+                    x: center.x + size.width * 0.08, y: center.y - size.height * 0.05,
+                    width: size.width * 0.26, height: size.height * 0.26
+                ))
+                ctx.fillEllipse(in: CGRect(
+                    x: center.x - size.width * 0.30, y: center.y - size.height * 0.42,
+                    width: size.width * 0.16, height: size.height * 0.16
+                ))
+            }
+        default:
+            break
+        }
     }
 
     // MARK: - Overlays
@@ -271,6 +422,7 @@ final class ReferenceImageSource: AnimationFrameSource {
     private struct SampledColors {
         var eyeDark: CGColor
         var blush: CGColor
+        var fur: CGColor
     }
 
     private func sampleColors(from base: CGImage) -> SampledColors {
@@ -285,7 +437,7 @@ final class ReferenceImageSource: AnimationFrameSource {
         ctx.draw(base, in: CGRect(x: 0, y: 0, width: width, height: height))
         guard let data = ctx.data else {
             let fallback = SKColor.black.cgColor
-            sampledColors = SampledColors(eyeDark: fallback, blush: fallback)
+            sampledColors = SampledColors(eyeDark: fallback, blush: fallback, fur: fallback)
             return sampledColors!
         }
         let px = data.bindMemory(to: UInt8.self, capacity: width * height * 4)
@@ -300,7 +452,8 @@ final class ReferenceImageSource: AnimationFrameSource {
         }
         let colors = SampledColors(
             eyeDark: probe(Self.eyeLeft.x, Self.eyeLeft.y),
-            blush: probe(Self.blushLeft.x, Self.blushLeft.y)
+            blush: probe(Self.blushLeft.x, Self.blushLeft.y),
+            fur: probe(0.50, 0.68)
         )
         if ProcessInfo.processInfo.environment["COOKIE_SAMPLE_DEBUG"] != nil {
             func desc(_ c: CGColor) -> String {
@@ -375,37 +528,34 @@ final class ReferenceImageSource: AnimationFrameSource {
         ctx.strokePath()
     }
 
-    private func drawOverlay(_ overlay: Overlay, in ctx: CGContext, base: CGImage, rect: CGRect, colors: SampledColors) {
+    private func drawOverlay(_ overlay: Overlay, in ctx: CGContext, base: CGImage, rect: CGRect, colors: SampledColors, eyeFill: CGColor) {
         switch overlay {
         case .eyesClosed, .eyesHappy, .eyesWide, .eyesHalf:
             for eye in [Self.eyeLeft, Self.eyeRight] {
                 let center = eye.point(in: rect)
                 let size = eye.scaledSize(in: rect)
-                // Clone from fur directly above each eye: adjacent shading
-                // makes the cover seamless.
-                func source(for patch: CGSize) -> CGPoint {
-                    CGPoint(x: eye.x,
-                            y: (eye.y - eye.ry) - patch.height / rect.height / 2 - 0.008)
-                }
+                // Clone from the bridge between the eyes: at eye height,
+                // so its shading matches the area being covered.
+                let sourceNorm = CGPoint(x: 0.46, y: 0.36)
                 switch overlay {
                 case .eyesClosed:
                     let patch = CGSize(width: size.width * 2.0, height: size.height * 1.35)
                     cloneOver(ctx, base: base, rect: rect, over: center,
-                              patchSize: patch, sourceCenterNorm: source(for: patch))
+                              patchSize: patch, sourceCenterNorm: sourceNorm)
                     strokeEyeArc(ctx, at: CGPoint(x: center.x, y: center.y + size.height * 0.12),
                                  radius: size.width * 0.62, upper: false,
                                  color: colors.eyeDark, width: size.height * 0.22)
                 case .eyesHappy:
                     let patch = CGSize(width: size.width * 2.0, height: size.height * 1.35)
                     cloneOver(ctx, base: base, rect: rect, over: center,
-                              patchSize: patch, sourceCenterNorm: source(for: patch))
+                              patchSize: patch, sourceCenterNorm: sourceNorm)
                     strokeEyeArc(ctx, at: CGPoint(x: center.x, y: center.y - size.height * 0.08),
                                  radius: size.width * 0.62, upper: true,
                                  color: colors.eyeDark, width: size.height * 0.22)
                 case .eyesWide:
                     let patch = CGSize(width: size.width * 1.6, height: size.height * 1.6)
                     cloneOver(ctx, base: base, rect: rect, over: center,
-                              patchSize: patch, sourceCenterNorm: source(for: patch))
+                              patchSize: patch, sourceCenterNorm: sourceNorm)
                     ctx.setFillColor(colors.eyeDark)
                     ctx.fillEllipse(in: CGRect(
                         x: center.x - size.width * 0.62, y: center.y - size.height * 0.62,
@@ -420,7 +570,7 @@ final class ReferenceImageSource: AnimationFrameSource {
                     let patch = CGSize(width: size.width * 1.6, height: size.height * 1.0)
                     cloneOver(ctx, base: base, rect: rect,
                               over: CGPoint(x: center.x, y: center.y + size.height * 0.5),
-                              patchSize: patch, sourceCenterNorm: source(for: patch))
+                              patchSize: patch, sourceCenterNorm: sourceNorm)
                     ctx.setStrokeColor(colors.eyeDark)
                     ctx.setLineWidth(size.height * 0.2)
                     ctx.setLineCap(.round)
@@ -492,7 +642,7 @@ final class ReferenceImageSource: AnimationFrameSource {
     // MARK: - Debug export
 
     /// Writes every animation's baked frames as PNGs for visual review.
-    static func exportFrames(to directory: URL, palette: CharacterPalette = .standard(for: .classicCream)) {
+    static func exportFrames(to directory: URL, config: CookieAppearanceConfig = CookieAppearanceConfig()) {
         let source = ReferenceImageSource()
         guard let base = loadArtwork() else {
             print("exportFrames: artwork not found"); return
@@ -504,7 +654,7 @@ final class ReferenceImageSource: AnimationFrameSource {
             guard let plan = plan(for: animation) else { continue }
             for (index, frame) in plan.enumerated() {
                 let image = source.bake(frame: frame, base: base, colors: colors,
-                                        canvas: canvas, palette: palette)
+                                        canvas: canvas, config: config)
                 let url = directory.appendingPathComponent("\(animation.rawValue)-\(index).png")
                 let dest = CGImageDestinationCreateWithURL(url as CFURL, "public.png" as CFString, 1, nil)
                 if let dest {
