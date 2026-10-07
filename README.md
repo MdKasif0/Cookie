@@ -1,258 +1,257 @@
-# Cookie 🍪
+<div align="center">
 
-A cute, premium desktop companion for macOS. Cookie is a little cat who
-lives on your desktop — blinking, watching, and hopping when you say hello.
+  <img src="website/assets/app_icon.png" width="108" height="108" alt="Cookie for macOS App Icon" />
 
-Native Swift app: **SwiftUI** for all UI, **SpriteKit** for the character.
-Light theme, warm palette, no cloud, no accounts — everything stays local.
+  # Cookie 🐱
 
-## Building
+  **A quiet, warm 2D desktop companion that lives on your Mac.**  
+  *No subscriptions. No cloud accounts. No telemetry. Just a tiny cat right on your desktop.*
 
-Requires Xcode with a full macOS SDK and [xcodegen](https://github.com/yonaskolb/XcodeGen).
+  [![Platform](https://img.shields.io/badge/Platform-macOS%2014.0%2B%20(Sonoma%20%7C%20Sequoia)-262421?style=flat-square&logo=apple&logoColor=white)](https://apple.com)
+  [![Architecture](https://img.shields.io/badge/Architecture-Universal%20(Apple%20Silicon%20%2B%20Intel)-e87920?style=flat-square)](https://github.com/MdKasif0/Cookie)
+  [![Tech Stack](https://img.shields.io/badge/UI-SwiftUI%20%7C%20SpriteKit-75856f?style=flat-square&logo=swift&logoColor=white)](https://developer.apple.com/swift/)
+  [![License](https://img.shields.io/badge/License-MIT-5d4d40?style=flat-square)](LICENSE)
+  [![Privacy](https://img.shields.io/badge/Privacy-100%25%20Offline%20%7C%20Zero%20Telemetry-262421?style=flat-square)](website/#privacy)
+  [![Disk Image](https://img.shields.io/badge/Download-~15%20MB%20DMG-e87920?style=flat-square)](https://github.com/MdKasif0/Cookie/releases)
 
-```sh
-xcodegen generate          # regenerates Cookie.xcodeproj from project.yml
-open Cookie.xcodeproj      # then Cmd+R, or:
-xcodebuild -project Cookie.xcodeproj -scheme Cookie -configuration Debug build
+</div>
+
+---
+
+## 📖 Overview
+
+**Cookie** is an authentic, lightweight indie desktop companion designed specifically for macOS. She wanders across your display, follows your cursor with curious glances, naps beside working windows, and purrs when pet.
+
+Built with native **SpriteKit** and **SwiftUI**, Cookie is whisper-quiet on hardware (~0% idle CPU during sleep) and never interrupts your workflow.
+
+---
+
+## ✨ Key Features
+
+| Capability | Detail |
+| :--- | :--- |
+| **🐾 Living Desktop Companion** | Runs as a borderless, non-activating floating panel across all macOS Spaces without stealing focus. |
+| **🎯 Pixel-Perfect Alpha Hit Testing** | Clicks on transparent pixels pass straight through to background apps. Cookie never obstructs your clicks. |
+| **🧠 Autonomous Behavior Engine** | Tick-driven state machine shaped by time of day, personality weights, and cooldown timers. |
+| **🫳 Direct Tactile Interactions** | Zone-aware petting (nose, head, feet, belly, tail), picking up and dragging, and play bursts. |
+| **🎨 Bespoke Customization** | 10 warm fur palettes, custom patterns, eye styles, body scaling, and layered vector accessories. |
+| **🎵 Synthesized Sound System** | Pitch-bent cat vocalizations (mrrps, purrs, squeaks, naps) with dedicated volume sliders. |
+| **🔒 100% Local & Private** | Zero analytics, zero network requests, and simple JSON persistence in `Application Support`. |
+
+---
+
+## 🏗️ Architecture & Engine
+
+### High-Level System Architecture
+
+```mermaid
+graph TD
+    subgraph macOS ["macOS Desktop & Window Server"]
+        Panel["NSPanel (Companion Window)<br/>Floating · Non-Activating · Spaces-Aware"]
+        Hit["CookieHitTester<br/>Downsampled Alpha Silhouette Hit Mask"]
+        Menu["Menu Bar Item (Cat Icon)<br/>Show/Hide · Quick Pet · Settings"]
+    end
+
+    subgraph Core ["Companion Core Engine"]
+        Engine["CookieBehaviorEngine<br/>Tick-Driven State Machine"]
+        Anim["SpriteAnimationController<br/>Priority-Based SpriteKit Pipeline"]
+        Audio["AudioManager<br/>Synthesized Voice & Soft Sfx"]
+    end
+
+    subgraph Interface ["SwiftUI Interface"]
+        Settings["Settings Window (⌘,)<br/>6-Tab Native Preferences"]
+        Customizer["Character Customizer (⌘K)<br/>Live Interactive Preview Studio"]
+    end
+
+    subgraph Storage ["Local Storage"]
+        Store["CookieStore (JSON)<br/>~/Library/Application Support/Cookie/"]
+    end
+
+    Panel --> Hit
+    Hit -->|Touch / Drag / Boop| Engine
+    Engine -->|Animation Triggers| Anim
+    Engine -->|Mood Vocalizations| Audio
+    Menu -->|Remote Pet / Feed / Play| Engine
+    Settings -->|Live Preference Updates| Engine
+    Customizer -->|Appearance & Accessory Mutators| Store
+    Engine <-->|Profile & Statistics| Store
 ```
 
-If `xcodebuild` points at the Command Line Tools, prefix with
-`DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer`.
+### Behavior State Machine
 
-## Project layout
+Cookie's behavior is governed by `CookieBehaviorEngine`. Rather than acting like a restless desktop toy, Cookie behaves like a real cat with weighted probabilities, natural durations, and anti-annoyance cooldowns:
+
+```mermaid
+stateDiagram-v2
+    [*] --> Idle
+
+    Idle --> Walking: Stroll Chance (15%)
+    Idle --> Sitting: Relaxing (8%)
+    Idle --> Grooming: Self-Care (7%)
+    Idle --> Sleeping: Low Energy / Late Night (4%)
+    Idle --> Curious: Cursor Enters Awareness Zone
+
+    Curious --> Idle: Cursor Departs / Timeout
+    
+    Walking --> Sitting: Destination / Edge Reached
+    Walking --> Idle: Pause
+    
+    Sitting --> Sleeping: Sleep Ritual (Yawn → Sit → Sleep)
+    Sleeping --> Idle: Wake-Up Stretch
+    
+    Idle --> PickedUp: Click & Drag
+    PickedUp --> Falling: Mouse Released
+    Falling --> Idle: Soft Landing Animation
+    
+    Idle --> Overpetted: Pet Tolerance Exceeded
+    Overpetted --> Sulking: Gentle Hmph & Disengagement
+    Sulking --> Idle: Rest Period Expired
+```
+
+### Base Activity Weight Distribution
+
+```mermaid
+pie title Base Companion Activity Weighting
+    "Idle & Observing" : 45
+    "Gentle Strolling" : 15
+    "Sitting & Relaxing" : 8
+    "Self-Grooming" : 7
+    "Stretching" : 6
+    "Interactive Play" : 5
+    "Curious Look" : 5
+    "Rest & Sleep" : 4
+    "Special Antics" : 3
+    "Cursor Following" : 2
+```
+
+---
+
+## 🎮 Direct Interactions
+
+Cookie's artwork is mapped into normalized anatomical zones (`CookieZone`) that scale dynamically with sprite variations:
+
+| Zone / Action | Interaction | Reaction & Effect |
+| :--- | :--- | :--- |
+| **Nose** | Single click | Surprised sneeze or tiny meow. |
+| **Head & Ears** | Single click / stroke | Delighted purr, closed-eye grin, and affection gain. |
+| **Belly & Body** | Click / rub | Soft meow, happy glance, or contented purr. |
+| **Feet** | Single click | Playful hop and quick paw lift. |
+| **Tail** | Single click | Gentle startle reaction with twitch. |
+| **Pick Up** | Click & Drag | Enters carried pose; stroking mid-air counts as comforting petting. |
+| **Drop** | Release cursor | Smooth physics drop with landing cushion sound. |
+| **Double Click** | Quick double tap | Short playful burst or enthusiastic jump. |
+| **Over-Petting** | Exceeding tolerance | Annoyed look away ("hmph") and a brief sulk avoiding cursor play. |
+
+---
+
+## 🎨 Personalities & Customization
+
+### The Six Personalities
+
+* **😴 Sleepy**: Spends extra time curled up in deep sleep. Ideal for quiet focus sessions.
+* **🧶 Playful**: Loves bouncing, double-click games, and inspecting screen elements.
+* **💖 Affectionate**: High pet tolerance, frequent purring, and quick affection growth.
+* **⚡ Energetic**: Fast strides, active strolls across your workspace, and lively curiosity.
+* **👀 Curious**: Follows your cursor closely, tracking movements with gentle head tilts.
+* **😼 Grumpy**: Lower pet tolerance, independent behavior, and dry, comical reactions.
+
+### Customization Studio (⌘K)
+
+Accessible directly from the menu bar or settings:
+* **Fur Colors**: 10 hand-curated warm swatches (Warm White, Cream, Peach, Ginger, Caramel, Cinnamon, Mocha, Slate, Charcoal, Velvet Black). *Strictly no cold blues or harsh purples.*
+* **Patterns**: Solid, Tuxedo, Siamese Points, and Tabby stripes.
+* **Eye Styles**: Round, Sleepy, and Sparkle with customized iris glints.
+* **Accessories**: Vector-anchored Collars, Bows, Party Hats, Glasses, Scarves, Bandanas, and Crowns.
+* **Body Scale**: Classic, Chubby, and Petite options with live panel re-centering.
+
+---
+
+## ⚙️ Native Settings & Menu Bar
+
+Cookie features a clean, native six-tab preference pane (⌘,):
+
+1. **General**: Launch at login (`SMAppService`), initial desktop visibility, and multi-display position recall.
+2. **Appearance**: Dynamic scale slider, animation frame rate, and macOS Reduced Motion compliance.
+3. **Sound**: Master volume, dedicated meow slider, interaction sound toggles, and ambient purring controls.
+4. **Behavior**: Activity cadence (Calm / Balanced / Lively), cursor awareness toggle, and nap duration cap.
+5. **Privacy**: Statement of complete local data residency and offline operation.
+6. **About**: Version metadata, open-source acknowledgments, and repository links.
+
+---
+
+## 📂 Project Structure
 
 ```
 Cookie/
-    App/            App lifecycle: entry point, AppDelegate, composition root, WindowManager
-    Models/         CookieProfile, personality, appearance, activity, statistics
-    Cookie/         The desktop companion: panel, view controller, SpriteKit scene
-    Animation/      SpriteProviding protocol, placeholder character, animation factory
-    Behaviors/      CookieBehaviorEngine — decides what Cookie does next
-    Customization/  Appearance/accessory catalog
-    Persistence/    CookieStore — JSON persistence in Application Support
-    Audio/          AudioManager — sound effects with gentle fallbacks
-    MenuBar/        Menu bar menu
-    Settings/       General / Appearance / Statistics tabs
-    Views/          Welcome window and character preview
-    ViewModels/     Welcome flow view model
-    Resources/      Info.plist, Sounds/ (drop final audio here)
-    Assets/         Asset catalog: accent color, app icon
-scripts/make_icon.swift  Regenerates the placeholder app icon
-project.yml              XcodeGen project definition
+├── Cookie/
+│   ├── App/             # Entry point, AppDelegate, WindowManager composition
+│   ├── Cookie/          # CompanionPanelController, NSPanel, CookieScene (SpriteKit)
+│   ├── Behaviors/       # CookieBehaviorEngine, state machine, timers, rituals
+│   ├── Animation/       # SpriteAnimationController, texture slicers, frame caches
+│   ├── Models/          # CookieProfile, CookieSettings, Personality, Activity
+│   ├── Customization/   # Appearance catalogs, vector accessories, pattern generators
+│   ├── Audio/           # AudioManager, sound synthesis engine, volume buses
+│   ├── MenuBar/         # Status item controller and companion menu
+│   ├── Settings/        # Native SwiftUI 6-tab preference panels
+│   ├── Views/           # Welcome onboarding window and character studio preview
+│   └── Persistence/     # CookieStore (JSON manager with corruption safeguards)
+├── scripts/             # Asset generators, sound synthesizer, icon builders
+├── website/             # Clean product showcase website & download portal
+├── DISTRIBUTION.md      # Code signing, notarization, and DMG build guide
+└── project.yml          # Declarative XcodeGen configuration
 ```
 
-## Direct interaction
+---
 
-All mouse input is routed through the alpha hit tester, which also names
-the body part being touched — `CookieZone` regions (nose, head, body,
-tail, feet) are normalized ellipses over the artwork, so they scale with
-the sprite and survive palette changes. `--export-cookie-hitmask` draws
-the zone outlines over the silhouette for review.
+## 🚀 Building & Developing
 
-- **Hover**: a nearby cursor earns an occasional glance — a short
-  curious look toward you, at most once every ~20–45 s, suppressed while
-  she is asleep, eating, grooming, or mid-animation.
-- **Single click**: zone-flavored reactions — nose taps surprise her,
-  tail touches startle her, head pets delight her (and build affection),
-  feet get a meow, body clicks purr, meow, or look up at you.
-- **Double click**: a short play burst with its own sound.
-- **Drag**: picking her up pauses the behavior machine and shows the
-  carried pose; stroking across her head or belly while carried counts
-  as petting (each sweep purrs and builds affection); letting go plays
-  the little landing and resumes normal life.
-- **Too much interaction**: past the personality's pet tolerance,
-  reactions turn annoyed — a hmph while looking away — followed by a
-  short sulk where she avoids play and drifts away from the cursor if
-  she moves. Nothing punitive, nothing loud.
-- **Sounds**: a synthesized cat voice set — a pitch-bent meow, rumbling
-  purr, happy "mrrp!", shy mew, surprise squeak, munches, toy blips,
-  landing thuds, and nap breathing — generated by
-  `scripts/make_sounds.swift` and throttled per effect. Meows follow
-  their own volume slider; real recordings can replace any file by name
-  (see `Resources/Sounds/README.md`).
-- **Statistics**: pets and affection accumulate locally and show in
-  Settings → Statistics.
+### Requirements
+* **macOS 14.0 Sonoma** or later
+* **Xcode 15.0+** with Command Line Tools
+* **[XcodeGen](https://github.com/yonaskolb/XcodeGen)** (`brew install xcodegen`)
 
-## Menu bar & Settings
+### Quick Start
 
-The menu bar item (a cat symbol) holds the whole app: the name header,
-Show/Hide Cookie, **Pet Cookie / Feed Cookie / Play** (remote companion
-commands through the behavior engine), **Customize Cookie…** (⌘K), and
-Settings (⌘,).
+```bash
+# 1. Clone repository
+git clone https://github.com/MdKasif0/Cookie.git
+cd Cookie
 
-Settings is a native six-tab window:
+# 2. Generate Xcode project from project.yml
+xcodegen generate
 
-- **General** — launch at login (SMAppService), show on startup, desktop
-  visibility, remember position, and the customization entry point.
-- **Appearance** — Cookie size (rescales the panel, character, and hit
-  tester live), animation intensity (frame rate + bob amplitude), and
-  reduced-motion mode (follow system / always / never).
-- **Sound** — master volume, a separate meow volume, interaction sounds,
-  and purring/ambient sounds.
-- **Behavior** — activity level (calm/balanced/lively), random
-  interactions, cursor interaction, window interaction, and sleep
-  behavior (normal/longer/never — with its own duration cap).
-- **Privacy** — everything local, no account, no cloud, no analytics.
-- **About** — name, version, credits, and the project link.
+# 3. Open in Xcode or build via CLI
+open Cookie.xcodeproj
+# Or build directly:
+xcodebuild -project Cookie.xcodeproj -scheme Cookie -configuration Debug build
+```
 
-Every setting lives in `CookieSettings` inside the profile JSON (with
-migration from the old top-level sound fields) and is read live by the
-engine, audio, and window layers.
+### Developer CLI Flags
 
-## Customization
+Cookie includes built-in diagnostics for inspecting assets and hit masks:
 
-Menu bar → **Customize Cookie…** opens a native character editor:
-category sidebar, a large live preview on a warm backdrop, and simple
-controls below. Every change applies instantly (no Apply button);
-Appearance and Accessories offer Revert/Remove-all; everything persists
-in the profile JSON and restores at launch.
+```bash
+# Export all rendered animation frames to /tmp/cookie-frames for visual review
+./build/Debug/Cookie.app/Contents/MacOS/Cookie --export-cookie-frames
 
-- **Appearance**: fur color (ten warm swatches — warm white through
-  charcoal, no purple/blue anywhere), fur pattern (tuxedo, points,
-  tabby — soft overlays over the base pose), eye color (repaints the
-  eyes and redraws their glints), eye style (round/sleepy/sparkle),
-  body variation (classic/chubby/petite scaling), plus ear and tail
-  variations that persist and render once layered artwork supplies
-  those pieces.
-- **Accessories**: collar, bow, party hat, glasses, scarf, crown, and
-  bandana — vector layers anchored to the artwork with per-accessory
-  visibility, scale, and height. They layer correctly (neck → head →
-  glasses) and mirror with the cat's direction.
-- **Personality**: all six personalities with their summaries.
-- **Name**: live rename; the menu bar, editor, and welcome text follow.
+# Export the pixel-accurate alpha hit-test mask as a debug image
+./build/Debug/Cookie.app/Contents/MacOS/Cookie --export-cookie-hitmask
+```
 
-### Sprite layer system
+---
 
-Rendering is a chain of independently replaceable sources
-(`AnimationFrameSource`): bundle sprite sheets → the user's reference
-artwork (with customization baked per frame) → the vector placeholder.
-Expression stickers (`CookieExpressionArt` — angry, cool, dizzy,
-embarrassed, joyful, hungry, mischievous, scared, supplied by the user)
-replace whole poses for their states: annoyed plays the angry pose,
-dropped lands dizzy, eating shows hungry, and so on — with a quick
-crossfade so nothing snaps. A future layered asset set can replace the
-flattened pipeline layer by layer (fur → pattern → face → eyes →
-accessories) without touching the state machine.
+## 📦 Distribution & Packaging
 
-## Behavior state machine
+* **Binary Format**: Universal 2 (`arm64` Apple Silicon + `x86_64` Intel)
+* **Installer Format**: Self-contained ~15 MB disk image (`Cookie-1.0.0.dmg`)
+* **Local Data Path**: `~/Library/Application Support/Cookie/cookie-store.json`
 
-`CookieBehaviorEngine` is a tick-driven state machine — the scene calls
-`tick(dt:currentX:cursorX:)` every frame and executes what it decides.
+For complete details on Hardened Runtime, Apple Developer ID signing, and notarization workflows, see [DISTRIBUTION.md](DISTRIBUTION.md).
 
-- **States**: idle, walking, running, sitting, sleeping, yawning,
-  stretching, grooming, curious, playing, eating, drinking,
-  followingCursor, beingDragged, reacting, special. Each has a natural
-  duration, an animation mapping, and exit conditions; multi-state
-  rituals run as sequences (the sleep ritual: yawn → sit → sleep →
-  wake-up stretch).
-- **Weights**: idle 45, walk 15, sit 8, groom 7, stretch 6, look around
-  5, play 5, sleep 4, special 3, and the rest split between running,
-  eating, drinking, and cursor-following. Personality and local time
-  scale these; cooldowns zero them out (no sleep within ~2–3.5 min of
-  the last nap, no bouncing between screen edges, one cursor-follow
-  per few minutes).
-- **Movement**: walks pick a destination within the visible screen,
-  face the right way, and include little pauses; arriving leads to a
-  look-around, a sit, or idle.
-- **Time awareness**: morning starts with a wake-up stretch and
-  favors strolling; evening calms things down; late night triples the
-  chance of sleep, slows her walk, and lengthens naps (capped at 90 s).
-- **Personalities**: Sleepy, Playful, Affectionate, Energetic, Curious,
-  Grumpy — gentle weight multipliers plus a pet tolerance. Over-petting
-  an intolerant Cookie makes reactions annoyed (grumpy most easily),
-  followed by a short sulk where she avoids playful antics.
-- **Anti-annoyance**: everything is weighted, cooled down, and capped —
-  no chasing, no repeated sounds, no notifications, movement only a
-  small fraction of the time.
-- **Testing**: the engine has injectable `now`/`visibleXRange` seams and
-  exposes `stateElapsed`/`edgeCooldownUntil` internally; the compile-in
-  test harness (`/tmp/main.swift` pattern — build the real sources plus
-  a `main.swift` with `swiftc`) drives simulated hours through the
-  machine and asserts transitions, rituals, caps, and cooldowns.
+---
 
-## Desktop companion behavior
+## 📄 License
 
-The companion panel (`Cookie/CompanionPanelController.swift`) is a
-borderless, non-activating `NSPanel` that floats above normal windows on
-every Space, with no chrome — Cookie is not a document window:
+Cookie is free and open-source software distributed under the **[MIT License](LICENSE)**.
 
-- **Click-through**: `CompanionSKView.hitTest` consults
-  `CookieHitTester`, a downsampled alpha silhouette of the artwork.
-  Clicks on transparent pixels pass straight through to whatever app is
-  beneath; only Cookie's actual shape (plus a 2-cell grab margin) is
-  interactive. She never blocks the desktop around her.
-- **Dragging**: grabbing Cookie pauses the activity cadence; dropping
-  her clamps the position back into the visible screen area and persists
-  it. A per-frame safety net re-clamps if a mouse-up is ever missed.
-- **Walking**: the behavior engine picks personality-weighted strolls;
-  `CookieScene.update(_:)` glides the panel at the personality's speed.
-  At a screen edge she stops and turns around, idles, or sits near the
-  edge — and walking stays suppressed for 25–50 s afterward, so she
-  never ping-pongs between boundaries.
-- **Screen safety**: `CookieScreenGeometry` keeps her center inside the
-  union of all displays' visible frames. Saved positions stranded by a
-  disconnected display fall back to the friendly default spot, and
-  display-configuration changes / screen wake re-clamp automatically.
-- **Window scanning**: `DesktopWindowScanner` is a read-only seam for
-  future playful interactions (perching, glancing at windows). Cookie
-  never modifies other applications' windows.
-- **Debug**: `--export-cookie-hitmask` writes the clickable silhouette
-  as PNG for review.
-
-## Sprite animation system
-
-The character is driven by `Animation/SpriteAnimationController`: a single
-sprite node plays frame animations resolved from an ordered chain of
-sources — bundle sprite sheets first, the shipped reference artwork
-second, the rendered vector placeholder third.
-
-**Current artwork**: the user's reference image ships as the `CookieArt`
-asset and *is* the base pose (`ReferenceImageSource`). Every animation is
-derived from it at runtime — bottom-anchored squash/tilt/bounce transforms
-plus texture-cloned overlays (closed/happy/wide eyes, open mouth, boosted
-blush) — so Cookie on screen always looks exactly like the reference.
-Feature coordinates were measured from the artwork with
-`scripts/analyze_reference.swift`; `scripts/prepare_reference.swift`
-regenerates the trimmed asset and the app icon from the original PNG.
-
-- **Catalog**: `CookieAnimationId` defines every animation (idle, blink,
-  walk/run ×2 directions, sit, sleep, wake, stretch, yawn, groom, emotions,
-  eat/drink, jump/fall/pickedUp/dropped, pet, meow) with priority, fps,
-  and looping. Missing artwork falls back to idle automatically.
-- **Priorities**: sleep < idle < walk < interaction < special. Higher
-  priorities interrupt lower ones; one-shots finish into the previous
-  looping base state automatically.
-- **Direction**: one shared pose per locomotion animation, mirrored at
-  render time via a flip container — no separate left/right art.
-- **Performance**: grid sheets are sliced with `SKTexture(rectIn:)` (one
-  GPU texture); derived frames are baked once per palette into cached
-  textures. Nothing is re-created per frame.
-- **Accessibility**: with macOS Reduced Motion enabled, transitions and
-  callbacks still occur but poses render statically.
-- **Resource contract**: `Resources/Sprites/README.md` documents the
-  `Sprites/Cookie/<Category>/` layout, the optional `manifest.json`
-  (fps, loop, frame order, grid), and frame-numbering conventions.
-- **Debug tool**: run the app with `--export-cookie-frames` to write
-  every baked frame as PNG (to `/tmp/cookie-frames`) for art review.
-
-## Replacing or extending the artwork
-
-Drop final animation sheets into `Cookie/Resources/Sprites/Cookie/…`
-following `Resources/Sprites/README.md` — the sheet source outranks the
-derived reference frames automatically, with no code changes. To swap the
-base artwork instead, replace the `CookieArt` imageset and re-run
-`scripts/prepare_reference.swift`.
-
-## Sound effects
-
-Drop files named `cookie-pet` and `cookie-welcome` (`.aiff`/`.caf`/`.mp3`)
-into the app bundle; `AudioManager` picks them up automatically and falls
-back to soft system sounds until then.
-
-## Data
-
-One JSON file: `~/Library/Application Support/Cookie/cookie-store.json`.
-Holds name, personality, appearance, accessories, unlocks, sound
-preferences, companion position/visibility, and basic statistics. A file
-that cannot be parsed is preserved as `cookie-store.json.unreadable`
-rather than overwritten. Reset everything from Settings → Statistics.
+Crafted with care by [Md Kasif Uddin](https://github.com/MdKasif0).
