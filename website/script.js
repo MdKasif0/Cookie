@@ -222,6 +222,16 @@ document.addEventListener("DOMContentLoaded", () => {
         setTimeout(() => {
           draggableCookie.style.transform = "";
         }, 180);
+
+        const sandboxToast = document.getElementById("sandboxToast");
+        if (sandboxToast) {
+          const sandboxPurrs = ["purr… 🐾", "mew 🌿", "*snuggle*", "*gentle stretch*"];
+          sandboxToast.textContent = sandboxPurrs[Math.floor(Math.random() * sandboxPurrs.length)];
+          sandboxToast.classList.add("active");
+          setTimeout(() => {
+            sandboxToast.classList.remove("active");
+          }, 1600);
+        }
       }
     };
 
@@ -318,7 +328,14 @@ document.addEventListener("DOMContentLoaded", () => {
     "sassy": "<strong>Sassy & Bold:</strong> Independent and proud. Swishes her tail, bats at toys, and commands your desktop presence."
   };
 
-  const updateCustomizerView = () => {
+  const styleDescriptions = {
+    "classic": "<strong>Classic Cookie:</strong> Warm, minimal, and timeless. The pure 2D desktop companion experience.",
+    "cool": "<strong>Tiny Shades:</strong> Unflappable cool. Cookie sports dark sunglasses as she strolls along your active windows.",
+    "shy": "<strong>Bashful Blush:</strong> Sweet and delicate. Blushes softly whenever your cursor glides close to say hello.",
+    "mischief": "<strong>Mischievous:</strong> Spirited and playful. Always looking for yarn balls to bat and fun trouble to stir up."
+  };
+
+  const updateCustomizerView = (lastChanged) => {
     // Choose appropriate sprite based on style preference first, then mood
     let spriteName = "cookie";
 
@@ -349,8 +366,12 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    if (customizerDesc && personalityDescriptions[currentMood]) {
-      customizerDesc.innerHTML = personalityDescriptions[currentMood];
+    if (customizerDesc) {
+      if (lastChanged === "style" && styleDescriptions[currentStyle]) {
+        customizerDesc.innerHTML = styleDescriptions[currentStyle];
+      } else if (personalityDescriptions[currentMood]) {
+        customizerDesc.innerHTML = personalityDescriptions[currentMood];
+      }
     }
   };
 
@@ -359,7 +380,7 @@ document.addEventListener("DOMContentLoaded", () => {
       personalityPills.forEach((p) => p.classList.remove("active"));
       pill.classList.add("active");
       currentMood = pill.getAttribute("data-mood") || "calm";
-      updateCustomizerView();
+      updateCustomizerView("mood");
     });
   });
 
@@ -368,7 +389,7 @@ document.addEventListener("DOMContentLoaded", () => {
       accessoryPills.forEach((p) => p.classList.remove("active"));
       pill.classList.add("active");
       currentStyle = pill.getAttribute("data-style") || "classic";
-      updateCustomizerView();
+      updateCustomizerView("style");
     });
   });
 });
