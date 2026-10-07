@@ -2,6 +2,29 @@ import Foundation
 import AppKit
 import os
 
+/// Harmless, very rare random events that surprise and delight the user.
+enum SpecialEventKind: String, CaseIterable, Identifiable {
+    case zoomies          // Cookie suddenly sprints across the desktop
+    case toyChase         // Cookie spots a rolling toy and dashes after it
+    case acrobatics       // Cookie performs a special hop/jump animation
+    case unusualNap       // Cookie wanders to a far corner and naps
+    case watchCursor      // Cookie sits and intently watches cursor moves
+    case boxAdventure     // A surprise cardboard box appears and Cookie climbs inside
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .zoomies: return "Zoomies"
+        case .toyChase: return "Chase Toy"
+        case .acrobatics: return "Acrobatics"
+        case .unusualNap: return "Unusual Nap"
+        case .watchCursor: return "Watch Cursor"
+        case .boxAdventure: return "Box Adventure"
+        }
+    }
+}
+
 /// Cookie's behavior state machine — the single source of truth for what
 /// she is doing and why.
 ///
@@ -77,6 +100,8 @@ final class CookieBehaviorEngine: ObservableObject {
     private var nextPeekAt = Date.distantPast
     private var peekUntil = Date.distantPast
     private var specialCooldownUntil = Date.distantPast
+    private var autonomousToyCooldownUntil = Date.distantPast
+    private var watchingCursorUntil = Date.distantPast
 
     private struct LocomotionPlan {
         var targetX: CGFloat
