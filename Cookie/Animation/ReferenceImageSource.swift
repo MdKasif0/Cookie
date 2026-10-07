@@ -476,14 +476,20 @@ final class ReferenceImageSource: AnimationFrameSource {
             blush: probe(Self.blushLeft.x, Self.blushLeft.y),
             fur: probe(0.50, 0.68)
         )
+        #if DEBUG
         if ProcessInfo.processInfo.environment["COOKIE_SAMPLE_DEBUG"] != nil {
             func desc(_ c: CGColor) -> String {
-                let ci = c.converted(to: CGColorSpace(name: CGColorSpace.sRGB)!, intent: .defaultIntent, options: nil) ?? c
-                let comp = ci.components ?? []
+                if let srgb = CGColorSpace(name: CGColorSpace.sRGB),
+                   let ci = c.converted(to: srgb, intent: .defaultIntent, options: nil) {
+                    let comp = ci.components ?? []
+                    return comp.map { String(format: "%.2f", $0) }.joined(separator: ", ")
+                }
+                let comp = c.components ?? []
                 return comp.map { String(format: "%.2f", $0) }.joined(separator: ", ")
             }
             print("eyeDark = \(desc(colors.eyeDark)); blush = \(desc(colors.blush))")
         }
+        #endif
         sampledColors = colors
         return colors
     }
@@ -660,6 +666,7 @@ final class ReferenceImageSource: AnimationFrameSource {
         }
     }
 
+    #if DEBUG
     // MARK: - Debug export
 
     /// Writes every animation's baked frames as PNGs for visual review.
@@ -685,4 +692,5 @@ final class ReferenceImageSource: AnimationFrameSource {
             }
         }
     }
+    #endif
 }

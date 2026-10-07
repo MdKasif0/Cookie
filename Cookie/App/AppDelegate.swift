@@ -5,6 +5,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let environment = AppEnvironment()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        #if DEBUG
         // Debug tools for art review; each exports and exits.
         let arguments = ProcessInfo.processInfo.arguments
         var debugConfig = CookieAppearanceConfig()
@@ -30,6 +31,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             print("Cookie expressions exported to \(directory.path)")
             exit(0)
         }
+        #endif
         // Explicitly set dynamic dock icon to guarantee immediate display on launch
         if let iconImage = NSImage(named: "AppIcon") ?? NSImage(contentsOfFile: Bundle.main.path(forResource: "AppIcon", ofType: "icns") ?? "") {
             NSApp.applicationIconImage = iconImage

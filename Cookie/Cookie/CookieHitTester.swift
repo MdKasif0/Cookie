@@ -97,6 +97,7 @@ final class CookieHitTester {
         return CGPoint(x: nx, y: ny)
     }
 
+    #if DEBUG
     /// Writes the tested silhouette — with interaction zone outlines —
     /// as a PNG for visual verification.
     func exportMask(to url: URL, cellSize: Int = 6) {
@@ -126,11 +127,11 @@ final class CookieHitTester {
         let scaleX = CGFloat(width) / art.width
         let scaleY = CGFloat(height) / art.height
         let styles: [(CGColor, CGFloat)] = [
-            (CGColor(srgbRed: 0.75, green: 0.30, blue: 0.25, alpha: 0.9), 2),   // nose
-            (CGColor(srgbRed: 0.85, green: 0.55, blue: 0.20, alpha: 0.9), 2),   // head
-            (CGColor(srgbRed: 0.35, green: 0.55, blue: 0.30, alpha: 0.9), 2),   // tail
-            (CGColor(srgbRed: 0.30, green: 0.45, blue: 0.65, alpha: 0.9), 2),   // feet
-            (CGColor(srgbRed: 0.45, green: 0.40, blue: 0.55, alpha: 0.9), 2)    // body
+            (CGColor(srgbRed: 0.75, green: 0.30, blue: 0.25, alpha: 0.9), 2),   // nose (terracotta)
+            (CGColor(srgbRed: 0.85, green: 0.55, blue: 0.20, alpha: 0.9), 2),   // head (warm amber)
+            (CGColor(srgbRed: 0.45, green: 0.55, blue: 0.30, alpha: 0.9), 2),   // tail (sage olive)
+            (CGColor(srgbRed: 0.65, green: 0.45, blue: 0.25, alpha: 0.9), 2),   // feet (warm caramel)
+            (CGColor(srgbRed: 0.55, green: 0.40, blue: 0.30, alpha: 0.9), 2)    // body (chestnut)
         ]
         for (index, zone) in Self.zones.enumerated() {
             let style = styles[index]
@@ -157,4 +158,5 @@ final class CookieHitTester {
             CGImageDestinationFinalize(destination)
         }
     }
+    #endif
 }

@@ -226,6 +226,7 @@ final class ExpressionArtSource {
         return CGRect(x: minX, y: minY, width: drawSize.width, height: drawSize.height)
     }
 
+    #if DEBUG
     /// Debug: writes every baked sticker for visual review.
     static func exportAll(to directory: URL, config: CookieAppearanceConfig = CookieAppearanceConfig()) {
         try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
@@ -242,4 +243,5 @@ final class ExpressionArtSource {
             }
         }
     }
+    #endif
 }
