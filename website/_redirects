@@ -1,0 +1,3 @@
+# Netlify Redirects for Cookie Website
+/download    /downloads/Cookie-1.0.0.dmg    302!
+/dist/*      /downloads/:splat              301

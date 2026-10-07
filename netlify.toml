@@ -1,0 +1,54 @@
+# Netlify Configuration for Cookie macOS Companion Website
+# Documentation: https://docs.netlify.com/configure-builds/file-based-configuration/
+
+[build]
+  # Directory that contains the deploy-ready HTML files and assets
+  publish = "website"
+  # Build command (ensures downloads/ is populated even if built on Netlify CI)
+  command = "mkdir -p website/downloads && cp -f dist/Cookie-1.0.0.dmg website/downloads/Cookie-1.0.0.dmg || true"
+
+# Global security headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+# Long-term immutable caching for static image & font assets
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Direct download headers for macOS DMG installer
+[[headers]]
+  for = "/downloads/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+    Content-Disposition = "attachment; filename=\"Cookie-1.0.0.dmg\""
+
+# Optimized caching for stylesheets and scripts
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=86400, stale-while-revalidate=604800"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=86400, stale-while-revalidate=604800"
+
+# Convenient redirects
+[[redirects]]
+  from = "/download"
+  to = "/downloads/Cookie-1.0.0.dmg"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/dist/*"
+  to = "/downloads/:splat"
+  status = 301
