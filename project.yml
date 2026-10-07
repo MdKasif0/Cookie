@@ -52,6 +52,7 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.cookie.mac.tests
+        GENERATE_INFOPLIST_FILE: "YES"
         CODE_SIGN_STYLE: Manual
         CODE_SIGN_IDENTITY: "-"
         DEVELOPMENT_TEAM: ""
