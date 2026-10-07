@@ -128,6 +128,23 @@ enum CookiePoseCatalog {
             CookiePose(squash: 0.85, bodyY: -6, eyeStyle: .closed),
             CookiePose(squash: 0.92, bodyY: -2, eyeStyle: .wide),
             CookiePose()
+        ],
+        "investigate": [
+            CookiePose(squash: 0.95, headX: 4, headY: -4, headTilt: 4, tailAngle: -4, eyeStyle: .wide),
+            CookiePose(squash: 0.93, headX: 6, headY: -6, headTilt: 6, tailAngle: -8, eyeStyle: .open),
+            CookiePose(squash: 0.95, headX: 4, headY: -4, headTilt: 4, tailAngle: -4, eyeStyle: .wide)
+        ],
+        "tired": [
+            CookiePose(squash: 0.94, bodyY: -3, headY: -2, tailAngle: 2, eyeStyle: .half, mouthStyle: .flat),
+            CookiePose(squash: 0.91, bodyY: -4, headY: -3, tailAngle: 0, eyeStyle: .happy, mouthStyle: .flat)
+        ],
+        "inBox": [
+            CookiePose(squash: 0.88, bodyY: -10, headY: -6, eyeStyle: .open),
+            CookiePose(squash: 0.88, bodyY: -10, headY: -6, eyeStyle: .half)
+        ],
+        "boxPeek": [
+            CookiePose(squash: 0.94, bodyY: -3, headY: 3, pawLift: 4, eyeStyle: .wide),
+            CookiePose(squash: 0.96, bodyY: -2, headY: 4, pawLift: 5, eyeStyle: .open)
         ]
     ]
 }

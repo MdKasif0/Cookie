@@ -89,6 +89,10 @@ enum CookieAnimationId: String, CaseIterable {
     case dropped
     case pet
     case meow
+    case investigate
+    case tired
+    case inBox
+    case boxPeek
 
     var spec: CookieAnimationSpec {
         switch self {
@@ -136,6 +140,14 @@ enum CookieAnimationId: String, CaseIterable {
             return .standard(.interaction, "pet", priority: .interaction, looping: false, fps: 6)
         case .meow:
             return .standard(.interaction, "meow", priority: .interaction, looping: false, fps: 6)
+        case .investigate:
+            return .standard(.interaction, "investigate", priority: .interaction, looping: true, fps: 4)
+        case .tired:
+            return .standard(.idle, "tired", priority: .idle, looping: true, fps: 3)
+        case .inBox:
+            return .standard(.sleep, "inBox", priority: .sleep, looping: true, fps: 2)
+        case .boxPeek:
+            return .standard(.interaction, "boxPeek", priority: .interaction, looping: true, fps: 4)
         case .jump:
             return .standard(.special, "jump", priority: .special, looping: false, fps: 8)
         case .fall:

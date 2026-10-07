@@ -20,6 +20,12 @@ enum CookieState: String, Codable, CaseIterable {
     case beingDragged
     case reacting
     case special
+    /// Sniffing a toy or food that just appeared.
+    case investigating
+    /// Panting happily after a play session.
+    case tired
+    /// Hidden inside the cardboard box (peeking is a separate flag).
+    case inBox
 
     /// States that move the companion panel across the desktop.
     var isLocomotion: Bool {

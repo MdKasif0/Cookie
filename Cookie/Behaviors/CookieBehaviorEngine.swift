@@ -65,6 +65,19 @@ final class CookieBehaviorEngine: ObservableObject {
     /// with a tiny chirp.
     @Published private(set) var noticeCount = 0
 
+    // MARK: World interactions (toys, food, the box)
+
+    /// The item currently on Cookie's desktop, if any. The presenter
+    /// renders it as a small panel; the engine owns its lifetime.
+    @Published private(set) var worldItem: WorldItem?
+    /// True while Cookie pokes her head out of the cardboard box.
+    @Published private(set) var isPeeking = false
+
+    private var sessionTargetX: CGFloat?
+    private var nextPeekAt = Date.distantPast
+    private var peekUntil = Date.distantPast
+    private var specialCooldownUntil = Date.distantPast
+
     private struct LocomotionPlan {
         var targetX: CGFloat
         var isPaused = false
@@ -111,6 +124,28 @@ final class CookieBehaviorEngine: ObservableObject {
             locomotionVelocity = 0
         }
 
+        // Box peeking: while she is inside, she occasionally pokes her
+        // head over the rim for a moment.
+        if state == .inBox {
+            let date = now()
+            if isPeeking {
+                if date >= peekUntil {
+                    isPeeking = false
+                    nextPeekAt = date.addingTimeInterval(Double.random(in: 5...11))
+                }
+            } else if date >= nextPeekAt {
+                isPeeking = true
+                peekUntil = date.addingTimeInterval(Double.random(in: 1.2...1.9))
+            }
+        }
+
+        // Session walks end by arrival, not by timer.
+        if (state == .walking || state == .running),
+           let target = sessionTargetX, abs(lastKnownX - target) < 16 {
+            sessionTargetX = nil
+            stateElapsed = currentDuration
+        }
+
         if stateElapsed >= currentDuration {
             stateExpired()
         }
@@ -141,6 +176,11 @@ final class CookieBehaviorEngine: ObservableObject {
         if state == .beingDragged {
             // Safety: a click that arrives while carried ends the carry.
             enter(.idle)
+        }
+        if state == .inBox {
+            petThroughBox()
+            endPress()
+            return
         }
         endPress()
         sequenceQueue = []
@@ -280,6 +320,7 @@ final class CookieBehaviorEngine: ObservableObject {
         guard isRunning else { return }
         endPress()
         sequenceQueue = []
+        if worldItem != nil { clearSession() }
         enter(.beingDragged, duration: .infinity)
     }
 
@@ -290,8 +331,21 @@ final class CookieBehaviorEngine: ObservableObject {
 
     /// Menu bar commands — the same reactions as touching her, triggered
     /// from a distance.
+    /// Petting the box gets a peek from inside — she stays put.
+    private func petThroughBox() {
+        isPeeking = true
+        peekUntil = now().addingTimeInterval(2.0)
+        store.statistics.affection += 1
+        store.statistics.petsReceived += 1
+        recentPets.append(now())
+    }
+
     func handleMenuPet() {
         guard isRunning, state != .beingDragged else { return }
+        if state == .inBox {
+            petThroughBox()
+            return
+        }
         sequenceQueue = []
         store.statistics.petsReceived += 1
         store.statistics.affection += 2
@@ -349,7 +403,15 @@ final class CookieBehaviorEngine: ObservableObject {
             enter(next, duration: duration)
             return
         }
+        // A finished session takes its item with it.
+        if worldItem != nil { clearSession() }
         pickNextState()
+    }
+
+    private func clearSession() {
+        worldItem = nil
+        sessionTargetX = nil
+        isPeeking = false
     }
 
     /// The current behavior weight table, tuned by personality, local
