@@ -17,9 +17,13 @@ struct StatsSettingsTab: View {
                 LabeledContent("Affection", value: "\(store.statistics.affection)")
             }
             Section("Care & Play") {
+                LabeledContent("Total interactions", value: "\(store.statistics.totalInteractions)")
                 LabeledContent("Treats given", value: "\(store.statistics.treatsGiven)")
                 LabeledContent("Toys played with", value: "\(store.statistics.toysPlayedWith)")
                 LabeledContent("Cardboard box visits", value: "\(store.statistics.boxVisits)")
+                if let favorite = store.statistics.favoriteToy {
+                    LabeledContent("Favorite toy", value: "\(favorite.displayName) \(favorite.emoji)")
+                }
             }
             Section {
                 Button("Reset Cookie…", role: .destructive) {

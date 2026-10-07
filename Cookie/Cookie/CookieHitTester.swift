@@ -30,11 +30,12 @@ final class CookieHitTester {
         artRect = ReferenceImageSource.artRect(canvas: canvasSize)
 
         let width = gridWidth, height = gridHeight
-        let context = CGContext(
-            data: nil, width: width, height: height, bitsPerComponent: 8,
-            bytesPerRow: width * 4, space: CGColorSpace(name: CGColorSpace.sRGB)!,
-            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
-        )!
+        guard let space = CGColorSpace(name: CGColorSpace.sRGB),
+              let context = CGContext(
+                  data: nil, width: width, height: height, bitsPerComponent: 8,
+                  bytesPerRow: width * 4, space: space,
+                  bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+              ) else { return nil }
         context.interpolationQuality = .medium
         context.draw(image, in: CGRect(x: 0, y: 0, width: width, height: height))
         guard let data = context.data else { return nil }
@@ -100,11 +101,12 @@ final class CookieHitTester {
     /// as a PNG for visual verification.
     func exportMask(to url: URL, cellSize: Int = 6) {
         let width = gridWidth * cellSize, height = gridHeight * cellSize
-        let context = CGContext(
-            data: nil, width: width, height: height, bitsPerComponent: 8,
-            bytesPerRow: 0, space: CGColorSpace(name: CGColorSpace.sRGB)!,
-            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
-        )!
+        guard let space = CGColorSpace(name: CGColorSpace.sRGB),
+              let context = CGContext(
+                  data: nil, width: width, height: height, bitsPerComponent: 8,
+                  bytesPerRow: 0, space: space,
+                  bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+              ) else { return }
         context.setFillColor(CGColor(srgbRed: 1, green: 0.97, blue: 0.94, alpha: 1))
         context.fill(CGRect(x: 0, y: 0, width: width, height: height))
         context.setFillColor(CGColor(srgbRed: 0.2, green: 0.18, blue: 0.16, alpha: 0.85))
