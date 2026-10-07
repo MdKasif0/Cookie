@@ -971,21 +971,48 @@
 
         <nav class="footer-nav" aria-label="Footer Links">
           <ul class="footer-links">
-            <li><a href="#story-custom">Privacy</a></li>
+            <li><button type="button" class="footer-link-btn" id="openPrivacyBtn" aria-haspopup="dialog">Privacy</button></li>
             <li><a href="downloads/Cookie-1.0.0.dmg" download>Download</a></li>
-            <li><a href="#download"><span class="footer-version-badge">Version 1.0.0</span></a></li>
-            <li><a href="https://github.com/MdKasif0/Cookie" target="_blank" rel="noopener">GitHub</a></li>
+            <li><a href="#download" class="footer-version-link" aria-label="Cookie Version 1.0.0 details"><span class="footer-version-badge">Version 1.0.0</span></a></li>
           </ul>
         </nav>
       </div>
 
       <div class="footer-bottom">
         <div class="footer-copyright">
-          © 2026 Md Kasif Uddin. All rights reserved. Crafted with care for macOS Sonoma and later.
+          © 2026 Md Kasif Uddin. All rights reserved. Crafted with care for macOS.
         </div>
       </div>
     </div>
   </footer>
+
+  <!-- Native Accessible Privacy Modal Sheet -->
+  <dialog id="privacyModal" class="privacy-modal" aria-labelledby="privacyTitle">
+    <div class="privacy-modal-card">
+      <div class="privacy-modal-header">
+        <div class="privacy-badge">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+          <span>Indie Privacy Guarantee</span>
+        </div>
+        <button type="button" class="privacy-modal-close" id="closePrivacyBtn" aria-label="Close Privacy Dialog">&times;</button>
+      </div>
+      <h3 id="privacyTitle" class="privacy-modal-title">Privacy is non-negotiable.</h3>
+      <div class="privacy-modal-body">
+        <p>A desktop companion should make your workspace calmer and more personal — never report back on what you do.</p>
+        <ul class="privacy-list">
+          <li><strong>Zero Telemetry:</strong> No tracking SDKs, analytics, or behavioral diagnostics are ever recorded.</li>
+          <li><strong>100% Offline:</strong> Cookie makes zero internet connections. It functions completely without a network.</li>
+          <li><strong>Local Storage Only:</strong> All configuration (fur colors, toys, sound levels, and names) is saved locally via macOS UserDefaults.</li>
+          <li><strong>Open Codebase:</strong> Cookie is MIT-licensed open source Swift software.</li>
+        </ul>
+      </div>
+      <div class="privacy-modal-footer">
+        <button type="button" class="btn-privacy-dismiss" id="dismissPrivacyBtn">Close</button>
+      </div>
+    </div>
+  </dialog>
 
   <script src="script.js"></script>
 </body>

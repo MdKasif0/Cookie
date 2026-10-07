@@ -701,4 +701,44 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
+
+  // ------------------------------------------------------------------------
+  // Privacy Modal Sheet Handlers (Native <dialog>)
+  // ------------------------------------------------------------------------
+  const privacyModal = document.getElementById("privacyModal");
+  const openPrivacyBtn = document.getElementById("openPrivacyBtn");
+  const closePrivacyBtn = document.getElementById("closePrivacyBtn");
+  const dismissPrivacyBtn = document.getElementById("dismissPrivacyBtn");
+
+  if (privacyModal && openPrivacyBtn) {
+    openPrivacyBtn.addEventListener("click", () => {
+      if (typeof privacyModal.showModal === "function") {
+        privacyModal.showModal();
+      } else {
+        privacyModal.setAttribute("open", "");
+      }
+    });
+
+    const closeDialog = () => {
+      if (typeof privacyModal.close === "function") {
+        privacyModal.close();
+      } else {
+        privacyModal.removeAttribute("open");
+      }
+      openPrivacyBtn.focus();
+    };
+
+    if (closePrivacyBtn) closePrivacyBtn.addEventListener("click", closeDialog);
+    if (dismissPrivacyBtn) dismissPrivacyBtn.addEventListener("click", closeDialog);
+
+    // Close when clicking dialog backdrop
+    privacyModal.addEventListener("click", (e) => {
+      const rect = privacyModal.getBoundingClientRect();
+      const isInDialog = (rect.top <= e.clientY && e.clientY <= rect.top + rect.height &&
+        rect.left <= e.clientX && e.clientX <= rect.left + rect.width);
+      if (!isInDialog) {
+        closeDialog();
+      }
+    });
+  }
 });
