@@ -1735,45 +1735,6 @@ img {
   color: var(--amber-hover);
 }
 
-/* ==========================================================================
-   Vignette 7: "Always Cookie." (Grand Editorial Finale)
-   ========================================================================== */
-.finale-section {
-  padding: 140px 0 130px;
-  text-align: center;
-  background-color: var(--canvas-subtle);
-  border-top: 1px solid var(--border-subtle);
-}
-
-.finale-headline {
-  font-family: var(--font-serif);
-  font-size: clamp(3.6rem, 8vw, 5.4rem);
-  font-weight: 600;
-  letter-spacing: -0.03em;
-  color: var(--charcoal-deep);
-  margin-bottom: 20px;
-}
-
-.finale-subtext {
-  font-size: clamp(1.25rem, 2.8vw, 1.5rem);
-  color: var(--soft-brown);
-  max-width: var(--max-w-reading);
-  margin: 0 auto 42px;
-  line-height: 1.55;
-}
-
-.finale-actions {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 18px;
-  margin-bottom: 24px;
-}
-
-.finale-note {
-  font-size: 0.88rem;
-  color: var(--neutral-gray);
-}
 
 /* ==========================================================================
    Site Footer
@@ -1940,40 +1901,6 @@ img {
   margin-top: 14px;
 }
 
-/* Minimal Native Mac Craft Strip */
-.craft-strip {
-  padding: 64px 0 72px;
-  border-top: 1px solid var(--border-subtle);
-  background-color: var(--canvas);
-}
-
-.craft-strip-inner {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 28px;
-}
-
-.craft-item {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.craft-item .craft-label {
-  font-size: 0.78rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--neutral-gray);
-}
-
-.craft-item .craft-val {
-  font-size: 1.05rem;
-  font-weight: 600;
-  color: var(--charcoal-deep);
-}
 
 /* ==========================================================================
    Dedicated Download Section
