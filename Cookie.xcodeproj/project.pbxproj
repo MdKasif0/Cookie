@@ -55,6 +55,7 @@
 		CE912B9F98BCBB80899EDD61 /* CookieCharacterNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44994CF7A0FE01B9276C2B2F /* CookieCharacterNode.swift */; };
 		D7F2D955D6917AA84555E0E8 /* CustomizationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0481870F29B62BF73D6D8DCA /* CustomizationView.swift */; };
 		DEDFB19C3E8AED84E4DE4562 /* DesktopWindowScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4514BA6F0CCB5A84B5A4CA5F /* DesktopWindowScanner.swift */; };
+		E33A52DC042D9CDD9EFC21FD /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7DA7141AC533EFDEE85B3D3D /* AppIcon.icns */; };
 		E67568E5D520C3E9FDE9A171 /* CookieStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7CBD9626E2243F075587141 /* CookieStore.swift */; };
 		E8E31096D8E2F5F973BE859B /* CookieStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D73954CEA6321E099B7E814 /* CookieStoreTests.swift */; };
 		EA63057604B4A8C098A2BFDA /* CookieApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D56AE459069F97085CE459DB /* CookieApp.swift */; };
@@ -94,6 +95,7 @@
 		76760163CA6BE3BAC37C0381 /* CookieInteractionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieInteractionTests.swift; sourceTree = "<group>"; };
 		779501F6B071E7E2651115BD /* CookiePose.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookiePose.swift; sourceTree = "<group>"; };
 		7D22F26FDBDFCA2AC60FC0A0 /* ReferenceImageSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReferenceImageSource.swift; sourceTree = "<group>"; };
+		7DA7141AC533EFDEE85B3D3D /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
 		7DDDA556F5DF54B178912C38 /* Sounds */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Sounds; path = Cookie/Resources/Sounds; sourceTree = SOURCE_ROOT; };
 		82D8641805F78FBEF35E59DB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		8B4DA208DB477D8FFA80328E /* WelcomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewModel.swift; sourceTree = "<group>"; };
@@ -229,6 +231,7 @@
 		9030496221ADCF85FEE5871F /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				7DA7141AC533EFDEE85B3D3D /* AppIcon.icns */,
 				7DDDA556F5DF54B178912C38 /* Sounds */,
 				445ACA6F52CF1CB035B5C229 /* Sprites */,
 			);
@@ -408,6 +411,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E33A52DC042D9CDD9EFC21FD /* AppIcon.icns in Resources */,
 				3E3C863DEB21A842A439B102 /* Assets.xcassets in Resources */,
 				51C51C0A3A571D55A5088ECA /* Sounds in Resources */,
 				59C31F3CC3BF7E83004FFE27 /* Sprites in Resources */,
