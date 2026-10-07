@@ -164,11 +164,20 @@ final class CookieBehaviorEngine: ObservableObject {
             }
         }
 
+        // Rare cursor watching event: Cookie keeps facing cursor while gazing
+        if now() < watchingCursorUntil, let cursorX = lastCursorX {
+            setFacing(cursorX >= lastKnownX ? .right : .left)
+        }
+
         // Session walks end by arrival, not by timer.
         if (state == .walking || state == .running),
-           let target = sessionTargetX, abs(lastKnownX - target) < 16 {
-            sessionTargetX = nil
-            stateElapsed = currentDuration
+           let target = sessionTargetX {
+            let isBox = worldItem?.kind.isBox ?? false
+            let threshold: CGFloat = isBox ? 16 : 42
+            if abs(lastKnownX - target) <= threshold {
+                sessionTargetX = nil
+                stateElapsed = currentDuration
+            }
         }
 
         if stateElapsed >= currentDuration {
