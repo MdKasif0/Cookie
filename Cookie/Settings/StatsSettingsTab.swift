@@ -16,6 +16,11 @@ struct StatsSettingsTab: View {
                 LabeledContent("Times petted", value: "\(store.statistics.petsReceived)")
                 LabeledContent("Affection", value: "\(store.statistics.affection)")
             }
+            Section("Care & Play") {
+                LabeledContent("Treats given", value: "\(store.statistics.treatsGiven)")
+                LabeledContent("Toys played with", value: "\(store.statistics.toysPlayedWith)")
+                LabeledContent("Cardboard box visits", value: "\(store.statistics.boxVisits)")
+            }
             Section {
                 Button("Reset Cookie…", role: .destructive) {
                     isResetConfirming = true
