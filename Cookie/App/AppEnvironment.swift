@@ -13,6 +13,7 @@ final class AppEnvironment: ObservableObject {
     private(set) var menuBarController: MenuBarController?
 
     private let log = Logger(subsystem: "com.cookie.mac", category: "App")
+    private var cancellables: Set<AnyCancellable> = []
 
     init() {
         let store = CookieStore()
@@ -22,6 +23,24 @@ final class AppEnvironment: ObservableObject {
         self.audioManager = audioManager
         self.behaviorEngine = behaviorEngine
         self.windows = WindowManager(store: store, audioManager: audioManager, behaviorEngine: behaviorEngine)
+
+        // Keep motion mode synchronized in real time
+        store.$profile
+            .map(\.settings.reducedMotion)
+            .removeDuplicates()
+            .sink { mode in
+                MotionSettings.mode = mode
+            }
+            .store(in: &cancellables)
+
+        // Observe macOS Accessibility Reduce Motion changes live
+        NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.accessibilityDisplayOptionsDidChangeNotification)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                guard let self else { return }
+                MotionSettings.mode = self.store.profile.settings.reducedMotion
+            }
+            .store(in: &cancellables)
     }
 
     /// Called once at launch. Returning users go straight to the desktop
