@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 160" width="200" height="160">
+  <defs>
+    <!-- Cardboard Kraft Gradients -->
+    <linearGradient id="kraftFront" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#d4aa7d" />
+      <stop offset="100%" stop-color="#b88c5d" />
+    </linearGradient>
+    <linearGradient id="kraftFlapLeft" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#c69a6d" />
+      <stop offset="100%" stop-color="#a87c4d" />
+    </linearGradient>
+    <linearGradient id="kraftFlapRight" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#c69a6d" />
+      <stop offset="100%" stop-color="#a87c4d" />
+    </linearGradient>
+    <linearGradient id="kraftTape" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#e8dfcb" stop-opacity="0.85" />
+      <stop offset="100%" stop-color="#d9cfb8" stop-opacity="0.85" />
+    </linearGradient>
+    <!-- Soft Drop Shadow -->
+    <filter id="boxShadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#4a3520" flood-opacity="0.12" />
+    </filter>
+  </defs>
+
+  <!-- Ground Shadow -->
+  <ellipse cx="100" cy="142" rx="76" ry="12" fill="#5c452e" opacity="0.16" />
+
+  <!-- Main Box Body Group -->
+  <g filter="url(#boxShadow)">
+    <!-- Back Interior (Dark Shadow inside box) -->
+    <path d="M 36 68 L 164 68 L 152 120 L 48 120 Z" fill="#755234" />
+
+    <!-- Left Opened Flap -->
+    <path d="M 36 68 L 16 52 L 44 48 L 52 68 Z" fill="url(#kraftFlapLeft)" stroke="#9c7247" stroke-width="1.2" />
+
+    <!-- Right Opened Flap -->
+    <path d="M 164 68 L 184 52 L 156 48 L 148 68 Z" fill="url(#kraftFlapRight)" stroke="#9c7247" stroke-width="1.2" />
+
+    <!-- Front Box Wall -->
+    <path d="M 36 68 L 164 68 L 158 136 C 158 138 156 140 153 140 L 47 140 C 44 140 42 138 42 136 Z" 
+          fill="url(#kraftFront)" 
+          stroke="#9c7247" 
+          stroke-width="1.5" />
+
+    <!-- Front Folded Flap (Hanging Down) -->
+    <path d="M 46 68 L 154 68 L 144 88 L 56 88 Z" fill="#c49769" stroke="#9c7247" stroke-width="1.2" />
+
+    <!-- Packaging Tape Strip down center of front wall -->
+    <rect x="94" y="68" width="12" height="72" fill="url(#kraftTape)" />
+
+    <!-- Minimal Stamp / Fragile Paw Icon on Box -->
+    <g transform="translate(122, 104) scale(0.75)" opacity="0.45">
+      <ellipse cx="12" cy="14" rx="7" ry="5.5" fill="#4a3420" />
+      <circle cx="6" cy="6" r="2.5" fill="#4a3420" />
+      <circle cx="12" cy="4" r="2.5" fill="#4a3420" />
+      <circle cx="18" cy="6" r="2.5" fill="#4a3420" />
+    </g>
+  </g>
+</svg>
