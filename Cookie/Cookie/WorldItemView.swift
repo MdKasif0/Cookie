@@ -92,7 +92,7 @@ struct WorldItemView: View {
 
     private var shadowWidth: CGFloat {
         switch item.kind {
-        case .box: return 68
+        case .box, .toy(.box): return 68
         case .toy(.yarnBall), .toy(.ball): return 34
         case .toy(.toyMouse): return 44
         case .toy(.feather), .toy(.fishToy): return 48
