@@ -107,6 +107,18 @@ final class CompanionPanelController: NSWindowController {
         log.debug("Companion panel hidden")
     }
 
+    /// Presents Cookie's contextual menu at the specified point or centered on Cookie.
+    func showMenu(at screenPoint: NSPoint? = nil) {
+        guard let window, let view = window.contentView, let menu = menuProvider?() else { return }
+        let localPoint: NSPoint
+        if let screenPoint {
+            localPoint = view.convert(window.convertPoint(fromScreen: screenPoint), from: nil)
+        } else {
+            localPoint = NSPoint(x: window.frame.width / 2, y: window.frame.height / 2)
+        }
+        menu.popUp(positioning: nil, at: localPoint, in: view)
+    }
+
     /// Persists the current panel origin to the store (honoring the
     /// "Remember position" setting).
     func savePosition() {

@@ -20,10 +20,14 @@ final class AppEnvironment: ObservableObject {
         let store = CookieStore()
         let audioManager = AudioManager(store: store)
         let behaviorEngine = CookieBehaviorEngine(store: store)
+        let windows = WindowManager(store: store, audioManager: audioManager, behaviorEngine: behaviorEngine)
         self.store = store
         self.audioManager = audioManager
         self.behaviorEngine = behaviorEngine
-        self.windows = WindowManager(store: store, audioManager: audioManager, behaviorEngine: behaviorEngine)
+        self.windows = windows
+        windows.menuProvider = { [weak self] in
+            self?.createCookieMenu()
+        }
 
         // Keep motion mode synchronized in real time
         store.$profile
@@ -129,6 +133,21 @@ final class AppEnvironment: ObservableObject {
     func clearWorldItem() { behaviorEngine.clearWorldItem() }
     var hasActiveWorldItem: Bool { behaviorEngine.worldItem != nil }
     func triggerSpecialEvent(_ event: SpecialEventKind) { behaviorEngine.triggerSpecialEvent(event) }
+
+    func createCookieMenu() -> NSMenu? {
+        if menuBarController == nil {
+            menuBarController = MenuBarController(environment: self, store: store)
+        }
+        return menuBarController?.createMenu()
+    }
+
+    func handleAppReopen() {
+        if !store.profile.isCompanionVisible {
+            windows.showCompanion()
+        }
+        windows.companionController?.window?.makeKeyAndOrderFront(nil)
+        windows.companionController?.showMenu()
+    }
 
     func quit() {
         NSApp.terminate(nil)

@@ -48,6 +48,8 @@ final class WindowManager: NSObject, NSWindowDelegate {
             .store(in: &cancellables)
     }
 
+    var menuProvider: (() -> NSMenu?)?
+
     // MARK: - Desktop companion
 
     func showCompanion() {
@@ -55,7 +57,10 @@ final class WindowManager: NSObject, NSWindowDelegate {
             companionController = CompanionPanelController(
                 store: store,
                 behaviorEngine: behaviorEngine,
-                audioManager: audioManager
+                audioManager: audioManager,
+                menuProvider: { [weak self] in
+                    self?.menuProvider?()
+                }
             )
         }
         if store.profile.isCompanionVisible {
