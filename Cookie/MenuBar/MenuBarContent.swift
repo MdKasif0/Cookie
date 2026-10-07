@@ -1,8 +1,7 @@
 import SwiftUI
 
-/// Cookie's menu bar menu — simple and polished. The name headers the
-/// menu, companion commands sit in the middle, and the app controls at
-/// the bottom.
+/// Cookie's native menu bar menu: name header, companion controls,
+/// care & play actions, and distinct sections for feeding and toys.
 struct MenuBarContent: View {
     @EnvironmentObject private var environment: AppEnvironment
     @EnvironmentObject private var store: CookieStore
@@ -10,43 +9,57 @@ struct MenuBarContent: View {
     var body: some View {
         Text(store.profile.displayName)
             .font(.system(size: 13, weight: .semibold, design: .rounded))
+
         Divider()
+
         if store.profile.isCompanionVisible {
             Button("Hide Cookie") { environment.toggleCompanion() }
         } else {
             Button("Show Cookie") { environment.toggleCompanion() }
         }
+
         Divider()
-        Button("Pet Cookie") { environment.petCookie() }
-        Menu("Feed Cookie") {
-            ForEach(FoodKind.allCases) { food in
-                Button("\(food.displayName) \(food.emoji)") {
-                    environment.feedCookie(food: food)
-                }
-            }
+
+        Section("Care & Play") {
+            Button("Pet Cookie") { environment.petCookie() }
+            Button("Play") { environment.playWithCookie() }
         }
-        Menu("Toys") {
-            ForEach(ToyKind.allCases) { toy in
-                Button("\(toy.displayName) \(toy.emoji)") {
-                    environment.offerToy(toy)
-                }
-            }
+
+        Divider()
+
+        Section("Feed Cookie") {
+            Button("Fish 🐟") { environment.feedCookie(food: .fish) }
+            Button("Milk 🥛") { environment.feedCookie(food: .milk) }
+            Button("Chicken 🍗") { environment.feedCookie(food: .chicken) }
+            Button("Cookie 🍪") { environment.feedCookie(food: .cookie) }
+        }
+
+        Divider()
+
+        Section("Toys") {
+            Button("Yarn Ball 🧶") { environment.offerToy(.yarnBall) }
+            Button("Feather 🪶") { environment.offerToy(.feather) }
+            Button("Toy Mouse 🐭") { environment.offerToy(.toyMouse) }
+            Button("Fish Toy 🐟") { environment.offerToy(.fishToy) }
+            Button("Ball 🎾") { environment.offerToy(.ball) }
+            Button("Cardboard Box 📦") { environment.offerToy(.box) }
             if environment.hasActiveWorldItem {
-                Divider()
-                Button("Put Toys Away") {
-                    environment.clearWorldItem()
-                }
+                Button("Put Toys Away 🧹") { environment.clearWorldItem() }
             }
         }
-        Button("Play") { environment.playWithCookie() }
+
         Divider()
+
         Button("Customize Cookie…") { environment.showCustomization() }
             .keyboardShortcut("k", modifiers: .command)
+
         SettingsLink {
             Text("Settings…")
         }
         .keyboardShortcut(",", modifiers: .command)
+
         Divider()
+
         Button("Quit Cookie") { environment.quit() }
             .keyboardShortcut("q", modifiers: .command)
     }
