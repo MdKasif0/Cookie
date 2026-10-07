@@ -638,15 +638,19 @@ img {
 
 .box-peek-tag {
   position: absolute;
-  top: -12px;
-  right: -8px;
+  top: -24px;
+  left: 50%;
+  transform: translateX(-50%);
   background-color: var(--cream);
   border: 1px solid var(--border-strong);
   font-size: 0.75rem;
   font-weight: 700;
   color: var(--amber);
-  padding: 3px 8px;
+  padding: 3px 12px;
   border-radius: var(--radius-full);
+  white-space: nowrap;
+  box-shadow: var(--shadow-subtle);
+  z-index: 20;
 }
 
 .sleepy-cat-wrap {
@@ -754,6 +758,31 @@ img {
   font-weight: 500;
   color: var(--neutral-gray);
   pointer-events: none;
+}
+
+.sandbox-toast {
+  position: absolute;
+  top: 28px;
+  left: 50%;
+  transform: translateX(-50%) translateY(6px);
+  background-color: var(--surface);
+  border: 1px solid var(--border-strong);
+  color: var(--charcoal-deep);
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 5px 16px;
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-warm);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 30;
+  white-space: nowrap;
+}
+
+.sandbox-toast.active {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
 }
 
 /* ==========================================================================
