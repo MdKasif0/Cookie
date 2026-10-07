@@ -661,4 +661,44 @@ document.addEventListener("DOMContentLoaded", () => {
   // Initial Sync
   syncControls();
   updatePreview();
+
+  // ------------------------------------------------------------------------
+  // Mobile Navigation Drawer Toggle & Accessibility Handlers
+  // ------------------------------------------------------------------------
+  const mobileNavToggle = document.getElementById("mobileNavToggle");
+  const mobileNavMenu = document.getElementById("mobileNavMenu");
+
+  if (mobileNavToggle && mobileNavMenu) {
+    const toggleMenu = (open) => {
+      const isOpen = open !== undefined ? open : !mobileNavMenu.classList.contains("active");
+      mobileNavMenu.classList.toggle("active", isOpen);
+      mobileNavToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+      mobileNavMenu.setAttribute("aria-hidden", isOpen ? "false" : "true");
+    };
+
+    mobileNavToggle.addEventListener("click", () => {
+      toggleMenu();
+    });
+
+    const mobileLinks = mobileNavMenu.querySelectorAll("a");
+    mobileLinks.forEach((link) => {
+      link.addEventListener("click", () => {
+        toggleMenu(false);
+      });
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && mobileNavMenu.classList.contains("active")) {
+        toggleMenu(false);
+        mobileNavToggle.focus();
+      }
+    });
+
+    document.addEventListener("click", (e) => {
+      const header = document.querySelector(".site-header");
+      if (header && !header.contains(e.target) && mobileNavMenu.classList.contains("active")) {
+        toggleMenu(false);
+      }
+    });
+  }
 });
