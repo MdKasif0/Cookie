@@ -741,4 +741,14 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
+
+  // ------------------------------------------------------------------------
+  // Footer Back to Top Button
+  // ------------------------------------------------------------------------
+  const backToTopBtn = document.getElementById("backToTopBtn");
+  if (backToTopBtn) {
+    backToTopBtn.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }
 });

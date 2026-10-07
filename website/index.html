@@ -827,30 +827,94 @@
   <!-- Clean Apple-Indie Product Footer -->
   <footer class="site-footer">
     <div class="container footer-inner">
-      <div class="footer-top">
-        <div class="footer-brand">
+      <div class="footer-grid">
+        
+        <!-- Brand & Identity Column -->
+        <div class="footer-brand-col">
           <a href="#hero" class="footer-logo" aria-label="Cookie Home">
             <picture>
               <source srcset="assets/app_icon.webp" type="image/webp">
-              <img src="assets/app_icon.png" alt="" class="footer-brand-icon" width="28" height="28" loading="lazy">
+              <img src="assets/app_icon.png" alt="" class="footer-brand-icon" width="30" height="30" loading="lazy">
             </picture>
             <span class="footer-title">Cookie</span>
+            <span class="footer-version-badge">v1.0.0</span>
           </a>
-          <p class="footer-tagline">A tiny cat for your Mac.</p>
+          <p class="footer-tagline">
+            A quiet desktop companion for macOS. Native SpriteKit, offline, and respectful of your attention.
+          </p>
+          <div class="footer-indie-badge">
+            <span class="footer-indie-dot" aria-hidden="true"></span>
+            <span>100% Offline · Zero Telemetry</span>
+          </div>
         </div>
 
-        <nav class="footer-nav" aria-label="Footer Links">
+        <!-- Experience Links Column -->
+        <div class="footer-col">
+          <h4 class="footer-col-title">Experience</h4>
           <ul class="footer-links">
-            <li><button type="button" class="footer-link-btn" id="openPrivacyBtn" aria-haspopup="dialog">Privacy</button></li>
-            <li><a href="downloads/Cookie-1.0.0.dmg" download>Download</a></li>
-            <li><a href="#download" class="footer-version-link" aria-label="Cookie Version 1.0.0 details"><span class="footer-version-badge">Version 1.0.0</span></a></li>
+            <li><a href="#hero">Overview</a></li>
+            <li><a href="#story-always-there">Companion</a></li>
+            <li><a href="#story-curious">Curious Peek</a></li>
+            <li><a href="#story-sleepy">Sleepy Mode</a></li>
+            <li><a href="#story-custom">Customization</a></li>
           </ul>
-        </nav>
+        </div>
+
+        <!-- Open Source Column -->
+        <div class="footer-col">
+          <h4 class="footer-col-title">Open Source</h4>
+          <ul class="footer-links">
+            <li>
+              <a href="https://github.com/MdKasif0/Cookie" target="_blank" rel="noopener" class="footer-ext-link">
+                <span>GitHub</span>
+                <svg viewBox="0 0 12 12" width="10" height="10" fill="currentColor" aria-hidden="true">
+                  <path d="M3.5 1.5h7v7H9V4.06L2.56 10.5 1.5 9.44 7.94 3H3.5V1.5z"/>
+                </svg>
+              </a>
+            </li>
+            <li>
+              <a href="https://github.com/MdKasif0/Cookie/blob/main/LICENSE" target="_blank" rel="noopener" class="footer-ext-link">
+                <span>MIT License</span>
+                <svg viewBox="0 0 12 12" width="10" height="10" fill="currentColor" aria-hidden="true">
+                  <path d="M3.5 1.5h7v7H9V4.06L2.56 10.5 1.5 9.44 7.94 3H3.5V1.5z"/>
+                </svg>
+              </a>
+            </li>
+            <li><button type="button" class="footer-link-btn" id="openPrivacyBtn" aria-haspopup="dialog">Privacy Guarantee</button></li>
+            <li><a href="#download">System Requirements</a></li>
+          </ul>
+        </div>
+
+        <!-- macOS Direct Download Column -->
+        <div class="footer-col footer-col-download">
+          <h4 class="footer-col-title">Get Cookie</h4>
+          <p class="footer-specs-note">
+            Universal binary for Apple Silicon &amp; Intel. macOS 14 Sonoma or later.
+          </p>
+          <a href="downloads/Cookie-1.0.0.dmg" class="footer-download-btn" download>
+            <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14" aria-hidden="true">
+              <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v7.586l2.293-2.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 11.586V4a1 1 0 011-1z" clip-rule="evenodd"/>
+              <path fill-rule="evenodd" d="M3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/>
+            </svg>
+            <span>Download DMG</span>
+          </a>
+        </div>
+
       </div>
 
+      <!-- Bottom Bar -->
       <div class="footer-bottom">
         <div class="footer-copyright">
-          © 2026 Md Kasif Uddin. All rights reserved. Crafted with care for macOS.
+          © 2026 Md Kasif Uddin. Open source software for Mac users everywhere.
+        </div>
+        <div class="footer-bottom-actions">
+          <span class="footer-crafted-tag">Crafted in Swift &amp; SpriteKit</span>
+          <button type="button" class="footer-back-to-top" id="backToTopBtn" aria-label="Scroll back to top">
+            <span>Back to top</span>
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12" aria-hidden="true">
+              <path d="M8 13V3M3 8l5-5 5 5"/>
+            </svg>
+          </button>
         </div>
       </div>
     </div>
