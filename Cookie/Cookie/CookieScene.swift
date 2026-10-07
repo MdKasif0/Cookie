@@ -132,6 +132,17 @@ final class CookieScene: SKScene {
                 }
                 .store(in: &cancellables)
 
+            engine.$isPeeking
+                .removeDuplicates()
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] isPeeking in
+                    self?.character.setPeeking(isPeeking)
+                    if isPeeking {
+                        self?.audioManager?.play(.mew)
+                    }
+                }
+                .store(in: &cancellables)
+
             engine.$state.combineLatest(engine.$facing, engine.$reaction)
                 .receive(on: DispatchQueue.main)
                 .removeDuplicates { $0 == $1 }
@@ -159,7 +170,10 @@ final class CookieScene: SKScene {
         case (.reacting, .dropped): audioManager.play(.drop)
         case (.reacting, .embarrassed): audioManager.play(.meow)
         case (.eating, _): audioManager.play(.eat)
+        case (.drinking, _): audioManager.play(.eat)
         case (.playing, _): audioManager.play(.toy)
+        case (.investigating, _): audioManager.play(.chirp)
+        case (.inBox, _): audioManager.play(.purr)
         default: break
         }
     }

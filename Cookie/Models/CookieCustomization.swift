@@ -229,6 +229,37 @@ enum TailVariation: String, CaseIterable, Codable, Identifiable {
 
 // MARK: - Accessories
 
+/// The seasonal or thematic grouping for an accessory.
+enum AccessoryTheme: String, CaseIterable, Codable, Identifiable {
+    case classic
+    case winter
+    case holiday
+    case autumn
+    case party
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .classic: return "Classic"
+        case .winter: return "Winter"
+        case .holiday: return "Holiday"
+        case .autumn: return "Autumn"
+        case .party: return "Party"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .classic: return "sparkles"
+        case .winter: return "snowflake"
+        case .holiday: return "gift"
+        case .autumn: return "leaf"
+        case .party: return "party.popper"
+        }
+    }
+}
+
 /// The accessory kinds Cookie can wear. Each is drawn as a crisp vector
 /// layer anchored to the artwork, so it tracks the sprite.
 enum AccessoryKind: String, CaseIterable, Codable, Identifiable {
@@ -239,6 +270,8 @@ enum AccessoryKind: String, CaseIterable, Codable, Identifiable {
     case scarf
     case crown
     case bandana
+    case pumpkin
+    case santaHat
 
     var id: String { rawValue }
 
@@ -248,10 +281,26 @@ enum AccessoryKind: String, CaseIterable, Codable, Identifiable {
         case .bow: return "Bow"
         case .hat: return "Party Hat"
         case .glasses: return "Glasses"
-        case .scarf: return "Scarf"
+        case .scarf: return "Winter Scarf"
         case .crown: return "Crown"
         case .bandana: return "Bandana"
+        case .pumpkin: return "Pumpkin"
+        case .santaHat: return "Santa Hat"
         }
+    }
+
+    var theme: AccessoryTheme {
+        switch self {
+        case .collar, .bow, .glasses, .bandana: return .classic
+        case .scarf: return .winter
+        case .santaHat: return .holiday
+        case .pumpkin: return .autumn
+        case .hat, .crown: return .party
+        }
+    }
+
+    var isSeasonal: Bool {
+        theme != .classic
     }
 
     /// Anchor in artwork-normalized coordinates (top-left origin).
@@ -264,6 +313,8 @@ enum AccessoryKind: String, CaseIterable, Codable, Identifiable {
         case .scarf: return CGPoint(x: 0.47, y: 0.635)
         case .crown: return CGPoint(x: 0.46, y: 0.045)
         case .bandana: return CGPoint(x: 0.47, y: 0.60)
+        case .pumpkin: return CGPoint(x: 0.46, y: 0.04)
+        case .santaHat: return CGPoint(x: 0.46, y: 0.03)
         }
     }
 }
