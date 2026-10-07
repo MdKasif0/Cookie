@@ -15,9 +15,9 @@ final class WindowManager: NSObject, NSWindowDelegate {
 
     private(set) var companionController: CompanionPanelController?
     private(set) var worldItemController: WorldItemPanelController?
-    private var welcomeWindow: NSWindow?
-    private var customizationWindow: NSWindow?
-    private var settingsWindow: NSWindow?
+    private(set) var welcomeWindow: NSWindow?
+    private(set) var customizationWindow: NSWindow?
+    private(set) var settingsWindow: NSWindow?
     weak var environment: AppEnvironment?
     private var onWelcomeDismissed: (() -> Void)?
     private var cancellables: Set<AnyCancellable> = []

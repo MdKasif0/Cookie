@@ -67,4 +67,47 @@ final class CookieMultiDisplayTests: XCTestCase {
         XCTAssertTrue(window.collectionBehavior.contains(.fullScreenAuxiliary))
         XCTAssertEqual(window.level, .floating)
     }
+
+    @MainActor
+    func testSettingsWindowLifecycle() {
+        let env = AppEnvironment()
+        XCTAssertNil(env.windows.settingsWindow)
+
+        env.showSettings()
+        guard let window = env.windows.settingsWindow else {
+            XCTFail("Settings window should be created")
+            return
+        }
+
+        XCTAssertEqual(window.title, "Cookie Settings")
+        XCTAssertTrue(window.isVisible)
+        XCTAssertGreaterThanOrEqual(window.frame.width, 540)
+        XCTAssertGreaterThanOrEqual(window.frame.height, 440)
+
+        // Calling showSettings again should reuse existing window
+        env.showSettings()
+        XCTAssertTrue(env.windows.settingsWindow === window)
+
+        // Closing should clean up reference
+        window.close()
+        XCTAssertNil(env.windows.settingsWindow)
+    }
+
+    @MainActor
+    func testCustomizationWindowLifecycle() {
+        let env = AppEnvironment()
+        XCTAssertNil(env.windows.customizationWindow)
+
+        env.showCustomization()
+        guard let window = env.windows.customizationWindow else {
+            XCTFail("Customization window should be created")
+            return
+        }
+
+        XCTAssertEqual(window.title, "Customize Cookie")
+        XCTAssertTrue(window.isVisible)
+
+        window.close()
+        XCTAssertNil(env.windows.customizationWindow)
+    }
 }
