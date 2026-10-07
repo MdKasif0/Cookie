@@ -2095,8 +2095,8 @@ img {
 .compatibility-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-  margin-bottom: 72px;
+  gap: 18px;
+  margin-bottom: 0;
 }
 
 .compat-card {
@@ -2107,320 +2107,93 @@ img {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  box-shadow: var(--shadow-subtle);
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  box-shadow: 0 2px 8px rgba(45, 32, 20, 0.03);
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.22s ease;
 }
 
 .compat-card:hover {
   transform: translateY(-3px);
-  border-color: var(--amber-border);
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-warm);
 }
 
 .compat-icon-wrap {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
   background-color: var(--canvas-subtle);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
   border: 1px solid var(--border-subtle);
+  color: var(--charcoal);
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
 
-.compat-icon {
-  font-size: 1.3rem;
-}
-
-.compat-title {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--charcoal-deep);
-  margin-bottom: 8px;
-}
-
-.compat-desc {
-  font-size: 0.85rem;
-  color: var(--soft-brown);
-  line-height: 1.5;
-  margin-bottom: 16px;
-}
-
-.compat-desc code {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 0.8rem;
-  background-color: var(--canvas-subtle);
-  padding: 2px 6px;
-  border-radius: 4px;
-  border: 1px solid var(--border-subtle);
-}
-
-.compat-pill {
-  align-self: flex-start;
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  padding: 3px 10px;
-  border-radius: var(--radius-full);
+.compat-card:hover .compat-icon-wrap {
   background-color: var(--amber-soft);
+  border-color: var(--amber-border);
   color: var(--amber);
-  border: 1px solid var(--amber-border);
+  transform: scale(1.04);
 }
 
-/* Installation Guide */
-.install-guide-block {
-  background-color: var(--surface);
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius-lg);
-  padding: 44px 44px;
-  margin-bottom: 56px;
-  box-shadow: var(--shadow-subtle);
-}
-
-.section-subheading {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 6px;
-}
-
-.subheading-pip {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: var(--amber);
-}
-
-.section-subheading h3 {
-  font-family: var(--font-serif);
-  font-size: 1.7rem;
-  font-weight: 700;
-  color: var(--charcoal-deep);
-}
-
-.install-subtext {
-  font-size: 0.95rem;
-  color: var(--soft-brown);
-  margin-bottom: 32px;
-}
-
-.install-steps-list {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 16px;
-  margin-bottom: 40px;
-}
-
-.install-step-card {
-  background-color: var(--canvas);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  padding: 22px 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.step-number {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background-color: var(--charcoal-deep);
-  color: var(--ivory);
-  font-weight: 700;
-  font-size: 0.9rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.step-title {
-  font-size: 0.92rem;
-  font-weight: 700;
-  color: var(--charcoal-deep);
-  line-height: 1.3;
-  margin-bottom: 4px;
-}
-
-.step-text {
-  font-size: 0.82rem;
-  color: var(--soft-brown);
-  line-height: 1.45;
-}
-
-.step-text code {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 0.78rem;
-  background-color: rgba(0, 0, 0, 0.04);
-  padding: 1px 4px;
-  border-radius: 3px;
-}
-
-.dmg-frame {
-  max-width: 680px;
-  margin: 0 auto;
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  box-shadow: var(--shadow-window);
-  border: 1px solid var(--border-subtle);
-  background-color: var(--surface);
-}
-
-.dmg-frame img {
-  width: 100%;
-  height: auto;
+.compat-svg {
+  width: 20px;
+  height: 20px;
   display: block;
 }
 
-.dmg-caption {
-  font-size: 0.8rem;
-  color: var(--neutral-gray);
-  text-align: center;
-  margin-top: 10px;
-}
-
-/* First Launch & Gatekeeper Grid */
-.launch-info-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 28px;
-  align-items: stretch;
-}
-
-.launch-card {
-  background-color: var(--surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  padding: 36px 32px;
-  box-shadow: var(--shadow-subtle);
+.compat-content {
   display: flex;
   flex-direction: column;
+  flex-grow: 1;
 }
 
-.card-tag {
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--amber);
-  margin-bottom: 8px;
-}
-
-.card-heading {
-  font-family: var(--font-serif);
-  font-size: 1.45rem;
-  font-weight: 700;
+.compat-title {
+  font-size: 1.02rem;
+  font-weight: 650;
+  letter-spacing: -0.015em;
   color: var(--charcoal-deep);
-  margin-bottom: 20px;
-  line-height: 1.25;
+  margin-bottom: 6px;
 }
 
-.launch-points {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-.launch-points li {
-  display: flex;
-  gap: 14px;
-  font-size: 0.88rem;
-  line-height: 1.5;
-  color: var(--soft-brown);
-}
-
-.point-bullet {
-  font-size: 1.25rem;
-  flex-shrink: 0;
-  line-height: 1.2;
-}
-
-.launch-points strong {
-  color: var(--charcoal-deep);
-}
-
-.gatekeeper-intro {
-  font-size: 0.9rem;
+.compat-desc {
+  font-size: 0.86rem;
   color: var(--soft-brown);
   line-height: 1.5;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
+  flex-grow: 1;
 }
 
-.gatekeeper-notice-box {
-  background-color: var(--canvas);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  padding: 22px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.gatekeeper-badge {
+.compat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   align-self: flex-start;
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  padding: 2px 8px;
-  border-radius: var(--radius-full);
-  background-color: #efe8dc;
-  color: var(--muted-brown);
-  border: 1px solid var(--border-strong);
-}
-
-.gatekeeper-text {
-  font-size: 0.85rem;
-  color: var(--soft-brown);
-  line-height: 1.45;
-}
-
-.gatekeeper-dialog-quote {
-  margin: 4px 0;
-  padding: 10px 14px;
-  background-color: var(--surface);
-  border-left: 3px solid var(--amber);
-  border-radius: 4px;
-  font-size: 0.85rem;
-  font-style: italic;
-  color: var(--charcoal-deep);
-  line-height: 1.45;
-}
-
-.gatekeeper-steps {
-  margin: 4px 0 8px 18px;
-  padding: 0;
-  font-size: 0.82rem;
-  color: var(--soft-brown);
-  line-height: 1.5;
-}
-
-.gatekeeper-steps li {
-  margin-bottom: 4px;
-}
-
-.gatekeeper-steps strong,
-.gatekeeper-steps em {
-  color: var(--charcoal-deep);
-}
-
-.open-source-assurance {
-  font-size: 0.8rem;
-  color: var(--neutral-gray);
-  line-height: 1.4;
-  border-top: 1px dashed var(--border-strong);
-  padding-top: 10px;
-  margin-top: 4px;
-}
-
-.open-source-assurance a {
-  color: var(--amber);
-  text-decoration: underline;
+  font-size: 0.74rem;
   font-weight: 600;
+  letter-spacing: 0.015em;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  background-color: var(--canvas-subtle);
+  color: var(--charcoal);
+  border: 1px solid var(--border-subtle);
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.compat-card:hover .compat-pill {
+  border-color: var(--border-strong);
+  background-color: var(--surface);
+}
+
+.compat-pill-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--sage);
+  box-shadow: 0 0 0 2px var(--sage-light);
+  flex-shrink: 0;
 }
 
 /* ==========================================================================
@@ -2491,30 +2264,12 @@ img {
   .compatibility-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;
-    margin-bottom: 48px;
-  }
-
-  .install-steps-list {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 14px;
-  }
-
-  .launch-info-grid {
-    grid-template-columns: 1fr;
-    gap: 24px;
-  }
-
-  .install-guide-block {
-    padding: 32px 24px;
+    margin-bottom: 0;
   }
 }
 
 @media (max-width: 600px) {
   .compatibility-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .install-steps-list {
     grid-template-columns: 1fr;
   }
 
