@@ -149,6 +149,9 @@ final class CookieScene: SKScene {
                 .sink { [weak self] state, facing, reaction in
                     self?.character.setState(state, facing: facing, reaction: reaction)
                     self?.playTransitionSound(state: state, reaction: reaction)
+                    if state == .sleeping || state == .sitting || state == .idle || state == .inBox {
+                        self?.store?.profile.lastRestingState = state
+                    }
                 }
                 .store(in: &cancellables)
         }
@@ -180,16 +183,27 @@ final class CookieScene: SKScene {
 
     // MARK: - Frame update
 
+    private var lastScreenSafetyCheck: TimeInterval = 0
+
     override func update(_ currentTime: TimeInterval) {
         super.update(currentTime)
         let dt = min(0.1, currentTime - (lastUpdateTime ?? currentTime))
         defer { lastUpdateTime = currentTime }
 
-        // Safety net: unless the user is holding Cookie right now, she can
-        // never rest with her center outside the visible screen area —
-        // covers missed mouse-ups and displays that changed mid-drag.
-        if !isDragging, let window = view?.window {
-            let safe = CookieScreenGeometry.safeOrigin(for: window.frame, in: NSScreen.screens)
+        // Sleeping CPU optimization: run at 15 FPS while sleeping to reduce CPU to ~0%
+        if let engine = behaviorEngine {
+            let targetFPS = engine.state == .sleeping ? 15 : 60
+            if view?.preferredFramesPerSecond != targetFPS {
+                view?.preferredFramesPerSecond = targetFPS
+            }
+        }
+
+        // Throttled safety net: check screen validity periodically or when dropped,
+        // avoiding wasteful NSScreen.screens IPC queries on every 16ms frame.
+        if !isDragging, currentTime - lastScreenSafetyCheck >= 2.0, let window = view?.window {
+            lastScreenSafetyCheck = currentTime
+            let screens = NSScreen.screens
+            let safe = CookieScreenGeometry.safeOrigin(for: window.frame, in: screens)
             if safe != window.frame.origin {
                 window.setFrameOrigin(safe)
                 onPositionSettled?(safe)
