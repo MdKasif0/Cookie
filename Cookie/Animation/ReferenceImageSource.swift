@@ -174,6 +174,27 @@ final class ReferenceImageSource: AnimationFrameSource {
                 Frame(scaleY: 0.95, offsetY: 2, overlays: [.eyesWide]),
                 Frame()
             ]
+        case .investigate:
+            return [
+                Frame(scaleX: 1.02, scaleY: 0.96, offsetX: 3, offsetY: 2, overlays: [.eyesWide]),
+                Frame(scaleX: 1.03, scaleY: 0.94, offsetX: 4, offsetY: 3, overlays: [.eyesWide]),
+                Frame(scaleX: 1.02, scaleY: 0.96, offsetX: 3, offsetY: 2, overlays: [.eyesWide])
+            ]
+        case .tired:
+            return [
+                Frame(scaleY: 0.94, offsetY: 2, overlays: [.eyesHalf, .mouthFlat]),
+                Frame(scaleY: 0.92, offsetY: 3, overlays: [.eyesHappy, .mouthFlat])
+            ]
+        case .inBox:
+            return [
+                Frame(scaleY: 0.9, offsetY: 8, overlays: [.eyesHalf]),
+                Frame(scaleY: 0.88, offsetY: 9, overlays: [.eyesClosed])
+            ]
+        case .boxPeek:
+            return [
+                Frame(scaleY: 0.98, offsetY: -2, overlays: [.eyesWide]),
+                Frame(scaleY: 1.01, offsetY: -3, overlays: [.eyesHappy])
+            ]
         }
     }
 
