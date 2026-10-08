@@ -7,7 +7,7 @@
   # Build command (ensures downloads/ is populated even if built on Netlify CI)
   command = "mkdir -p website/downloads && cp -f dist/Cookie-1.0.0.dmg website/downloads/Cookie-1.0.0.dmg || true"
 
-# Global security headers
+# Global security headers & HTML revalidation
 [[headers]]
   for = "/*"
   [headers.values]
@@ -16,6 +16,7 @@
     X-XSS-Protection = "1; mode=block"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Cache-Control = "public, max-age=0, must-revalidate"
 
 # Long-term immutable caching for static image & font assets
 [[headers]]
@@ -30,16 +31,16 @@
     Cache-Control = "public, max-age=86400"
     Content-Disposition = "attachment; filename=\"Cookie-1.0.0.dmg\""
 
-# Optimized caching for stylesheets and scripts
+# Revalidate stylesheets and scripts so updates apply immediately
 [[headers]]
   for = "/*.css"
   [headers.values]
-    Cache-Control = "public, max-age=86400, stale-while-revalidate=604800"
+    Cache-Control = "public, max-age=0, must-revalidate"
 
 [[headers]]
   for = "/*.js"
   [headers.values]
-    Cache-Control = "public, max-age=86400, stale-while-revalidate=604800"
+    Cache-Control = "public, max-age=0, must-revalidate"
 
 # Convenient redirects
 [[redirects]]
