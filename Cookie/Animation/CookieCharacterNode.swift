@@ -226,7 +226,7 @@ final class CookieCharacterNode: SKNode, SpriteProviding {
                 .scaleX(to: 1.0, duration: 0.30),
                 .scaleY(to: 1.0, duration: 0.30),
                 .rotate(toAngle: 0.0, duration: 0.30),
-                .moveTo(x: 0, y: 0, duration: 0.30)
+                .move(to: .zero, duration: 0.30)
             ])
             let hold = SKAction.wait(forDuration: 0.20)
             animationSequence = .sequence([snuggleLean, pulse1, pulse2, unLean, hold])
@@ -301,7 +301,7 @@ final class CookieCharacterNode: SKNode, SpriteProviding {
             let land = SKAction.group([
                 .scaleX(to: 1.02, duration: 0.20),
                 .scaleY(to: 0.97, duration: 0.20),
-                .moveTo(x: 0, y: 0, duration: 0.20)
+                .move(to: .zero, duration: 0.20)
             ])
             let recover = SKAction.group([
                 .scaleX(to: 1.0, duration: 0.22),
