@@ -17,6 +17,7 @@ enum CookieExpressionArt: String, CaseIterable {
     case shy
     case sleep
     case walk
+    case wave
 
     var assetName: String { "cookie-\(rawValue)" }
 
@@ -33,6 +34,7 @@ enum CookieExpressionArt: String, CaseIterable {
         case .shy: return "Shy"
         case .sleep: return "Asleep"
         case .walk: return "Strolling"
+        case .wave: return "Wave"
         }
     }
 
