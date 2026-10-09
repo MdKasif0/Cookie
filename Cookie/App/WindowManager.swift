@@ -193,7 +193,7 @@ final class WindowManager: NSObject, NSWindowDelegate {
         guard let environment else { return }
 
         let panelWidth: CGFloat = 300
-        let panelHeight: CGFloat = 250
+        let panelHeight: CGFloat = 265
 
         let panel = EmotePickerPanel(
             contentRect: NSRect(x: 0, y: 0, width: panelWidth, height: panelHeight),
