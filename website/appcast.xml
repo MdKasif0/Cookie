@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Cookie Changelog</title>
+    <link>https://cookiecat.app</link>
+    <description>Most recent updates and cozy improvements for Cookie.</description>
+    <language>en</language>
+    <item>
+      <title>Cookie 1.0.0</title>
+      <pubDate>Sat, 10 Oct 2026 00:00:00 +0000</pubDate>
+      <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+      <description><![CDATA[
+        <p>Welcome to Cookie! A cozy native macOS desktop companion cat.</p>
+        <ul>
+          <li>Interactive companion walking, sleeping, and playing on your screen.</li>
+          <li>Five expressive emotes: Wave, Love, Sleepy, Happy, and Playful.</li>
+          <li>Toys, treats, and customizable coats.</li>
+          <li>Secure in-app updates powered by Sparkle with cryptographic EdDSA verification.</li>
+        </ul>
+      ]]></description>
+      <enclosure
+        url="https://github.com/MdKasif0/Cookie/releases/download/v1.0.0/Cookie-1.0.0.dmg"
+        sparkle:version="1"
+        sparkle:shortVersionString="1.0.0"
+        length="15672083"
+        type="application/octet-stream"
+        sparkle:edSignature="K/cA2KeUVBekRx1d1+DA0Fnhaj20UWK0DG7Ij8mPiBU="/>
+    </item>
+  </channel>
+</rss>

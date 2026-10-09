@@ -18,3 +18,8 @@
 
 /*.js
   Cache-Control: public, max-age=0, must-revalidate
+
+/appcast.xml
+  Content-Type: application/xml; charset=utf-8
+  Cache-Control: public, max-age=300, must-revalidate
+  Access-Control-Allow-Origin: *
