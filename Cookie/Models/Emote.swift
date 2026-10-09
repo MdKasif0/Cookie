@@ -1,0 +1,129 @@
+import Foundation
+
+/// Unique identifier for each predefined Cookie emote.
+enum EmoteId: String, CaseIterable, Identifiable, Codable {
+    case wave
+    case happy
+    case love
+    case sleepy
+    case playful
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .wave: return "Wave"
+        case .happy: return "Happy"
+        case .love: return "Love"
+        case .sleepy: return "Sleepy"
+        case .playful: return "Playful"
+        }
+    }
+}
+
+/// Explicit lifecycle phases of an emote sequence.
+enum EmotePlaybackPhase: String, CaseIterable, Equatable {
+    case ready
+    case starting
+    case playing
+    case finishing
+    case returning
+}
+
+/// Reusable model describing a complete Cookie emote.
+///
+/// Contains metadata, identifiers, durations, cooldowns, and priority.
+/// Execution and animation logic remain in the animation controller and
+/// behavior state machine.
+struct Emote: Identifiable, Equatable, Hashable {
+    let id: EmoteId
+    let name: String
+    let description: String
+    /// SF Symbol name representing this emote in native UI.
+    let icon: String
+    /// Associated animation sequence in the animation catalog.
+    let animationIdentifier: CookieAnimationId
+    /// Baseline sequence duration in seconds.
+    let duration: TimeInterval
+    /// Associated sound effect vocalization or cue.
+    let soundIdentifier: SoundEffect?
+    /// Minimum cooldown in seconds before this emote can be triggered again.
+    let cooldown: TimeInterval
+    /// Animation priority tier.
+    let priority: CookieAnimationPriority
+
+    // MARK: - Predefined Catalog
+
+    static let wave = Emote(
+        id: .wave,
+        name: "Wave",
+        description: "Cookie raises a paw in a warm, welcoming greeting.",
+        icon: "hand.wave.fill",
+        animationIdentifier: .wave,
+        duration: 2.0,
+        soundIdentifier: .welcome,
+        cooldown: 2.0,
+        priority: .emote
+    )
+
+    static let happy = Emote(
+        id: .happy,
+        name: "Happy",
+        description: "Cookie bounces joyfully with rosy cheeks and a happy purr.",
+        icon: "sparkles",
+        animationIdentifier: .happyEmote,
+        duration: 1.8,
+        soundIdentifier: .happy,
+        cooldown: 1.5,
+        priority: .emote
+    )
+
+    static let love = Emote(
+        id: .love,
+        name: "Love",
+        description: "Cookie leans in with shy affection and deep purring.",
+        icon: "heart.fill",
+        animationIdentifier: .love,
+        duration: 2.2,
+        soundIdentifier: .mew,
+        cooldown: 2.0,
+        priority: .emote
+    )
+
+    static let sleepy = Emote(
+        id: .sleepy,
+        name: "Sleepy",
+        description: "Cookie stretches softly, yawns, and snuggles down.",
+        icon: "moon.zzz.fill",
+        animationIdentifier: .sleepy,
+        duration: 2.5,
+        soundIdentifier: .sleep,
+        cooldown: 2.5,
+        priority: .emote
+    )
+
+    static let playful = Emote(
+        id: .playful,
+        name: "Playful",
+        description: "Cookie wiggles eagerly, ready for pouncing and fun.",
+        icon: "pawprint.fill",
+        animationIdentifier: .playfulEmote,
+        duration: 2.0,
+        soundIdentifier: .toy,
+        cooldown: 2.0,
+        priority: .emote
+    )
+
+    /// Complete ordered list of the five initial emotes.
+    static let allEmotes: [Emote] = [
+        .wave,
+        .happy,
+        .love,
+        .sleepy,
+        .playful
+    ]
+
+    static func find(_ id: EmoteId) -> Emote {
+        allEmotes.first { $0.id == id } ?? .wave
+    }
+}

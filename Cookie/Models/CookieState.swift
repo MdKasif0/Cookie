@@ -26,6 +26,8 @@ enum CookieState: String, Codable, CaseIterable {
     case tired
     /// Hidden inside the cardboard box (peeking is a separate flag).
     case inBox
+    /// User-triggered emote animation sequence currently playing.
+    case emoting
 
     /// States that move the companion panel across the desktop.
     var isLocomotion: Bool {

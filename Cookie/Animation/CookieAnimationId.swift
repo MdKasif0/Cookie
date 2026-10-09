@@ -7,6 +7,7 @@ enum CookieAnimationPriority: Int, Comparable {
     case idle = 10
     case walk = 20
     case interaction = 30
+    case emote = 35
     case special = 40
 
     static func < (lhs: CookieAnimationPriority, rhs: CookieAnimationPriority) -> Bool {
@@ -24,6 +25,7 @@ enum CookieAnimationCategory: String, CaseIterable {
     case interaction = "Interaction"
     case emotions = "Emotions"
     case special = "Special"
+    case emotes = "Emotes"
 }
 
 /// Everything the animation system needs to know about one animation.
@@ -93,6 +95,12 @@ enum CookieAnimationId: String, CaseIterable {
     case tired
     case inBox
     case boxPeek
+    // User-triggered emotes (priority .emote)
+    case wave
+    case happyEmote
+    case love
+    case sleepy
+    case playfulEmote
 
     var spec: CookieAnimationSpec {
         switch self {
@@ -156,6 +164,16 @@ enum CookieAnimationId: String, CaseIterable {
             return .standard(.special, "pickedUp", priority: .special, looping: true, fps: 4)
         case .dropped:
             return .standard(.special, "dropped", priority: .special, looping: false, fps: 8)
+        case .wave:
+            return .standard(.emotes, "wave", priority: .emote, looping: false, fps: 6)
+        case .happyEmote:
+            return .standard(.emotes, "happy", priority: .emote, looping: false, fps: 6)
+        case .love:
+            return .standard(.emotes, "love", priority: .emote, looping: false, fps: 6)
+        case .sleepy:
+            return .standard(.emotes, "sleepy", priority: .emote, looping: false, fps: 4)
+        case .playfulEmote:
+            return .standard(.emotes, "playful", priority: .emote, looping: false, fps: 6)
         }
     }
 

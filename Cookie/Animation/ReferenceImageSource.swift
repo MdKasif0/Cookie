@@ -195,6 +195,46 @@ final class ReferenceImageSource: AnimationFrameSource {
                 Frame(scaleY: 0.98, offsetY: -2, overlays: [.eyesWide]),
                 Frame(scaleY: 1.01, offsetY: -3, overlays: [.eyesHappy])
             ]
+        case .wave:
+            return [
+                Frame(rotation: -2, overlays: [.eyesHappy, .blushBoost]),
+                Frame(scaleY: 1.02, rotation: 3, offsetY: 2, overlays: [.eyesHappy, .blushBoost]),
+                Frame(scaleY: 1.04, rotation: 6, offsetY: 4, overlays: [.eyesHappy, .blushBoost]),
+                Frame(scaleY: 1.02, rotation: 3, offsetY: 2, overlays: [.eyesHappy, .blushBoost]),
+                Frame(scaleY: 1.04, rotation: 6, offsetY: 4, overlays: [.eyesHappy, .blushBoost]),
+                Frame(rotation: -1, overlays: [.eyesHappy])
+            ]
+        case .happyEmote:
+            return [
+                Frame(scaleY: 0.92, offsetY: 3, overlays: [.blushBoost, .eyesHappy]),
+                Frame(scaleY: 1.08, offsetY: -6, overlays: [.blushBoost, .eyesHappy]),
+                Frame(scaleY: 0.96, offsetY: 1, overlays: [.blushBoost, .eyesHappy]),
+                Frame(scaleY: 1.06, offsetY: -4, overlays: [.blushBoost, .eyesHappy]),
+                Frame(overlays: [.blushBoost, .eyesHappy])
+            ]
+        case .love:
+            return [
+                Frame(scaleY: 0.95, rotation: 2, offsetY: 2, overlays: [.blushBoost, .eyesHappy]),
+                Frame(scaleY: 0.92, rotation: 5, offsetY: 3, overlays: [.blushBoost, .eyesClosed]),
+                Frame(scaleY: 0.94, rotation: 4, offsetY: 2, overlays: [.blushBoost, .eyesHappy]),
+                Frame(scaleY: 0.98, rotation: 1, overlays: [.blushBoost, .eyesHappy])
+            ]
+        case .sleepy:
+            return [
+                Frame(scaleY: 0.98, overlays: [.eyesHalf]),
+                Frame(scaleY: 1.02, overlays: [.mouthOpen, .eyesClosed]),
+                Frame(scaleY: 1.03, overlays: [.mouthOpenWide, .eyesClosed]),
+                Frame(scaleY: 0.96, rotation: 2, overlays: [.eyesClosed]),
+                Frame(scaleY: 0.94, rotation: 3, overlays: [.eyesClosed])
+            ]
+        case .playfulEmote:
+            return [
+                Frame(scaleY: 0.90, rotation: -3, offsetY: 4, overlays: [.eyesWide]),
+                Frame(scaleY: 0.92, rotation: 3, offsetY: 3, overlays: [.eyesWide]),
+                Frame(scaleY: 0.90, rotation: -2, offsetY: 4, overlays: [.eyesWide]),
+                Frame(scaleY: 1.06, rotation: 0, offsetY: -5, overlays: [.eyesHappy, .blushBoost]),
+                Frame(scaleY: 0.98, overlays: [.eyesHappy])
+            ]
         }
     }
 
