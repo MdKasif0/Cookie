@@ -177,7 +177,7 @@ struct EmotePickerView: View {
                 emoteTile(emote: .playful, index: 5)
             }
         }
-        .padding(.horizontal, 14)
+        .padding(.horizontal, 16)
         .padding(.vertical, 12)
         .background(EmoteColors.warmWhite)
     }
@@ -198,38 +198,50 @@ struct EmotePickerView: View {
         return Button {
             selectEmote(emote)
         } label: {
-            VStack(spacing: 4) {
-                // Character Artwork Preview
-                ZStack {
-                    RoundedRectangle(cornerRadius: 10)
+            VStack(spacing: 3) {
+                // Character Artwork Preview + Prominent Emoji Badge
+                ZStack(alignment: .topTrailing) {
+                    RoundedRectangle(cornerRadius: 12)
                         .fill(
                             isPlaying
                                 ? EmoteColors.warmPeach
                                 : (isHovered ? EmoteColors.warmPeachHighlight : EmoteColors.ivory)
                         )
-                        .frame(width: 44, height: 44)
+                        .frame(width: 50, height: 50)
 
                     if let nsImage = EmoteArtwork.image(for: emote.id) {
                         Image(nsImage: nsImage)
                             .resizable()
                             .interpolation(.high)
                             .aspectRatio(contentMode: .fit)
-                            .frame(width: 36, height: 36)
+                            .frame(width: 44, height: 44)
                     } else {
                         Image(systemName: emote.icon)
-                            .font(.system(size: 18, weight: .semibold))
+                            .font(.system(size: 20, weight: .semibold))
                             .foregroundStyle(
                                 isPlaying
                                     ? EmoteColors.softOrange
                                     : (isOnCooldown ? EmoteColors.neutralGray : EmoteColors.warmBrown)
                             )
                     }
+
+                    // Prominent Emoji Badge
+                    Text(emote.emoji)
+                        .font(.system(size: 13))
+                        .padding(2.5)
+                        .background(
+                            Circle()
+                                .fill(EmoteColors.warmWhite.opacity(0.96))
+                                .shadow(color: Color.black.opacity(0.12), radius: 1.5, x: 0, y: 1)
+                        )
+                        .offset(x: 5, y: -5)
                 }
 
                 // Short Name
                 Text(emote.name)
                     .font(.system(size: 11.5, weight: .bold, design: .rounded))
                     .foregroundStyle(isDisabled ? EmoteColors.neutralGray : EmoteColors.darkCharcoal)
+                    .lineLimit(1)
 
                 // Subtitle / Cooldown / Status hint
                 if isOnCooldown {
@@ -246,7 +258,7 @@ struct EmotePickerView: View {
                         .foregroundStyle(EmoteColors.warmBrown.opacity(0.55))
                 }
             }
-            .frame(width: 82, height: 82)
+            .frame(width: 84, height: 88)
             .background(
                 RoundedRectangle(cornerRadius: 12)
                     .fill(
@@ -280,7 +292,7 @@ struct EmotePickerView: View {
             hoveredEmoteId = inside ? emote.id : nil
         }
         .keyboardShortcut(KeyEquivalent(Character("\(index)")), modifiers: [])
-        .accessibilityLabel("\(emote.name) emote")
+        .accessibilityLabel("\(emote.name) \(emote.emoji) emote")
         .accessibilityHint("\(emote.description). Shortcut key \(index).")
         .accessibilityAddTraits(.isButton)
     }
