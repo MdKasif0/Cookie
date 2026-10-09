@@ -991,6 +991,7 @@ final class CookieBehaviorEngine: ObservableObject {
         case .investigating: base = 1.8...3.0
         case .tired: base = 2.4...4.0
         case .inBox: base = 16...28
+        case .emoting: base = 2.0...3.0
         }
         var value = Double.random(in: base)
         if state == .idle { value /= max(0.5, store.profile.settings.activity.idleDurationFactor) }
