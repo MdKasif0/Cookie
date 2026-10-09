@@ -47,6 +47,19 @@ final class AppEnvironment: ObservableObject {
                 MotionSettings.mode = self.store.profile.settings.reducedMotion
             }
             .store(in: &cancellables)
+
+        // Observe UpdateManager prompt visibility
+        UpdateManager.shared.$isShowingUpdatePrompt
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] show in
+                guard let self else { return }
+                if show {
+                    self.windows.showUpdatePrompt()
+                } else {
+                    self.windows.closeUpdatePrompt()
+                }
+            }
+            .store(in: &cancellables)
     }
 
     /// Called once at launch. Returning users go straight to the desktop
@@ -65,6 +78,13 @@ final class AppEnvironment: ObservableObject {
             behaviorEngine.start()
         } else {
             presentWelcome()
+        }
+
+        // Check for updates in background if enabled, after a smooth launch pause
+        if store.profile.settings.automaticallyCheckForUpdates {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) { [weak self] in
+                self?.checkForUpdates(userInitiated: false)
+            }
         }
     }
 
