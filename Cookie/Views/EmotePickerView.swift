@@ -24,7 +24,7 @@ private enum EmoteColors {
 enum EmoteArtwork {
     static func assetName(for id: EmoteId) -> String {
         switch id {
-        case .wave: return "CookieArt"
+        case .wave: return "cookie-wave"
         case .happy: return "cookie-eyes-close"
         case .love: return "cookie-shy"
         case .sleepy: return "cookie-sleep"

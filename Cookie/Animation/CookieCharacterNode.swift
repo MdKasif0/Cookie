@@ -143,10 +143,77 @@ final class CookieCharacterNode: SKNode, SpriteProviding {
     func playEmote(_ emote: Emote, completion: @escaping (Bool) -> Void) {
         state = .emoting
         displayEmoteEffects(for: emote)
+        if emote.id == .wave,
+           let texture = ExpressionArtSource.shared.texture(for: .wave, config: config) {
+            playWaveStickerEmote(texture: texture, completion: completion)
+            return
+        }
         controller.play(emote.animationIdentifier) { [weak self] finished in
             self?.clearEmoteEffects()
             completion(finished)
         }
+    }
+
+    /// Plays the dedicated wave sticker emote with an adorable spring, paw wave sways, and clean idle restoration.
+    private func playWaveStickerEmote(texture: SKTexture, completion: @escaping (Bool) -> Void) {
+        sprite.removeAction(forKey: CookieAnimationId.actionKey)
+        sprite.removeAction(forKey: "cookie.bob")
+        sprite.texture = texture
+        sprite.position.y = 0
+
+        if MotionSettings.reduceMotion {
+            sprite.alpha = 0.8
+            sprite.run(.sequence([
+                .fadeAlpha(to: 1.0, duration: 0.15),
+                .wait(forDuration: 1.6),
+                .run { [weak self] in
+                    self?.clearEmoteEffects()
+                    self?.startIdling()
+                    completion(true)
+                }
+            ]), withKey: CookieAnimationId.actionKey)
+            return
+        }
+
+        // Cheerful spring and adorable waving rocking
+        let prep = SKAction.group([
+            .scaleX(to: 1.04, duration: 0.12),
+            .scaleY(to: 0.96, duration: 0.12)
+        ])
+        let springUp = SKAction.group([
+            .scaleX(to: 0.98, duration: 0.18),
+            .scaleY(to: 1.04, duration: 0.18),
+            .moveBy(x: 0, y: 3.5, duration: 0.18)
+        ])
+        let wave1 = SKAction.rotate(toAngle: 0.08, duration: 0.18)
+        let wave2 = SKAction.rotate(toAngle: -0.07, duration: 0.20)
+        let wave3 = SKAction.rotate(toAngle: 0.09, duration: 0.20)
+        let wave4 = SKAction.rotate(toAngle: -0.06, duration: 0.20)
+        let waveReset = SKAction.rotate(toAngle: 0.0, duration: 0.18)
+        let settle = SKAction.group([
+            .scaleX(to: 1.0, duration: 0.22),
+            .scaleY(to: 1.0, duration: 0.22),
+            .moveTo(y: 0, duration: 0.22)
+        ])
+        let hold = SKAction.wait(forDuration: 0.35)
+
+        let sequence = SKAction.sequence([
+            prep,
+            springUp,
+            wave1,
+            wave2,
+            wave3,
+            wave4,
+            waveReset,
+            settle,
+            hold,
+            .run { [weak self] in
+                self?.clearEmoteEffects()
+                self?.startIdling()
+                completion(true)
+            }
+        ])
+        sprite.run(sequence, withKey: CookieAnimationId.actionKey)
     }
 
     /// Awakens Cookie naturally before seamlessly playing the requested emote.
@@ -159,11 +226,7 @@ final class CookieCharacterNode: SKNode, SpriteProviding {
                 return
             }
             onEmoteStart?()
-            self.displayEmoteEffects(for: emote)
-            self.controller.play(emote.animationIdentifier) { [weak self] finished in
-                self?.clearEmoteEffects()
-                completion(finished)
-            }
+            self.playEmote(emote, completion: completion)
         }
     }
 
@@ -178,6 +241,73 @@ final class CookieCharacterNode: SKNode, SpriteProviding {
     private func displayEmoteEffects(for emote: Emote) {
         clearEmoteEffects()
         switch emote.id {
+        case .wave:
+            let greetingNode = SKNode()
+            greetingNode.position = CGPoint(x: 28, y: 38)
+            greetingNode.zPosition = 3.0
+            greetingNode.alpha = 0
+
+            // Warm cream speech bubble with soft orange outline
+            let bgWidth: CGFloat = 48
+            let bgHeight: CGFloat = 20
+            let bgRect = CGRect(x: -bgWidth / 2, y: -bgHeight / 2, width: bgWidth, height: bgHeight)
+            let bubble = SKShapeNode(rect: bgRect, cornerRadius: 10)
+            bubble.fillColor = SKColor(srgbRed: 0.99, green: 0.96, blue: 0.90, alpha: 0.95)
+            bubble.strokeColor = SKColor(srgbRed: 0.91, green: 0.61, blue: 0.41, alpha: 0.85)
+            bubble.lineWidth = 1.2
+            greetingNode.addChild(bubble)
+
+            // "Hii! ✨" label
+            let label = SKLabelNode(text: "Hii! ✨")
+            label.fontName = "Helvetica-Bold"
+            label.fontSize = 10.5
+            label.fontColor = SKColor(srgbRed: 0.44, green: 0.31, blue: 0.22, alpha: 1.0)
+            label.verticalAlignmentMode = .center
+            label.horizontalAlignmentMode = .center
+            greetingNode.addChild(label)
+
+            // Sparkling burst star near waving paw
+            let spark = SKLabelNode(text: "✦")
+            spark.fontName = "Helvetica-Bold"
+            spark.fontSize = 13
+            spark.fontColor = SKColor(srgbRed: 0.96, green: 0.72, blue: 0.35, alpha: 0.95)
+            spark.position = CGPoint(x: -28, y: -2)
+            greetingNode.addChild(spark)
+
+            container.addChild(greetingNode)
+            activeEmoteEffect = greetingNode
+
+            if MotionSettings.reduceMotion {
+                greetingNode.run(.sequence([
+                    .fadeIn(withDuration: 0.25),
+                    .wait(forDuration: 1.3),
+                    .fadeOut(withDuration: 0.35),
+                    .run { [weak self] in self?.clearEmoteEffects() }
+                ]))
+            } else {
+                let popIn = SKAction.group([
+                    .fadeIn(withDuration: 0.20),
+                    .scale(to: 1.0, duration: 0.20),
+                    .moveBy(x: 2, y: 6, duration: 0.20)
+                ])
+                let floatSway = SKAction.sequence([
+                    .moveBy(x: 0, y: 2.5, duration: 0.35),
+                    .moveBy(x: 0, y: -2.5, duration: 0.35),
+                    .moveBy(x: 0, y: 1.5, duration: 0.3)
+                ])
+                let fadeOut = SKAction.group([
+                    .fadeOut(withDuration: 0.35),
+                    .scale(to: 0.8, duration: 0.35),
+                    .moveBy(x: 0, y: 4, duration: 0.35)
+                ])
+                greetingNode.setScale(0.5)
+                greetingNode.run(.sequence([
+                    popIn,
+                    floatSway,
+                    fadeOut,
+                    .run { [weak self] in self?.clearEmoteEffects() }
+                ]))
+            }
         case .love:
             let heart = SKShapeNode(path: Self.makeHeartPath(size: 14))
             heart.fillColor = SKColor(srgbRed: 0.94, green: 0.62, blue: 0.50, alpha: 0.95)

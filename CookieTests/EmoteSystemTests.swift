@@ -261,7 +261,7 @@ final class EmoteSystemTests: XCTestCase {
     // MARK: - Emote UI & Menu Integration Tests
 
     func testEmoteArtworkAssetNames() {
-        XCTAssertEqual(EmoteArtwork.assetName(for: .wave), "CookieArt")
+        XCTAssertEqual(EmoteArtwork.assetName(for: .wave), "cookie-wave")
         XCTAssertEqual(EmoteArtwork.assetName(for: .happy), "cookie-eyes-close")
         XCTAssertEqual(EmoteArtwork.assetName(for: .love), "cookie-shy")
         XCTAssertEqual(EmoteArtwork.assetName(for: .sleepy), "cookie-sleep")
