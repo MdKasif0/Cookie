@@ -19,6 +19,7 @@ final class WindowManager: NSObject, NSWindowDelegate {
     private(set) var customizationWindow: NSWindow?
     private(set) var settingsWindow: NSWindow?
     private(set) var emotePickerWindow: NSWindow?
+    private(set) var updatePromptWindow: NSWindow?
     weak var environment: AppEnvironment?
     private var onWelcomeDismissed: (() -> Void)?
     private var cancellables: Set<AnyCancellable> = []
@@ -256,6 +257,50 @@ final class WindowManager: NSObject, NSWindowDelegate {
         }
     }
 
+    // MARK: - Software Updates Window
+
+    func showUpdatePrompt() {
+        if let updatePromptWindow {
+            updatePromptWindow.makeKeyAndOrderFront(nil)
+            NSApp.activate(ignoringOtherApps: true)
+            return
+        }
+
+        let panel = NSPanel(
+            contentRect: NSRect(x: 0, y: 0, width: 380, height: 280),
+            styleMask: [.titled, .closable, .fullSizeContentView],
+            backing: .buffered,
+            defer: false
+        )
+        panel.title = "A little update for Cookie"
+        panel.titlebarAppearsTransparent = true
+        panel.titleVisibility = .hidden
+        panel.isReleasedWhenClosed = false
+        panel.level = .floating
+        panel.isOpaque = false
+        panel.backgroundColor = .clear
+        panel.hasShadow = true
+        panel.isMovableByWindowBackground = true
+        panel.delegate = self
+
+        let content = UpdatePromptView(
+            updateManager: UpdateManager.shared,
+            onDismiss: { [weak self] in
+                self?.closeUpdatePrompt()
+            }
+        )
+        panel.contentViewController = NSHostingController(rootView: content)
+        panel.center()
+        updatePromptWindow = panel
+        panel.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
+    func closeUpdatePrompt() {
+        updatePromptWindow?.close()
+        updatePromptWindow = nil
+    }
+
     // MARK: - NSWindowDelegate
 
     func windowWillClose(_ notification: Notification) {
@@ -271,6 +316,8 @@ final class WindowManager: NSObject, NSWindowDelegate {
             settingsWindow = nil
         } else if window === emotePickerWindow {
             emotePickerWindow = nil
+        } else if window === updatePromptWindow {
+            updatePromptWindow = nil
         }
     }
 }
