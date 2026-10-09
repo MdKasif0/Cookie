@@ -220,7 +220,7 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         emotesMenu.addItem(.separator())
         for emote in Emote.allEmotes {
             let item = NSMenuItem(
-                title: "\(emote.name) \(Self.emoteEmoji(for: emote.id))",
+                title: "\(emote.name) \(emote.emoji)",
                 action: #selector(emoteAction(_:)),
                 keyEquivalent: ""
             )
@@ -292,13 +292,7 @@ final class MenuBarController: NSObject, NSMenuDelegate {
     }
 
     private static func emoteEmoji(for id: EmoteId) -> String {
-        switch id {
-        case .wave: return "👋"
-        case .happy: return "✨"
-        case .love: return "🧡"
-        case .sleepy: return "💤"
-        case .playful: return "🧶"
-        }
+        id.emoji
     }
 
     @objc private func feedAction(_ sender: NSMenuItem) {
