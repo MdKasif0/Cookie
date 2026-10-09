@@ -1,0 +1,10 @@
+{
+  "name": "Love",
+  "id": "love",
+  "fps": 6,
+  "loop": false,
+  "sound": "cookie-mew",
+  "expectedDuration": 2.2,
+  "description": "Cookie leans in with shy affection and deep purring.",
+  "status": "placeholder_active"
+}

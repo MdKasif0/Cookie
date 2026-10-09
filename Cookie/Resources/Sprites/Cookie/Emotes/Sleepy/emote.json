@@ -1,0 +1,10 @@
+{
+  "name": "Sleepy",
+  "id": "sleepy",
+  "fps": 4,
+  "loop": false,
+  "sound": "cookie-sleep",
+  "expectedDuration": 2.5,
+  "description": "Cookie stretches softly, yawns, and snuggles down.",
+  "status": "placeholder_active"
+}
