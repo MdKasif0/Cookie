@@ -182,6 +182,19 @@ final class WindowManager: NSObject, NSWindowDelegate {
         NSApp.activate(ignoringOtherApps: true)
     }
 
+/// Specialized borderless floating panel for the emote picker popover.
+/// Overrides `canBecomeKey` and `canBecomeMain` so keyboard navigation (1–5, Tab, Return, Esc)
+/// works immediately without requiring a titled window decoration.
+final class EmotePickerPanel: NSPanel {
+    override var canBecomeKey: Bool { true }
+    override var canBecomeMain: Bool { true }
+
+    override func cancelOperation(_ sender: Any?) {
+        self.close()
+    }
+}
+
+extension WindowManager {
     // MARK: - Emotes Panel
 
     func showEmotePicker() {
@@ -192,9 +205,12 @@ final class WindowManager: NSObject, NSWindowDelegate {
         }
         guard let environment else { return }
 
-        let panel = NSPanel(
-            contentRect: NSRect(x: 0, y: 0, width: 320, height: 350),
-            styleMask: [.titled, .closable, .utilityWindow, .nonactivatingPanel],
+        let panelWidth: CGFloat = 300
+        let panelHeight: CGFloat = 250
+
+        let panel = EmotePickerPanel(
+            contentRect: NSRect(x: 0, y: 0, width: panelWidth, height: panelHeight),
+            styleMask: [.borderless, .nonactivatingPanel],
             backing: .buffered,
             defer: false
         )
@@ -204,10 +220,11 @@ final class WindowManager: NSObject, NSWindowDelegate {
         panel.isOpaque = false
         panel.backgroundColor = .clear
         panel.hasShadow = true
+        panel.isMovableByWindowBackground = true
         panel.delegate = self
 
         let content = EmotePickerView(onDismiss: { [weak self] in
-            self?.emotePickerWindow?.close()
+            self?.closeEmotePicker()
         })
         .environmentObject(store)
         .environmentObject(environment)
@@ -215,10 +232,20 @@ final class WindowManager: NSObject, NSWindowDelegate {
 
         panel.contentViewController = NSHostingController(rootView: content)
 
-        if let companionWindow = companionController?.window {
-            let companionOrigin = companionWindow.frame.origin
-            let x = companionOrigin.x + companionWindow.frame.width + 12
-            let y = max(50, companionOrigin.y)
+        if let companionWindow = companionController?.window,
+           let screen = companionWindow.screen ?? NSScreen.main ?? NSScreen.screens.first {
+            let companionFrame = companionWindow.frame
+            let visible = screen.visibleFrame
+
+            var x = companionFrame.maxX + 12
+            if x + panelWidth > visible.maxX {
+                x = companionFrame.minX - panelWidth - 12
+            }
+            x = max(visible.minX + 8, min(x, visible.maxX - panelWidth - 8))
+
+            var y = companionFrame.midY - panelHeight / 2
+            y = max(visible.minY + 8, min(y, visible.maxY - panelHeight - 8))
+
             panel.setFrameOrigin(NSPoint(x: x, y: y))
         } else {
             panel.center()
@@ -226,15 +253,22 @@ final class WindowManager: NSObject, NSWindowDelegate {
 
         emotePickerWindow = panel
         panel.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
+    func closeEmotePicker() {
+        emotePickerWindow?.close()
+        emotePickerWindow = nil
     }
 
     func toggleEmotePicker() {
         if let window = emotePickerWindow, window.isVisible {
-            window.close()
+            closeEmotePicker()
         } else {
             showEmotePicker()
         }
     }
+}
 
     // MARK: - NSWindowDelegate
 
