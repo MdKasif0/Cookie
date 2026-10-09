@@ -42,12 +42,28 @@ enum UpdateCheckState: Equatable {
             return false
         }
     }
+
+    var isUpdateAvailable: Bool {
+        if case .updateAvailable = self {
+            return true
+        }
+        return false
+    }
 }
 
 /// Identifies whether the running binary is signed with an Apple Developer ID or ad-hoc / unsigned.
-enum CodeSigningStatus: Equatable {
+enum CodeSigningStatus: Equatable, CustomStringConvertible {
     case developerId(teamId: String)
     case adHocOrUnsigned
+
+    var description: String {
+        switch self {
+        case .developerId(let teamId):
+            return "Developer ID Signed (Team: \(teamId))"
+        case .adHocOrUnsigned:
+            return "Ad-Hoc / Unsigned (Self-distributed DMG)"
+        }
+    }
 
     /// Inspects the running application's static code signature via the Security framework.
     static func current() -> CodeSigningStatus {
