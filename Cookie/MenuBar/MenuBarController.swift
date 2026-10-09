@@ -192,6 +192,9 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         let customItem = NSMenuItem(title: "Customize Cookie…", action: #selector(customizeAction), keyEquivalent: "k")
         customItem.target = self
         appMenu.addItem(customItem)
+        let updateItem = NSMenuItem(title: "Check for Updates…", action: #selector(checkForUpdatesAction), keyEquivalent: "")
+        updateItem.target = self
+        appMenu.addItem(updateItem)
         appMenu.addItem(.separator())
         let hideItem = NSMenuItem(title: "Hide Cookie", action: #selector(toggleCompanionAction), keyEquivalent: "h")
         hideItem.target = self
@@ -324,6 +327,10 @@ final class MenuBarController: NSObject, NSMenuDelegate {
 
     @objc private func settingsAction() {
         environment.showSettings()
+    }
+
+    @objc private func checkForUpdatesAction() {
+        environment.checkForUpdates(userInitiated: true)
     }
 
     @objc private func quitAction() {
