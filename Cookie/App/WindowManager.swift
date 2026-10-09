@@ -18,6 +18,7 @@ final class WindowManager: NSObject, NSWindowDelegate {
     private(set) var welcomeWindow: NSWindow?
     private(set) var customizationWindow: NSWindow?
     private(set) var settingsWindow: NSWindow?
+    private(set) var emotePickerWindow: NSWindow?
     weak var environment: AppEnvironment?
     private var onWelcomeDismissed: (() -> Void)?
     private var cancellables: Set<AnyCancellable> = []
