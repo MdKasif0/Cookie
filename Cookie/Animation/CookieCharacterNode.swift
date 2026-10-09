@@ -143,9 +143,9 @@ final class CookieCharacterNode: SKNode, SpriteProviding {
     func playEmote(_ emote: Emote, completion: @escaping (Bool) -> Void) {
         state = .emoting
         displayEmoteEffects(for: emote)
-        if emote.id == .wave,
-           let texture = ExpressionArtSource.shared.texture(for: .wave, config: config) {
-            playWaveStickerEmote(texture: texture, completion: completion)
+        if let art = CookieExpressionArt.forEmote(emote.id),
+           let texture = ExpressionArtSource.shared.texture(for: art, config: config) {
+            playExpressionStickerEmote(art: art, emote: emote, texture: texture, completion: completion)
             return
         }
         controller.play(emote.animationIdentifier) { [weak self] finished in
@@ -154,20 +154,24 @@ final class CookieCharacterNode: SKNode, SpriteProviding {
         }
     }
 
-    /// Plays the dedicated wave sticker emote with an adorable spring, paw wave sways, and clean idle restoration.
-    private func playWaveStickerEmote(texture: SKTexture, completion: @escaping (Bool) -> Void) {
+    /// Plays dedicated whole-pose artwork emotes with custom expressive SpriteKit actions and natural idle return.
+    private func playExpressionStickerEmote(art: CookieExpressionArt, emote: Emote, texture: SKTexture, completion: @escaping (Bool) -> Void) {
         sprite.removeAction(forKey: CookieAnimationId.actionKey)
         sprite.removeAction(forKey: "cookie.bob")
         sprite.texture = texture
-        sprite.position.y = 0
+        sprite.position = .zero
+        accessories.isHidden = CookieExpressionArt.poseFarFromBase.contains(art)
+
+        let duration = emote.duration
 
         if MotionSettings.reduceMotion {
             sprite.alpha = 0.8
             sprite.run(.sequence([
                 .fadeAlpha(to: 1.0, duration: 0.15),
-                .wait(forDuration: 1.6),
+                .wait(forDuration: duration * 0.8),
                 .run { [weak self] in
                     self?.clearEmoteEffects()
+                    self?.accessories.isHidden = false
                     self?.startIdling()
                     completion(true)
                 }
@@ -175,45 +179,148 @@ final class CookieCharacterNode: SKNode, SpriteProviding {
             return
         }
 
-        // Cheerful spring and adorable waving rocking
-        let prep = SKAction.group([
-            .scaleX(to: 1.04, duration: 0.12),
-            .scaleY(to: 0.96, duration: 0.12)
-        ])
-        let springUp = SKAction.group([
-            .scaleX(to: 0.98, duration: 0.18),
-            .scaleY(to: 1.04, duration: 0.18),
-            .moveBy(x: 0, y: 3.5, duration: 0.18)
-        ])
-        let wave1 = SKAction.rotate(toAngle: 0.08, duration: 0.18)
-        let wave2 = SKAction.rotate(toAngle: -0.07, duration: 0.20)
-        let wave3 = SKAction.rotate(toAngle: 0.09, duration: 0.20)
-        let wave4 = SKAction.rotate(toAngle: -0.06, duration: 0.20)
-        let waveReset = SKAction.rotate(toAngle: 0.0, duration: 0.18)
-        let settle = SKAction.group([
-            .scaleX(to: 1.0, duration: 0.22),
-            .scaleY(to: 1.0, duration: 0.22),
-            .moveTo(y: 0, duration: 0.22)
-        ])
-        let hold = SKAction.wait(forDuration: 0.35)
+        let animationSequence: SKAction
 
-        let sequence = SKAction.sequence([
-            prep,
-            springUp,
-            wave1,
-            wave2,
-            wave3,
-            wave4,
-            waveReset,
-            settle,
-            hold,
+        switch emote.id {
+        case .wave:
+            // Cheerful spring and adorable waving rocking
+            let prep = SKAction.group([
+                .scaleX(to: 1.04, duration: 0.12),
+                .scaleY(to: 0.96, duration: 0.12)
+            ])
+            let springUp = SKAction.group([
+                .scaleX(to: 0.98, duration: 0.18),
+                .scaleY(to: 1.04, duration: 0.18),
+                .moveBy(x: 0, y: 3.5, duration: 0.18)
+            ])
+            let wave1 = SKAction.rotate(toAngle: 0.08, duration: 0.18)
+            let wave2 = SKAction.rotate(toAngle: -0.07, duration: 0.20)
+            let wave3 = SKAction.rotate(toAngle: 0.09, duration: 0.20)
+            let wave4 = SKAction.rotate(toAngle: -0.06, duration: 0.20)
+            let waveReset = SKAction.rotate(toAngle: 0.0, duration: 0.18)
+            let settle = SKAction.group([
+                .scaleX(to: 1.0, duration: 0.22),
+                .scaleY(to: 1.0, duration: 0.22),
+                .moveTo(y: 0, duration: 0.22)
+            ])
+            let hold = SKAction.wait(forDuration: 0.35)
+            animationSequence = .sequence([prep, springUp, wave1, wave2, wave3, wave4, waveReset, settle, hold])
+
+        case .love:
+            // Affectionate blushing lean, sweet snuggle tilt, and gentle heartbeat purr pulse
+            let snuggleLean = SKAction.group([
+                .scaleX(to: 1.03, duration: 0.22),
+                .scaleY(to: 0.97, duration: 0.22),
+                .rotate(toAngle: 0.06, duration: 0.22),
+                .moveBy(x: 2, y: 1, duration: 0.22)
+            ])
+            let pulse1 = SKAction.sequence([
+                .scale(to: 1.03, duration: 0.25),
+                .scale(to: 0.99, duration: 0.25)
+            ])
+            let pulse2 = SKAction.sequence([
+                .scale(to: 1.025, duration: 0.25),
+                .scale(to: 0.995, duration: 0.25)
+            ])
+            let unLean = SKAction.group([
+                .scaleX(to: 1.0, duration: 0.30),
+                .scaleY(to: 1.0, duration: 0.30),
+                .rotate(toAngle: 0.0, duration: 0.30),
+                .moveTo(x: 0, y: 0, duration: 0.30)
+            ])
+            let hold = SKAction.wait(forDuration: 0.20)
+            animationSequence = .sequence([snuggleLean, pulse1, pulse2, unLean, hold])
+
+        case .sleepy:
+            // Settle down peacefully into sleep curl, gentle deep breathing cycles
+            let curlDown = SKAction.group([
+                .scaleY(to: 0.96, duration: 0.35),
+                .moveTo(y: -1, duration: 0.35)
+            ])
+            let breathIn1 = SKAction.scaleY(to: 0.985, duration: 0.75)
+            let breathOut1 = SKAction.scaleY(to: 0.945, duration: 0.75)
+            let breathIn2 = SKAction.scaleY(to: 0.985, duration: 0.75)
+            let breathOut2 = SKAction.scaleY(to: 0.945, duration: 0.75)
+            let wakeUp = SKAction.group([
+                .scaleX(to: 1.0, duration: 0.40),
+                .scaleY(to: 1.0, duration: 0.40),
+                .moveTo(y: 0, duration: 0.40)
+            ])
+            animationSequence = .sequence([curlDown, breathIn1, breathOut1, breathIn2, breathOut2, wakeUp])
+
+        case .happy:
+            // Joyful excited leaps, happy landing squash, and sweet wiggle
+            let crouch = SKAction.group([
+                .scaleX(to: 1.04, duration: 0.12),
+                .scaleY(to: 0.95, duration: 0.12)
+            ])
+            let hop1 = SKAction.group([
+                .scaleX(to: 0.97, duration: 0.16),
+                .scaleY(to: 1.06, duration: 0.16),
+                .moveBy(x: 0, y: 6.5, duration: 0.16)
+            ])
+            let land1 = SKAction.group([
+                .scaleX(to: 1.03, duration: 0.14),
+                .scaleY(to: 0.96, duration: 0.14),
+                .moveTo(y: 0, duration: 0.14)
+            ])
+            let hop2 = SKAction.group([
+                .scaleX(to: 0.98, duration: 0.15),
+                .scaleY(to: 1.04, duration: 0.15),
+                .moveBy(x: 0, y: 4.5, duration: 0.15)
+            ])
+            let land2 = SKAction.group([
+                .scaleX(to: 1.0, duration: 0.16),
+                .scaleY(to: 1.0, duration: 0.16),
+                .moveTo(y: 0, duration: 0.16)
+            ])
+            let wiggle1 = SKAction.rotate(toAngle: 0.05, duration: 0.14)
+            let wiggle2 = SKAction.rotate(toAngle: -0.05, duration: 0.14)
+            let wiggleReset = SKAction.rotate(toAngle: 0.0, duration: 0.12)
+            let hold = SKAction.wait(forDuration: 0.25)
+            animationSequence = .sequence([crouch, hop1, land1, hop2, land2, wiggle1, wiggle2, wiggleReset, hold])
+
+        case .playful:
+            // Mischievous pounce crouch, wiggle, playful leap and waggle
+            let pouncePrep = SKAction.group([
+                .scaleX(to: 1.05, duration: 0.14),
+                .scaleY(to: 0.94, duration: 0.14),
+                .moveBy(x: -2, y: -1, duration: 0.14)
+            ])
+            let buttWiggle = SKAction.sequence([
+                .rotate(toAngle: -0.06, duration: 0.10),
+                .rotate(toAngle: 0.06, duration: 0.10),
+                .rotate(toAngle: -0.05, duration: 0.10),
+                .rotate(toAngle: 0.0, duration: 0.08)
+            ])
+            let pounce = SKAction.group([
+                .scaleX(to: 0.97, duration: 0.18),
+                .scaleY(to: 1.06, duration: 0.18),
+                .moveBy(x: 4, y: 5.5, duration: 0.18)
+            ])
+            let land = SKAction.group([
+                .scaleX(to: 1.02, duration: 0.20),
+                .scaleY(to: 0.97, duration: 0.20),
+                .moveTo(x: 0, y: 0, duration: 0.20)
+            ])
+            let recover = SKAction.group([
+                .scaleX(to: 1.0, duration: 0.22),
+                .scaleY(to: 1.0, duration: 0.22)
+            ])
+            let hold = SKAction.wait(forDuration: 0.35)
+            animationSequence = .sequence([pouncePrep, buttWiggle, pounce, land, recover, hold])
+        }
+
+        let fullSequence = SKAction.sequence([
+            animationSequence,
             .run { [weak self] in
                 self?.clearEmoteEffects()
+                self?.accessories.isHidden = false
                 self?.startIdling()
                 completion(true)
             }
         ])
-        sprite.run(sequence, withKey: CookieAnimationId.actionKey)
+        sprite.run(fullSequence, withKey: CookieAnimationId.actionKey)
     }
 
     /// Awakens Cookie naturally before seamlessly playing the requested emote.
@@ -387,8 +494,98 @@ final class CookieCharacterNode: SKNode, SpriteProviding {
                 ]))
             }
 
-        default:
-            break
+        case .happy:
+            let sparksNode = SKNode()
+            sparksNode.position = CGPoint(x: 0, y: 32)
+            sparksNode.zPosition = 3.0
+            sparksNode.alpha = 0
+
+            let leftSpark = SKLabelNode(text: "✨")
+            leftSpark.fontSize = 12
+            leftSpark.position = CGPoint(x: -24, y: 4)
+            sparksNode.addChild(leftSpark)
+
+            let rightSpark = SKLabelNode(text: "✨")
+            rightSpark.fontSize = 12
+            rightSpark.position = CGPoint(x: 24, y: 8)
+            sparksNode.addChild(rightSpark)
+
+            container.addChild(sparksNode)
+            activeEmoteEffect = sparksNode
+
+            if MotionSettings.reduceMotion {
+                sparksNode.run(.sequence([
+                    .fadeIn(withDuration: 0.25),
+                    .wait(forDuration: 1.0),
+                    .fadeOut(withDuration: 0.35),
+                    .run { [weak self] in self?.clearEmoteEffects() }
+                ]))
+            } else {
+                let appear = SKAction.group([
+                    .fadeIn(withDuration: 0.20),
+                    .scale(to: 1.1, duration: 0.20)
+                ])
+                let drift = SKAction.group([
+                    .moveBy(x: 0, y: 12, duration: 1.1),
+                    .sequence([
+                        .wait(forDuration: 0.7),
+                        .fadeOut(withDuration: 0.4)
+                    ])
+                ])
+                sparksNode.setScale(0.5)
+                sparksNode.run(.sequence([
+                    appear,
+                    drift,
+                    .run { [weak self] in self?.clearEmoteEffects() }
+                ]))
+            }
+
+        case .playful:
+            let toyNode = SKNode()
+            toyNode.position = CGPoint(x: 24, y: 26)
+            toyNode.zPosition = 3.0
+            toyNode.alpha = 0
+
+            let yarn = SKLabelNode(text: "🧶")
+            yarn.fontSize = 13
+            yarn.position = CGPoint(x: 0, y: 0)
+            toyNode.addChild(yarn)
+
+            let spark = SKLabelNode(text: "✦")
+            spark.fontSize = 11
+            spark.fontColor = SKColor(srgbRed: 0.95, green: 0.65, blue: 0.40, alpha: 0.95)
+            spark.position = CGPoint(x: -14, y: 12)
+            toyNode.addChild(spark)
+
+            container.addChild(toyNode)
+            activeEmoteEffect = toyNode
+
+            if MotionSettings.reduceMotion {
+                toyNode.run(.sequence([
+                    .fadeIn(withDuration: 0.25),
+                    .wait(forDuration: 1.2),
+                    .fadeOut(withDuration: 0.35),
+                    .run { [weak self] in self?.clearEmoteEffects() }
+                ]))
+            } else {
+                let pop = SKAction.group([
+                    .fadeIn(withDuration: 0.20),
+                    .scale(to: 1.1, duration: 0.20),
+                    .moveBy(x: 2, y: 6, duration: 0.20)
+                ])
+                let bounce = SKAction.sequence([
+                    .moveBy(x: 0, y: -4, duration: 0.25),
+                    .moveBy(x: 0, y: 2, duration: 0.25),
+                    .wait(forDuration: 0.6),
+                    .fadeOut(withDuration: 0.35)
+                ])
+                toyNode.setScale(0.5)
+                toyNode.run(.sequence([
+                    pop,
+                    bounce,
+                    .run { [weak self] in self?.clearEmoteEffects() }
+                ]))
+            }
         }
     }
 
