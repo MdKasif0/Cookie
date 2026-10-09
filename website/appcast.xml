@@ -22,9 +22,9 @@
         url="https://github.com/MdKasif0/Cookie/releases/download/v1.0.0/Cookie-1.0.0.dmg"
         sparkle:version="1"
         sparkle:shortVersionString="1.0.0"
-        length="22054597"
+        length="22133186"
         type="application/octet-stream"
-        sparkle:edSignature="vJ+1dRGOpT8dF1R3LXqgCVJAcR0oDz3bp1lYN5qkd+Gg2562Hv4bGun0KfFko9DIf7IKF4xhn0oDWwESPrPyBg=="/>
+        sparkle:edSignature="j+shEmacKy9xOP7tVFK3fE0WeJ9pMcEmlpz92dWaEA/Ug3lpXJ8GdNyL0UkfcX5IpcLQbqtFB4hPj76D7HgfBQ=="/>
     </item>
   </channel>
 </rss>
