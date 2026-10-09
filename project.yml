@@ -13,10 +13,17 @@ settings:
     SWIFT_STRICT_CONCURRENCY: minimal
     OTHER_SWIFT_FLAGS: "-Xfrontend -disable-sandbox"
 
+packages:
+  Sparkle:
+    url: https://github.com/sparkle-project/Sparkle
+    from: 2.6.0
+
 targets:
   Cookie:
     type: application
     platform: macOS
+    dependencies:
+      - package: Sparkle
     sources:
       - path: Cookie
         excludes:
