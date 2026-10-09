@@ -140,17 +140,17 @@ final class UpdateSystemTests: XCTestCase {
         let storeURL = tempDirectory.appendingPathComponent("store.json")
         let store = CookieStore(storageURL: storeURL)
 
-        // Initial default is false
-        XCTAssertFalse(store.profile.settings.automaticallyCheckForUpdates)
+        // Initial default is true
+        XCTAssertTrue(store.profile.settings.automaticallyCheckForUpdates)
 
         // Change setting and persist
-        store.profile.settings.automaticallyCheckForUpdates = true
+        store.profile.settings.automaticallyCheckForUpdates = false
         store.profile.name = "Mocha"
         store.flush()
 
         // Reload fresh from disk
         let reloaded = CookieStore(storageURL: storeURL)
-        XCTAssertTrue(reloaded.profile.settings.automaticallyCheckForUpdates)
+        XCTAssertFalse(reloaded.profile.settings.automaticallyCheckForUpdates)
         XCTAssertEqual(reloaded.profile.name, "Mocha")
     }
 
