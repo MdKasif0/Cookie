@@ -1,0 +1,10 @@
+{
+  "name": "Wave",
+  "id": "wave",
+  "fps": 6,
+  "loop": false,
+  "sound": "cookie-welcome",
+  "expectedDuration": 2.0,
+  "description": "Cookie raises a paw in a friendly, welcoming greeting.",
+  "status": "placeholder_active"
+}
