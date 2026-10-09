@@ -274,3 +274,16 @@ final class WindowManager: NSObject, NSWindowDelegate {
         }
     }
 }
+
+/// Specialized borderless floating panel for the emote picker popover.
+/// Overrides `canBecomeKey` and `canBecomeMain` so keyboard navigation (1–5, Tab, Return, Esc)
+/// works immediately without requiring a titled window decoration.
+final class EmotePickerPanel: NSPanel {
+    override var canBecomeKey: Bool { true }
+    override var canBecomeMain: Bool { true }
+
+    override func cancelOperation(_ sender: Any?) {
+        self.close()
+    }
+}
+
