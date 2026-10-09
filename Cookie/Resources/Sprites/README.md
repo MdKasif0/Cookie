@@ -14,6 +14,7 @@ the built-in placeholder, with no code changes.
         Interaction/    eat, drink, pet, meow
         Emotions/       curious, happy, surprised, scared, annoyed, playful
         Special/        jump, fall, pickedUp, dropped
+        Emotes/         wave, happy, love, sleepy, playful
 
 ## Animations
 
@@ -37,6 +38,11 @@ the built-in placeholder, with no code changes.
 | drink      | yes     | 5   | interaction |
 | pet        | no      | 6   | interaction |
 | meow       | no      | 6   | interaction |
+| wave       | no      | 6   | emote       |
+| happy      | no      | 6   | emote       |
+| love       | no      | 6   | emote       |
+| sleepy     | no      | 4   | emote       |
+| playful    | no      | 6   | emote       |
 | sleep      | yes     | 2   | sleep       |
 | wake       | no      | 4   | idle        |
 | jump       | no      | 8   | special     |
@@ -44,7 +50,7 @@ the built-in placeholder, with no code changes.
 | pickedUp   | yes     | 4   | special     |
 | dropped    | no      | 8   | special     |
 
-Priority ordering: sleep < idle < walk < interaction < special. A higher
+Priority ordering: sleep < idle < walk < interaction < emote < special. A higher
 priority interrupts a lower one; when a one-shot finishes, the previous
 looping animation resumes automatically. Defaults above can be overridden
 per animation with a manifest (see below).
