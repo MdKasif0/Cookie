@@ -213,6 +213,11 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         // 3. Emotes menu
         let emotesMainMenu = NSMenuItem()
         let emotesMenu = NSMenu(title: "Emotes")
+        let openPickerItem = NSMenuItem(title: "Open Emotes…", action: #selector(openEmotesPickerAction), keyEquivalent: "e")
+        openPickerItem.keyEquivalentModifierMask = [.command]
+        openPickerItem.target = self
+        emotesMenu.addItem(openPickerItem)
+        emotesMenu.addItem(.separator())
         for emote in Emote.allEmotes {
             let item = NSMenuItem(
                 title: "\(emote.name) \(Self.emoteEmoji(for: emote.id))",
@@ -223,11 +228,6 @@ final class MenuBarController: NSObject, NSMenuDelegate {
             item.representedObject = emote
             emotesMenu.addItem(item)
         }
-        emotesMenu.addItem(.separator())
-        let openPickerItem = NSMenuItem(title: "Open Emotes…", action: #selector(openEmotesPickerAction), keyEquivalent: "e")
-        openPickerItem.keyEquivalentModifierMask = [.command]
-        openPickerItem.target = self
-        emotesMenu.addItem(openPickerItem)
         emotesMainMenu.submenu = emotesMenu
         mainMenu.addItem(emotesMainMenu)
 
