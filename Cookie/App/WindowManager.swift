@@ -182,6 +182,60 @@ final class WindowManager: NSObject, NSWindowDelegate {
         NSApp.activate(ignoringOtherApps: true)
     }
 
+    // MARK: - Emotes Panel
+
+    func showEmotePicker() {
+        if let emotePickerWindow {
+            emotePickerWindow.makeKeyAndOrderFront(nil)
+            NSApp.activate(ignoringOtherApps: true)
+            return
+        }
+        guard let environment else { return }
+
+        let panel = NSPanel(
+            contentRect: NSRect(x: 0, y: 0, width: 320, height: 350),
+            styleMask: [.titled, .closable, .utilityWindow, .nonactivatingPanel],
+            backing: .buffered,
+            defer: false
+        )
+        panel.title = "Emotes"
+        panel.isReleasedWhenClosed = false
+        panel.level = .floating
+        panel.isOpaque = false
+        panel.backgroundColor = .clear
+        panel.hasShadow = true
+        panel.delegate = self
+
+        let content = EmotePickerView(onDismiss: { [weak self] in
+            self?.emotePickerWindow?.close()
+        })
+        .environmentObject(store)
+        .environmentObject(environment)
+        .environmentObject(behaviorEngine)
+
+        panel.contentViewController = NSHostingController(rootView: content)
+
+        if let companionWindow = companionController?.window {
+            let companionOrigin = companionWindow.frame.origin
+            let x = companionOrigin.x + companionWindow.frame.width + 12
+            let y = max(50, companionOrigin.y)
+            panel.setFrameOrigin(NSPoint(x: x, y: y))
+        } else {
+            panel.center()
+        }
+
+        emotePickerWindow = panel
+        panel.makeKeyAndOrderFront(nil)
+    }
+
+    func toggleEmotePicker() {
+        if let window = emotePickerWindow, window.isVisible {
+            window.close()
+        } else {
+            showEmotePicker()
+        }
+    }
+
     // MARK: - NSWindowDelegate
 
     func windowWillClose(_ notification: Notification) {
@@ -195,6 +249,8 @@ final class WindowManager: NSObject, NSWindowDelegate {
             customizationWindow = nil
         } else if window === settingsWindow {
             settingsWindow = nil
+        } else if window === emotePickerWindow {
+            emotePickerWindow = nil
         }
     }
 }
