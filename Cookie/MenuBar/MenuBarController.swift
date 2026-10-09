@@ -92,34 +92,15 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         playItem.target = self
         menu.addItem(playItem)
 
-        // 5. Emotes Submenu
-        let emotesMenuItem = NSMenuItem(title: "Emotes", action: nil, keyEquivalent: "")
-        let emotesSubmenu = NSMenu(title: "Emotes")
-        for emote in Emote.allEmotes {
-            let emoteItem = NSMenuItem(
-                title: "\(emote.name) \(Self.emoteEmoji(for: emote.id))",
-                action: #selector(emoteAction(_:)),
-                keyEquivalent: ""
-            )
-            emoteItem.target = self
-            emoteItem.representedObject = emote
-            let isOnCooldown = environment.behaviorEngine.cooldownRemaining(for: emote.id) > 0.05
-            let isBusy = environment.behaviorEngine.activeEmote != nil
-            let isDragged = environment.behaviorEngine.state == .beingDragged
-            emoteItem.isEnabled = !isOnCooldown && !isBusy && !isDragged
-            emotesSubmenu.addItem(emoteItem)
-        }
-        emotesSubmenu.addItem(.separator())
-        let openPickerItem = NSMenuItem(
-            title: "Open Emotes…",
+        // 5. Emotes Entry
+        let emotesItem = NSMenuItem(
+            title: "Emotes…",
             action: #selector(openEmotesPickerAction),
             keyEquivalent: "e"
         )
-        openPickerItem.keyEquivalentModifierMask = [.command]
-        openPickerItem.target = self
-        emotesSubmenu.addItem(openPickerItem)
-        emotesMenuItem.submenu = emotesSubmenu
-        menu.addItem(emotesMenuItem)
+        emotesItem.keyEquivalentModifierMask = [.command]
+        emotesItem.target = self
+        menu.addItem(emotesItem)
 
         menu.addItem(.separator())
 
