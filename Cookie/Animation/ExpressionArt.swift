@@ -66,4 +66,15 @@ enum CookieExpressionArt: String, CaseIterable {
         default: return nil
         }
     }
+
+    /// Dedicated whole-pose expression artwork for each predefined emote.
+    static func forEmote(_ emoteId: EmoteId) -> CookieExpressionArt? {
+        switch emoteId {
+        case .wave: return .wave
+        case .happy: return .eyesClose
+        case .love: return .shy
+        case .sleepy: return .sleep
+        case .playful: return .mischievous
+        }
+    }
 }
