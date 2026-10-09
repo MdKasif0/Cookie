@@ -228,13 +228,13 @@ final class ReferenceImageSource: AnimationFrameSource {
         case .love:
             return [
                 Frame(rotation: 1.0, overlays: [.eyesHappy]),
-                Frame(rotation: 2.0, scaleY: 0.98, overlays: [.eyesHappy, .blushBoost]),
-                Frame(rotation: 3.0, scaleY: 0.95, offsetY: 2, overlays: [.eyesClosed, .blushBoost]),
-                Frame(rotation: 3.5, scaleY: 0.93, offsetY: 2.5, overlays: [.eyesClosed, .blushBoost]),
-                Frame(rotation: 3.5, scaleY: 0.93, offsetY: 2.5, overlays: [.eyesClosed, .blushBoost]),
-                Frame(rotation: 2.8, scaleY: 0.95, offsetY: 2, overlays: [.eyesHappy, .blushBoost]),
-                Frame(rotation: 2.0, scaleY: 0.97, offsetY: 1.5, overlays: [.eyesHappy, .blushBoost]),
-                Frame(rotation: 1.2, scaleY: 0.99, offsetY: 0.5, overlays: [.eyesHappy, .blushBoost]),
+                Frame(scaleY: 0.98, rotation: 2.0, overlays: [.eyesHappy, .blushBoost]),
+                Frame(scaleY: 0.95, rotation: 3.0, offsetY: 2, overlays: [.eyesClosed, .blushBoost]),
+                Frame(scaleY: 0.93, rotation: 3.5, offsetY: 2.5, overlays: [.eyesClosed, .blushBoost]),
+                Frame(scaleY: 0.93, rotation: 3.5, offsetY: 2.5, overlays: [.eyesClosed, .blushBoost]),
+                Frame(scaleY: 0.95, rotation: 2.8, offsetY: 2, overlays: [.eyesHappy, .blushBoost]),
+                Frame(scaleY: 0.97, rotation: 2.0, offsetY: 1.5, overlays: [.eyesHappy, .blushBoost]),
+                Frame(scaleY: 0.99, rotation: 1.2, offsetY: 0.5, overlays: [.eyesHappy, .blushBoost]),
                 Frame(rotation: 0.6, overlays: [.eyesHappy]),
                 Frame()
             ]

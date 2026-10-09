@@ -149,9 +149,9 @@ enum CookiePoseCatalog {
         "wave": [
             CookiePose(headTilt: 2, eyeStyle: .wide),
             CookiePose(headTilt: 3, pawLift: 3, eyeStyle: .happy, blushScale: 1.3),
-            CookiePose(squash: 1.02, bodyY: 1, headTilt: 4, pawLift: 6, pawOffsetX: 3, eyeStyle: .happy, blushScale: 1.4),
-            CookiePose(squash: 1.02, bodyY: 1, headTilt: 3, pawLift: 7, pawOffsetX: -2, eyeStyle: .happy, blushScale: 1.4),
-            CookiePose(squash: 1.02, bodyY: 1, headTilt: 4, pawLift: 6, pawOffsetX: 3, eyeStyle: .happy, blushScale: 1.4),
+            CookiePose(squash: 1.02, bodyY: 1, headTilt: 4, pawOffsetX: 3, pawLift: 6, eyeStyle: .happy, blushScale: 1.4),
+            CookiePose(squash: 1.02, bodyY: 1, headTilt: 3, pawOffsetX: -2, pawLift: 7, eyeStyle: .happy, blushScale: 1.4),
+            CookiePose(squash: 1.02, bodyY: 1, headTilt: 4, pawOffsetX: 3, pawLift: 6, eyeStyle: .happy, blushScale: 1.4),
             CookiePose(headTilt: 2, pawLift: 2, eyeStyle: .happy, blushScale: 1.2),
             CookiePose(eyeStyle: .happy),
             CookiePose()
