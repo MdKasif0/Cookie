@@ -268,6 +268,20 @@ final class EmoteSystemTests: XCTestCase {
         XCTAssertEqual(EmoteArtwork.assetName(for: .playful), "cookie-mischievous")
     }
 
+    func testCookieExpressionArtMappingForEmotes() {
+        XCTAssertEqual(CookieExpressionArt.forEmote(.wave), .wave)
+        XCTAssertEqual(CookieExpressionArt.forEmote(.happy), .eyesClose)
+        XCTAssertEqual(CookieExpressionArt.forEmote(.love), .shy)
+        XCTAssertEqual(CookieExpressionArt.forEmote(.sleepy), .sleep)
+        XCTAssertEqual(CookieExpressionArt.forEmote(.playful), .mischievous)
+
+        XCTAssertEqual(CookieExpressionArt.forEmote(.wave)?.assetName, "cookie-wave")
+        XCTAssertEqual(CookieExpressionArt.forEmote(.happy)?.assetName, "cookie-eyes-close")
+        XCTAssertEqual(CookieExpressionArt.forEmote(.love)?.assetName, "cookie-shy")
+        XCTAssertEqual(CookieExpressionArt.forEmote(.sleepy)?.assetName, "cookie-sleep")
+        XCTAssertEqual(CookieExpressionArt.forEmote(.playful)?.assetName, "cookie-mischievous")
+    }
+
     @MainActor
     func testEmotePickerPanelAllowsKeyFocus() {
         let panel = EmotePickerPanel(
