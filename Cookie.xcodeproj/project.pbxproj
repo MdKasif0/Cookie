@@ -55,6 +55,7 @@
 		CC32FFCBE756E720AD5B37F6 /* WindowManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD3A06C9DFA605ECE0FE1E3 /* WindowManager.swift */; };
 		CDA994145CB0964CA47681EB /* CookieBehaviorEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97E4F7E33C5112C40D7D66E4 /* CookieBehaviorEngine.swift */; };
 		CE912B9F98BCBB80899EDD61 /* CookieCharacterNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44994CF7A0FE01B9276C2B2F /* CookieCharacterNode.swift */; };
+		CFDD1E098A8F37701A33B219 /* EmoteSystemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B801E5668BCB18DF49A0C355 /* EmoteSystemTests.swift */; };
 		D7F2D955D6917AA84555E0E8 /* CustomizationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0481870F29B62BF73D6D8DCA /* CustomizationView.swift */; };
 		DEDFB19C3E8AED84E4DE4562 /* DesktopWindowScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4514BA6F0CCB5A84B5A4CA5F /* DesktopWindowScanner.swift */; };
 		E33A52DC042D9CDD9EFC21FD /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7DA7141AC533EFDEE85B3D3D /* AppIcon.icns */; };
@@ -112,6 +113,7 @@
 		AA3655D1B788BFAA8DB24B3A /* PlaceholderVectorSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderVectorSource.swift; sourceTree = "<group>"; };
 		AA64B52E068713421CB908E2 /* WorldItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldItemView.swift; sourceTree = "<group>"; };
 		ACB87B0BAECF70291F77A18E /* CharacterPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterPreviewView.swift; sourceTree = "<group>"; };
+		B801E5668BCB18DF49A0C355 /* EmoteSystemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmoteSystemTests.swift; sourceTree = "<group>"; };
 		BA1825A4B08D0C1CE8F8A027 /* Emote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Emote.swift; sourceTree = "<group>"; };
 		BB0ED0D19E3B07DA7B1231A4 /* ExpressionArtSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpressionArtSource.swift; sourceTree = "<group>"; };
 		BC201CE915B5D96AB2C0B573 /* CookieState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieState.swift; sourceTree = "<group>"; };
@@ -307,6 +309,7 @@
 				76760163CA6BE3BAC37C0381 /* CookieInteractionTests.swift */,
 				EBBA93F76B12629BDAFC7946 /* CookieMultiDisplayTests.swift */,
 				5D73954CEA6321E099B7E814 /* CookieStoreTests.swift */,
+				B801E5668BCB18DF49A0C355 /* EmoteSystemTests.swift */,
 			);
 			path = CookieTests;
 			sourceTree = "<group>";
@@ -489,6 +492,7 @@
 				303C49FAF4196BC343E55D6E /* CookieInteractionTests.swift in Sources */,
 				9662A7AFE3D7E0D4C546723F /* CookieMultiDisplayTests.swift in Sources */,
 				E8E31096D8E2F5F973BE859B /* CookieStoreTests.swift in Sources */,
+				CFDD1E098A8F37701A33B219 /* EmoteSystemTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
