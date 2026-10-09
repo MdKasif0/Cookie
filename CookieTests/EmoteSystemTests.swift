@@ -282,6 +282,18 @@ final class EmoteSystemTests: XCTestCase {
         XCTAssertEqual(CookieExpressionArt.forEmote(.playful)?.assetName, "cookie-mischievous")
     }
 
+    func testEmoteEmojis() {
+        XCTAssertEqual(Emote.wave.emoji, "👋")
+        XCTAssertEqual(Emote.happy.emoji, "✨")
+        XCTAssertEqual(Emote.love.emoji, "🧡")
+        XCTAssertEqual(Emote.sleepy.emoji, "💤")
+        XCTAssertEqual(Emote.playful.emoji, "🧶")
+
+        for emote in Emote.allEmotes {
+            XCTAssertFalse(emote.emoji.isEmpty, "\(emote.id) must define an emoji")
+        }
+    }
+
     @MainActor
     func testEmotePickerPanelAllowsKeyFocus() {
         let panel = EmotePickerPanel(
