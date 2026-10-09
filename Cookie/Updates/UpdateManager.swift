@@ -366,13 +366,17 @@ final class UpdateManager: NSObject, ObservableObject, SPUUpdaterDelegate, SPUUs
         }
     }
 
-    nonisolated func showSendingTerminationSignal() {}
-
-    nonisolated func showUpdateInstallationDidFinish(acknowledgement: @escaping () -> Void) {
+    nonisolated func showUpdateInstalledAndRelaunched(_ relaunched: Bool, acknowledgement: @escaping () -> Void) {
         Task { @MainActor in
             acknowledgement()
             self.state = .idle
             self.isShowingUpdatePrompt = false
+        }
+    }
+
+    nonisolated func showUpdateInFocus() {
+        Task { @MainActor in
+            self.isShowingUpdatePrompt = true
         }
     }
 
