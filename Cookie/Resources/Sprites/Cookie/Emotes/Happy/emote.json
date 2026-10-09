@@ -1,10 +1,10 @@
 {
-  "name": "Happy",
   "id": "happy",
+  "name": "Happy",
+  "description": "Cookie is feeling happy.",
   "fps": 6,
   "loop": false,
+  "duration": 1.8,
   "sound": "cookie-happy",
-  "expectedDuration": 1.8,
-  "description": "Cookie bounces joyfully with rosy cheeks and a happy purr.",
-  "status": "placeholder_active"
+  "cooldown": 1.8
 }

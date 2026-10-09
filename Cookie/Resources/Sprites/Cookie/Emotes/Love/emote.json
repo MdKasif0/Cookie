@@ -1,10 +1,10 @@
 {
-  "name": "Love",
   "id": "love",
-  "fps": 6,
+  "name": "Love",
+  "description": "Cookie sends you some love.",
+  "fps": 5,
   "loop": false,
-  "sound": "cookie-mew",
-  "expectedDuration": 2.2,
-  "description": "Cookie leans in with shy affection and deep purring.",
-  "status": "placeholder_active"
+  "duration": 2.0,
+  "sound": "cookie-purr",
+  "cooldown": 2.0
 }

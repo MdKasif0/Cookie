@@ -1,10 +1,10 @@
 {
-  "name": "Playful",
   "id": "playful",
-  "fps": 6,
+  "name": "Playful",
+  "description": "Cookie wants to play.",
+  "fps": 5,
   "loop": false,
+  "duration": 2.2,
   "sound": "cookie-toy",
-  "expectedDuration": 2.0,
-  "description": "Cookie wiggles eagerly, ready for pouncing and fun.",
-  "status": "placeholder_active"
+  "cooldown": 2.0
 }
