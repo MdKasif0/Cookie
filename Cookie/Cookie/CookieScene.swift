@@ -172,14 +172,19 @@ final class CookieScene: SKScene {
     private func executeEmote(_ emote: Emote) {
         guard let engine = behaviorEngine else { return }
         engine.setEmotePlaybackPhase(.playing)
-        if let sound = emote.soundIdentifier {
-            audioManager?.play(sound)
-        }
+        let sound = emote.soundIdentifier
         if engine.wasSleepingBeforeEmote {
-            character.playWakeThenEmote(emote) { [weak self] _ in
+            character.playWakeThenEmote(emote, onEmoteStart: { [weak self] in
+                if let sound {
+                    self?.audioManager?.play(sound)
+                }
+            }) { [weak self] _ in
                 self?.behaviorEngine?.completeEmote()
             }
         } else {
+            if let sound {
+                audioManager?.play(sound)
+            }
             character.playEmote(emote) { [weak self] _ in
                 self?.behaviorEngine?.completeEmote()
             }

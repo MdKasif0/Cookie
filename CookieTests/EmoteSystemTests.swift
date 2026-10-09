@@ -182,4 +182,79 @@ final class EmoteSystemTests: XCTestCase {
         XCTAssertEqual(engine.state, .idle, "Cookie must automatically recover to idle if animation completes")
         XCTAssertNil(engine.activeEmote)
     }
+
+    func testEmoteModelSpecificationsMatchProductRequirements() {
+        let wave = Emote.wave
+        XCTAssertEqual(wave.name, "Wave")
+        XCTAssertEqual(wave.description, "Cookie says hello.")
+        XCTAssertEqual(wave.duration, 2.0)
+        XCTAssertEqual(wave.soundIdentifier, .mew)
+
+        let happy = Emote.happy
+        XCTAssertEqual(happy.name, "Happy")
+        XCTAssertEqual(happy.description, "Cookie is feeling happy.")
+        XCTAssertEqual(happy.duration, 1.8)
+        XCTAssertEqual(happy.soundIdentifier, .happy)
+
+        let love = Emote.love
+        XCTAssertEqual(love.name, "Love")
+        XCTAssertEqual(love.description, "Cookie sends you some love.")
+        XCTAssertEqual(love.duration, 2.0)
+        XCTAssertEqual(love.soundIdentifier, .purr)
+
+        let sleepy = Emote.sleepy
+        XCTAssertEqual(sleepy.name, "Sleepy")
+        XCTAssertEqual(sleepy.description, "Cookie needs a little nap.")
+        XCTAssertEqual(sleepy.duration, 4.0)
+        XCTAssertEqual(sleepy.soundIdentifier, .sleep)
+
+        let playful = Emote.playful
+        XCTAssertEqual(playful.name, "Playful")
+        XCTAssertEqual(playful.description, "Cookie wants to play.")
+        XCTAssertEqual(playful.duration, 2.2)
+        XCTAssertEqual(playful.soundIdentifier, .toy)
+    }
+
+    func testEmoteAnimationSpecsFPSAndPriorities() {
+        XCTAssertEqual(CookieAnimationId.wave.spec.fps, 6)
+        XCTAssertEqual(CookieAnimationId.wave.spec.priority, .emote)
+        XCTAssertFalse(CookieAnimationId.wave.spec.isLooping)
+
+        XCTAssertEqual(CookieAnimationId.happyEmote.spec.fps, 6)
+        XCTAssertEqual(CookieAnimationId.happyEmote.spec.priority, .emote)
+        XCTAssertFalse(CookieAnimationId.happyEmote.spec.isLooping)
+
+        XCTAssertEqual(CookieAnimationId.love.spec.fps, 5)
+        XCTAssertEqual(CookieAnimationId.love.spec.priority, .emote)
+        XCTAssertFalse(CookieAnimationId.love.spec.isLooping)
+
+        XCTAssertEqual(CookieAnimationId.sleepy.spec.fps, 4)
+        XCTAssertEqual(CookieAnimationId.sleepy.spec.priority, .emote)
+        XCTAssertFalse(CookieAnimationId.sleepy.spec.isLooping)
+
+        XCTAssertEqual(CookieAnimationId.playfulEmote.spec.fps, 5)
+        XCTAssertEqual(CookieAnimationId.playfulEmote.spec.priority, .emote)
+        XCTAssertFalse(CookieAnimationId.playfulEmote.spec.isLooping)
+    }
+
+    @MainActor
+    func testReducedMotionPreservesEmoteCompletion() {
+        let originalMode = MotionSettings.mode
+        defer { MotionSettings.mode = originalMode }
+        MotionSettings.mode = .always
+        XCTAssertTrue(MotionSettings.reduceMotion)
+
+        for emote in Emote.allEmotes {
+            // Ensure no cooldown active
+            advanceTime(by: 10.0)
+            let triggered = engine.triggerEmote(emote)
+            XCTAssertTrue(triggered, "Should trigger \(emote.id) in reduced motion")
+            XCTAssertEqual(engine.state, .emoting)
+
+            // Complete emote
+            engine.completeEmote()
+            XCTAssertEqual(engine.state, .idle, "Should return to idle after \(emote.id) in reduced motion")
+            XCTAssertNil(engine.activeEmote)
+        }
+    }
 }
