@@ -273,7 +273,7 @@ final class UpdateManager: NSObject, ObservableObject, SPUUpdaterDelegate, SPUUs
 
     // MARK: - SPUUserDriver Protocol Implementation
 
-    nonisolated func showUpdatePermissionRequest(_ request: SPUUpdatePermissionRequest, reply: @escaping (SUUpdatePermissionResponse) -> Void) {
+    nonisolated func show(_ request: SPUUpdatePermissionRequest, reply: @escaping (SUUpdatePermissionResponse) -> Void) {
         Task { @MainActor in
             // Default to opt-in based on user settings
             reply(SUUpdatePermissionResponse(automaticUpdateChecks: true, sendSystemProfile: false))
