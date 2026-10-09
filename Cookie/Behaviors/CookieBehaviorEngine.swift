@@ -365,6 +365,7 @@ final class CookieBehaviorEngine: ObservableObject {
     func handleGrab(zone: CookieZone? = nil) {
         guard isRunning else { return }
         endPress()
+        cancelActiveEmote()
         sequenceQueue = []
         if worldItem != nil { clearSession() }
         enter(.beingDragged, duration: .infinity)
@@ -486,6 +487,81 @@ final class CookieBehaviorEngine: ObservableObject {
 
     func handlePlayCommand() {
         handleOfferToy(.yarnBall)
+    }
+
+    // MARK: - Emotes Engine
+
+    /// Remaining cooldown in seconds for the given emote.
+    func cooldownRemaining(for id: EmoteId) -> TimeInterval {
+        guard let until = emoteCooldowns[id] else { return 0 }
+        let remaining = until.timeIntervalSince(now())
+        return max(0, remaining)
+    }
+
+    /// Validates whether Cookie can currently execute the requested emote.
+    func canPerformEmote(_ emote: Emote) -> Bool {
+        guard isRunning else { return false }
+        guard state != .beingDragged && !isPressed else { return false }
+        guard activeEmote == nil else { return false }
+        guard cooldownRemaining(for: emote.id) <= 0 else { return false }
+        return true
+    }
+
+    /// Triggers an emote sequence, validating state and priority rules.
+    @discardableResult
+    func triggerEmote(_ emote: Emote) -> Bool {
+        guard canPerformEmote(emote) else {
+            log.notice("Cannot trigger emote \(emote.name, privacy: .public): Cookie is busy or cooldown active")
+            return false
+        }
+
+        let date = now()
+        emoteCooldowns[emote.id] = date.addingTimeInterval(emote.cooldown)
+        wasSleepingBeforeEmote = (state == .sleeping)
+
+        // Cancel active locomotion smoothly — keep position stable, no sudden jump
+        plan = nil
+        locomotionVelocity = 0
+        sessionTargetX = nil
+        sequenceQueue.removeAll()
+
+        activeEmote = emote
+        emotePlaybackPhase = .starting
+
+        // Generous safety duration ensures completion even if SpriteKit view is disconnected
+        let safetyDuration = emote.duration + (wasSleepingBeforeEmote ? 1.6 : 0.8)
+        enter(.emoting, duration: safetyDuration)
+
+        log.info("Triggered emote: \(emote.name, privacy: .public) (wasSleeping: \(self.wasSleepingBeforeEmote, privacy: .public))")
+        return true
+    }
+
+    func setEmotePlaybackPhase(_ phase: EmotePlaybackPhase) {
+        guard activeEmote != nil else { return }
+        emotePlaybackPhase = phase
+        log.debug("Emote playback phase → \(phase.rawValue, privacy: .public)")
+    }
+
+    /// Completes the emote and restores Cookie's normal autonomous behavior.
+    func completeEmote() {
+        guard let emote = activeEmote else { return }
+        log.info("Emote finished: \(emote.name, privacy: .public)")
+        emotePlaybackPhase = .finishing
+        store.statistics.affection += 1
+        emotePlaybackPhase = .returning
+        activeEmote = nil
+        wasSleepingBeforeEmote = false
+        enter(.idle, duration: Double.random(in: 4...8))
+        emotePlaybackPhase = .ready
+    }
+
+    /// Cancels active emote immediately when interrupted by higher-priority interaction (e.g. user drag).
+    func cancelActiveEmote() {
+        guard let emote = activeEmote else { return }
+        log.info("Emote cancelled: \(emote.name, privacy: .public)")
+        activeEmote = nil
+        wasSleepingBeforeEmote = false
+        emotePlaybackPhase = .ready
     }
 
     /// Triggers one of the rare random events directly (for tests or autonomous rolls).

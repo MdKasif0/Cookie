@@ -138,6 +138,9 @@ final class AppEnvironment: ObservableObject {
     func clearWorldItem() { behaviorEngine.clearWorldItem() }
     var hasActiveWorldItem: Bool { behaviorEngine.worldItem != nil }
     func triggerSpecialEvent(_ event: SpecialEventKind) { behaviorEngine.triggerSpecialEvent(event) }
+    @discardableResult
+    func triggerEmote(_ emote: Emote) -> Bool { behaviorEngine.triggerEmote(emote) }
+    func showEmotePicker() { windows.showEmotePicker() }
 
     func createCookieMenu() -> NSMenu? {
         if menuBarController == nil {

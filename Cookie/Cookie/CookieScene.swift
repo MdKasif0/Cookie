@@ -157,6 +157,32 @@ final class CookieScene: SKScene {
                     }
                 }
                 .store(in: &cancellables)
+
+            engine.$activeEmote.combineLatest(engine.$emotePlaybackPhase)
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] activeEmote, phase in
+                    guard let self, let emote = activeEmote, phase == .starting else { return }
+                    self.executeEmote(emote)
+                }
+                .store(in: &cancellables)
+        }
+    }
+
+    /// Coordinates SpriteKit execution of an emote animation sequence.
+    private func executeEmote(_ emote: Emote) {
+        guard let engine = behaviorEngine else { return }
+        engine.setEmotePlaybackPhase(.playing)
+        if let sound = emote.soundIdentifier {
+            audioManager?.play(sound)
+        }
+        if engine.wasSleepingBeforeEmote {
+            character.playWakeThenEmote(emote) { [weak self] _ in
+                self?.behaviorEngine?.completeEmote()
+            }
+        } else {
+            character.playEmote(emote) { [weak self] _ in
+                self?.behaviorEngine?.completeEmote()
+            }
         }
     }
 
