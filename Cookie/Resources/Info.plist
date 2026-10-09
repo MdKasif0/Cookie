@@ -30,5 +30,13 @@
 	<string>public.app-category.entertainment</string>
 	<key>NSHighResolutionCapable</key>
 	<true/>
+	<key>SUFeedURL</key>
+	<string>https://raw.githubusercontent.com/MdKasif0/Cookie/main/website/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>K/cA2KeUVBekRx1d1+DA0Fnhaj20UWK0DG7Ij8mPiBU=</string>
+	<key>SUEnableAutomaticChecks</key>
+	<false/>
+	<key>SUScheduledCheckInterval</key>
+	<integer>86400</integer>
 </dict>
 </plist>

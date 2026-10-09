@@ -48,6 +48,10 @@ targets:
         NSHumanReadableCopyright: "© 2026 Md Kasif Uddin. All rights reserved."
         LSApplicationCategoryType: public.app-category.entertainment
         NSHighResolutionCapable: true
+        SUFeedURL: "https://raw.githubusercontent.com/MdKasif0/Cookie/main/website/appcast.xml"
+        SUPublicEDKey: "K/cA2KeUVBekRx1d1+DA0Fnhaj20UWK0DG7Ij8mPiBU="
+        SUEnableAutomaticChecks: false
+        SUScheduledCheckInterval: 86400
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.cookie.mac
