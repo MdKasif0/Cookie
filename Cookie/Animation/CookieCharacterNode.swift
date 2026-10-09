@@ -17,6 +17,7 @@ final class CookieCharacterNode: SKNode, SpriteProviding {
 
     private let boxBackNode: SKNode
     private let boxFrontNode: SKNode
+    private var activeEmoteEffect: SKNode?
 
     init(config: CookieAppearanceConfig = CookieAppearanceConfig()) {
         self.config = config
@@ -72,6 +73,9 @@ final class CookieCharacterNode: SKNode, SpriteProviding {
         let facingChanged = newFacing != controller.facing
         guard newState != state || facingChanged else { return }
         state = newState
+        if newState != .emoting {
+            clearEmoteEffects()
+        }
 
         if newState != .inBox {
             boxBackNode.isHidden = true
@@ -138,23 +142,144 @@ final class CookieCharacterNode: SKNode, SpriteProviding {
     /// Triggers a dedicated emote animation on Cookie with natural SpriteKit completion.
     func playEmote(_ emote: Emote, completion: @escaping (Bool) -> Void) {
         state = .emoting
-        controller.play(emote.animationIdentifier) { finished in
+        displayEmoteEffects(for: emote)
+        controller.play(emote.animationIdentifier) { [weak self] finished in
+            self?.clearEmoteEffects()
             completion(finished)
         }
     }
 
     /// Awakens Cookie naturally before seamlessly playing the requested emote.
-    func playWakeThenEmote(_ emote: Emote, completion: @escaping (Bool) -> Void) {
+    func playWakeThenEmote(_ emote: Emote, onEmoteStart: (() -> Void)? = nil, completion: @escaping (Bool) -> Void) {
         state = .emoting
+        clearEmoteEffects()
         controller.play(.wake) { [weak self] _ in
             guard let self else {
                 completion(false)
                 return
             }
-            self.controller.play(emote.animationIdentifier) { finished in
+            onEmoteStart?()
+            self.displayEmoteEffects(for: emote)
+            self.controller.play(emote.animationIdentifier) { [weak self] finished in
+                self?.clearEmoteEffects()
                 completion(finished)
             }
         }
+    }
+
+    /// Immediately cancels and cleans up any active secondary emote effect nodes.
+    func clearEmoteEffects() {
+        activeEmoteEffect?.removeAllActions()
+        activeEmoteEffect?.removeFromParent()
+        activeEmoteEffect = nil
+    }
+
+    /// Spawns subtle, tasteful secondary effects for emotes that benefit from them.
+    private func displayEmoteEffects(for emote: Emote) {
+        clearEmoteEffects()
+        switch emote.id {
+        case .love:
+            let heart = SKShapeNode(path: Self.makeHeartPath(size: 14))
+            heart.fillColor = SKColor(srgbRed: 0.94, green: 0.62, blue: 0.50, alpha: 0.95)
+            heart.strokeColor = SKColor(srgbRed: 0.84, green: 0.48, blue: 0.38, alpha: 0.90)
+            heart.lineWidth = 1.0
+            heart.position = CGPoint(x: 24, y: 28)
+            heart.zPosition = 3.0
+            heart.alpha = 0
+            container.addChild(heart)
+            activeEmoteEffect = heart
+
+            if MotionSettings.reduceMotion {
+                heart.run(.sequence([
+                    .fadeIn(withDuration: 0.3),
+                    .wait(forDuration: 1.0),
+                    .fadeOut(withDuration: 0.4),
+                    .run { [weak self] in self?.clearEmoteEffects() }
+                ]))
+            } else {
+                let appear = SKAction.group([
+                    .fadeIn(withDuration: 0.25),
+                    .scale(to: 1.0, duration: 0.25)
+                ])
+                let drift = SKAction.group([
+                    .moveBy(x: 4, y: 16, duration: 1.2),
+                    .sequence([
+                        .wait(forDuration: 0.8),
+                        .fadeOut(withDuration: 0.4)
+                    ])
+                ])
+                heart.setScale(0.5)
+                heart.run(.sequence([
+                    appear,
+                    drift,
+                    .run { [weak self] in self?.clearEmoteEffects() }
+                ]))
+            }
+
+        case .sleepy:
+            let zLabel = SKLabelNode(text: "z")
+            zLabel.fontName = "Helvetica-Bold"
+            zLabel.fontSize = 13
+            zLabel.fontColor = SKColor(srgbRed: 0.52, green: 0.45, blue: 0.38, alpha: 0.85)
+            zLabel.position = CGPoint(x: 20, y: 38)
+            zLabel.zPosition = 3.0
+            zLabel.alpha = 0
+            container.addChild(zLabel)
+            activeEmoteEffect = zLabel
+
+            if MotionSettings.reduceMotion {
+                zLabel.run(.sequence([
+                    .wait(forDuration: 1.4),
+                    .fadeIn(withDuration: 0.3),
+                    .wait(forDuration: 1.2),
+                    .fadeOut(withDuration: 0.4),
+                    .run { [weak self] in self?.clearEmoteEffects() }
+                ]))
+            } else {
+                let delay = SKAction.wait(forDuration: 1.4)
+                let appear = SKAction.group([
+                    .fadeIn(withDuration: 0.3),
+                    .scale(to: 1.0, duration: 0.3)
+                ])
+                let drift = SKAction.group([
+                    .moveBy(x: 3, y: 12, duration: 1.5),
+                    .sequence([
+                        .wait(forDuration: 1.0),
+                        .fadeOut(withDuration: 0.5)
+                    ])
+                ])
+                zLabel.setScale(0.6)
+                zLabel.run(.sequence([
+                    delay,
+                    appear,
+                    drift,
+                    .run { [weak self] in self?.clearEmoteEffects() }
+                ]))
+            }
+
+        default:
+            break
+        }
+    }
+
+    private static func makeHeartPath(size: CGFloat) -> CGPath {
+        let path = CGMutablePath()
+        let s = size / 2.0
+        path.move(to: CGPoint(x: 0, y: -s * 0.8))
+        path.addCurve(to: CGPoint(x: -s, y: s * 0.2),
+                      control1: CGPoint(x: -s * 0.2, y: -s * 0.5),
+                      control2: CGPoint(x: -s, y: -s * 0.2))
+        path.addArc(tangent1End: CGPoint(x: -s, y: s * 0.9),
+                    tangent2End: CGPoint(x: 0, y: s * 0.9),
+                    radius: s * 0.45)
+        path.addArc(tangent1End: CGPoint(x: s, y: s * 0.9),
+                    tangent2End: CGPoint(x: s, y: s * 0.2),
+                    radius: s * 0.45)
+        path.addCurve(to: CGPoint(x: 0, y: -s * 0.8),
+                      control1: CGPoint(x: s, y: -s * 0.2),
+                      control2: CGPoint(x: 0.2, y: -s * 0.5))
+        path.closeSubpath()
+        return path
     }
 
     private func updateBoxAppearance() {

@@ -38,7 +38,7 @@ final class ReferenceImageSource: AnimationFrameSource {
     private static let blushLeft = Feature(x: 0.170, y: 0.470, rx: 0.075, ry: 0.075)
     private static let blushRight = Feature(x: 0.740, y: 0.525, rx: 0.072, ry: 0.072)
 
-    private enum Overlay {
+    private enum Overlay: Equatable {
         case eyesClosed
         case eyesHalf
         case eyesHappy
@@ -47,6 +47,7 @@ final class ReferenceImageSource: AnimationFrameSource {
         case mouthOpenWide
         case mouthFlat
         case blushBoost
+        case pawWave(swing: CGFloat)
     }
 
     private struct Frame {
@@ -197,43 +198,78 @@ final class ReferenceImageSource: AnimationFrameSource {
             ]
         case .wave:
             return [
-                Frame(rotation: -2, overlays: [.eyesHappy, .blushBoost]),
-                Frame(scaleY: 1.02, rotation: 3, offsetY: 2, overlays: [.eyesHappy, .blushBoost]),
-                Frame(scaleY: 1.04, rotation: 6, offsetY: 4, overlays: [.eyesHappy, .blushBoost]),
-                Frame(scaleY: 1.02, rotation: 3, offsetY: 2, overlays: [.eyesHappy, .blushBoost]),
-                Frame(scaleY: 1.04, rotation: 6, offsetY: 4, overlays: [.eyesHappy, .blushBoost]),
-                Frame(rotation: -1, overlays: [.eyesHappy])
+                Frame(rotation: -1.0, overlays: [.eyesWide]),
+                Frame(rotation: 0.5, overlays: [.eyesHappy, .blushBoost]),
+                Frame(rotation: 1.2, offsetY: 1, overlays: [.eyesHappy, .blushBoost, .pawWave(swing: -0.4)]),
+                Frame(rotation: 1.8, offsetY: 2, overlays: [.eyesHappy, .blushBoost, .pawWave(swing: 0.8)]),
+                Frame(rotation: 1.4, offsetY: 1.5, overlays: [.eyesHappy, .blushBoost, .pawWave(swing: 0.0)]),
+                Frame(rotation: 1.8, offsetY: 2, overlays: [.eyesHappy, .blushBoost, .pawWave(swing: -0.8)]),
+                Frame(rotation: 1.4, offsetY: 1.5, overlays: [.eyesHappy, .blushBoost, .pawWave(swing: 0.0)]),
+                Frame(rotation: 1.8, offsetY: 2, overlays: [.eyesHappy, .blushBoost, .pawWave(swing: 0.8)]),
+                Frame(rotation: 1.4, offsetY: 1.5, overlays: [.eyesHappy, .blushBoost, .pawWave(swing: -0.5)]),
+                Frame(rotation: 1.0, offsetY: 0.5, overlays: [.eyesHappy, .blushBoost, .pawWave(swing: 0.0)]),
+                Frame(rotation: 0.5, overlays: [.eyesHappy, .blushBoost]),
+                Frame(overlays: [.eyesHappy])
             ]
         case .happyEmote:
             return [
-                Frame(scaleY: 0.92, offsetY: 3, overlays: [.blushBoost, .eyesHappy]),
-                Frame(scaleY: 1.08, offsetY: -6, overlays: [.blushBoost, .eyesHappy]),
-                Frame(scaleY: 0.96, offsetY: 1, overlays: [.blushBoost, .eyesHappy]),
-                Frame(scaleY: 1.06, offsetY: -4, overlays: [.blushBoost, .eyesHappy]),
-                Frame(overlays: [.blushBoost, .eyesHappy])
+                Frame(scaleY: 1.02, offsetY: -1, overlays: [.eyesWide]),
+                Frame(scaleY: 0.95, offsetY: 2, overlays: [.eyesHappy, .blushBoost]),
+                Frame(scaleX: 0.98, scaleY: 1.07, offsetY: -6, overlays: [.eyesHappy, .blushBoost]),
+                Frame(scaleY: 0.94, offsetY: 2.5, overlays: [.eyesHappy, .blushBoost]),
+                Frame(scaleX: 0.99, scaleY: 1.05, offsetY: -4.5, overlays: [.eyesHappy, .blushBoost]),
+                Frame(scaleY: 0.96, offsetY: 1.5, overlays: [.eyesHappy, .blushBoost]),
+                Frame(scaleX: 1.01, scaleY: 0.98, offsetY: 0.5, overlays: [.eyesHappy, .blushBoost]),
+                Frame(scaleY: 1.01, overlays: [.eyesHappy, .blushBoost]),
+                Frame(overlays: [.eyesHappy, .blushBoost]),
+                Frame(overlays: [.eyesHappy]),
+                Frame()
             ]
         case .love:
             return [
-                Frame(scaleY: 0.95, rotation: 2, offsetY: 2, overlays: [.blushBoost, .eyesHappy]),
-                Frame(scaleY: 0.92, rotation: 5, offsetY: 3, overlays: [.blushBoost, .eyesClosed]),
-                Frame(scaleY: 0.94, rotation: 4, offsetY: 2, overlays: [.blushBoost, .eyesHappy]),
-                Frame(scaleY: 0.98, rotation: 1, overlays: [.blushBoost, .eyesHappy])
+                Frame(rotation: 1.0, overlays: [.eyesHappy]),
+                Frame(rotation: 2.0, scaleY: 0.98, overlays: [.eyesHappy, .blushBoost]),
+                Frame(rotation: 3.0, scaleY: 0.95, offsetY: 2, overlays: [.eyesClosed, .blushBoost]),
+                Frame(rotation: 3.5, scaleY: 0.93, offsetY: 2.5, overlays: [.eyesClosed, .blushBoost]),
+                Frame(rotation: 3.5, scaleY: 0.93, offsetY: 2.5, overlays: [.eyesClosed, .blushBoost]),
+                Frame(rotation: 2.8, scaleY: 0.95, offsetY: 2, overlays: [.eyesHappy, .blushBoost]),
+                Frame(rotation: 2.0, scaleY: 0.97, offsetY: 1.5, overlays: [.eyesHappy, .blushBoost]),
+                Frame(rotation: 1.2, scaleY: 0.99, offsetY: 0.5, overlays: [.eyesHappy, .blushBoost]),
+                Frame(rotation: 0.6, overlays: [.eyesHappy]),
+                Frame()
             ]
         case .sleepy:
             return [
-                Frame(scaleY: 0.98, overlays: [.eyesHalf]),
-                Frame(scaleY: 1.02, overlays: [.mouthOpen, .eyesClosed]),
-                Frame(scaleY: 1.03, overlays: [.mouthOpenWide, .eyesClosed]),
-                Frame(scaleY: 0.96, rotation: 2, overlays: [.eyesClosed]),
-                Frame(scaleY: 0.94, rotation: 3, overlays: [.eyesClosed])
+                Frame(scaleY: 0.99, overlays: [.eyesHalf]),
+                Frame(scaleY: 0.97, offsetY: 1.5, overlays: [.eyesHalf]),
+                Frame(scaleY: 0.98, rotation: 1.2, overlays: [.mouthOpen, .eyesHalf]),
+                Frame(scaleY: 1.03, rotation: 2.2, offsetY: -1, overlays: [.mouthOpenWide, .eyesClosed]),
+                Frame(scaleY: 1.02, rotation: 2.2, overlays: [.mouthOpenWide, .eyesClosed]),
+                Frame(scaleY: 0.98, rotation: 1.2, overlays: [.mouthOpen, .eyesClosed]),
+                Frame(scaleY: 0.95, rotation: 2.0, offsetY: 3, overlays: [.eyesClosed]),
+                Frame(scaleY: 0.93, rotation: 2.5, offsetY: 4, overlays: [.eyesClosed]),
+                Frame(scaleY: 0.94, rotation: 2.5, offsetY: 3.5, overlays: [.eyesClosed]),
+                Frame(scaleY: 0.93, rotation: 2.5, offsetY: 4, overlays: [.eyesClosed]),
+                Frame(scaleY: 0.94, rotation: 2.5, offsetY: 3.5, overlays: [.eyesClosed]),
+                Frame(scaleY: 0.93, rotation: 2.5, offsetY: 4, overlays: [.eyesClosed]),
+                Frame(scaleY: 0.96, rotation: 1.2, offsetY: 2, overlays: [.eyesHalf]),
+                Frame(scaleY: 1.04, rotation: 0.0, offsetY: -3, overlays: [.eyesClosed]),
+                Frame(scaleY: 1.01, overlays: [.eyesHalf]),
+                Frame()
             ]
         case .playfulEmote:
             return [
-                Frame(scaleY: 0.90, rotation: -3, offsetY: 4, overlays: [.eyesWide]),
-                Frame(scaleY: 0.92, rotation: 3, offsetY: 3, overlays: [.eyesWide]),
-                Frame(scaleY: 0.90, rotation: -2, offsetY: 4, overlays: [.eyesWide]),
-                Frame(scaleY: 1.06, rotation: 0, offsetY: -5, overlays: [.eyesHappy, .blushBoost]),
-                Frame(scaleY: 0.98, overlays: [.eyesHappy])
+                Frame(scaleY: 0.98, overlays: [.eyesWide]),
+                Frame(scaleY: 0.92, rotation: -2.0, offsetY: 3.5, overlays: [.eyesWide]),
+                Frame(scaleY: 0.90, rotation: 2.0, offsetY: 4.0, overlays: [.eyesWide]),
+                Frame(scaleY: 0.91, rotation: -1.0, offsetY: 3.5, overlays: [.eyesWide]),
+                Frame(scaleX: 0.97, scaleY: 1.07, rotation: 1.5, offsetY: -6.5, overlays: [.eyesHappy, .blushBoost, .pawWave(swing: -0.2)]),
+                Frame(scaleX: 0.98, scaleY: 1.05, rotation: -0.5, offsetY: -5.0, overlays: [.eyesHappy, .blushBoost, .pawWave(swing: 0.2)]),
+                Frame(scaleY: 0.94, rotation: 0.5, offsetY: 2.5, overlays: [.eyesHappy, .blushBoost]),
+                Frame(scaleY: 0.98, overlays: [.eyesHappy, .blushBoost]),
+                Frame(scaleY: 1.01, overlays: [.eyesHappy, .blushBoost]),
+                Frame(overlays: [.eyesHappy]),
+                Frame()
             ]
         }
     }
@@ -703,6 +739,77 @@ final class ReferenceImageSource: AnimationFrameSource {
                                        endCenter: center, endRadius: radius * 1.25, options: [])
                 ctx.setBlendMode(.normal)
             }
+        case .pawWave(let swing):
+            let dark = colors.eyeDark
+            let fur = colors.fur
+            let blush = colors.blush
+
+            let bodyRight = CGPoint(x: rect.minX + rect.width * 0.62, y: rect.minY + rect.height * 0.30)
+            let armLen = rect.height * 0.16
+            let swingRad = swing * (16.0 * .pi / 180.0)
+
+            let pawCenter = CGPoint(
+                x: bodyRight.x + rect.width * 0.08 + sin(swingRad) * rect.width * 0.04,
+                y: bodyRight.y + armLen * 0.82 + cos(swingRad) * rect.height * 0.02
+            )
+
+            ctx.saveGState()
+            // 1. Arm connecting body to paw
+            let armPath = CGMutablePath()
+            armPath.move(to: CGPoint(x: bodyRight.x - rect.width * 0.03, y: bodyRight.y - rect.height * 0.03))
+            armPath.addQuadCurve(
+                to: CGPoint(x: pawCenter.x - rect.width * 0.03, y: pawCenter.y - rect.height * 0.02),
+                control: CGPoint(x: bodyRight.x + rect.width * 0.01, y: bodyRight.y + armLen * 0.3)
+            )
+            armPath.addLine(to: CGPoint(x: pawCenter.x + rect.width * 0.03, y: pawCenter.y - rect.height * 0.02))
+            armPath.addQuadCurve(
+                to: CGPoint(x: bodyRight.x + rect.width * 0.05, y: bodyRight.y - rect.height * 0.03),
+                control: CGPoint(x: bodyRight.x + rect.width * 0.07, y: bodyRight.y + armLen * 0.3)
+            )
+            armPath.closeSubpath()
+
+            ctx.setFillColor(fur)
+            ctx.addPath(armPath)
+            ctx.fillPath()
+            ctx.setStrokeColor(dark)
+            ctx.setLineWidth(rect.width * 0.016)
+            ctx.setLineCap(.round)
+            ctx.setLineJoin(.round)
+            ctx.addPath(armPath)
+            ctx.strokePath()
+
+            // 2. Paw rotated by swing angle
+            ctx.translateBy(x: pawCenter.x, y: pawCenter.y)
+            ctx.rotate(by: swingRad)
+
+            let pawSize = CGSize(width: rect.width * 0.13, height: rect.height * 0.10)
+            let pawRect = CGRect(x: -pawSize.width / 2, y: -pawSize.height / 2, width: pawSize.width, height: pawSize.height)
+
+            ctx.setFillColor(fur)
+            ctx.fillEllipse(in: pawRect)
+            ctx.setStrokeColor(dark)
+            ctx.setLineWidth(rect.width * 0.016)
+            ctx.strokeEllipse(in: pawRect)
+
+            // 3. Main paw pad
+            let mainPadSize = CGSize(width: pawSize.width * 0.44, height: pawSize.height * 0.40)
+            let mainPadRect = CGRect(x: -mainPadSize.width / 2, y: -mainPadSize.height / 2 - pawSize.height * 0.04,
+                                     width: mainPadSize.width, height: mainPadSize.height)
+            ctx.setFillColor(blush)
+            ctx.fillEllipse(in: mainPadRect)
+
+            // 4. Three little toe beans
+            let toeRadius = pawSize.width * 0.10
+            let toeOffsets: [(CGFloat, CGFloat)] = [
+                (-pawSize.width * 0.26, pawSize.height * 0.22),
+                (0.0, pawSize.height * 0.30),
+                (pawSize.width * 0.26, pawSize.height * 0.22)
+            ]
+            for (dx, dy) in toeOffsets {
+                ctx.fillEllipse(in: CGRect(x: dx - toeRadius, y: dy - toeRadius,
+                                           width: toeRadius * 2, height: toeRadius * 2))
+            }
+            ctx.restoreGState()
         }
     }
 
