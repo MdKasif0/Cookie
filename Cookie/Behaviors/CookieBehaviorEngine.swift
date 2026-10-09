@@ -103,6 +103,12 @@ final class CookieBehaviorEngine: ObservableObject {
     private var autonomousToyCooldownUntil = Date.distantPast
     private var watchingCursorUntil = Date.distantPast
 
+    // MARK: Emotes
+    @Published private(set) var activeEmote: Emote?
+    @Published private(set) var emotePlaybackPhase: EmotePlaybackPhase = .ready
+    private(set) var wasSleepingBeforeEmote = false
+    private var emoteCooldowns: [EmoteId: Date] = [:]
+
     private struct LocomotionPlan {
         var targetX: CGFloat
         var isPaused = false
@@ -143,6 +149,12 @@ final class CookieBehaviorEngine: ObservableObject {
         case .beingDragged:
             locomotionVelocity = 0
             return // held by the user; time does not advance
+        case .emoting:
+            locomotionVelocity = 0
+            if stateElapsed >= currentDuration {
+                completeEmote()
+            }
+            return // autonomous state changes do not interrupt active emote
         case .walking, .running, .followingCursor:
             advanceLocomotion(dt: dt, currentX: currentX)
         default:
