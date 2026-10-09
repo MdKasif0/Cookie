@@ -35,6 +35,9 @@ struct CookieSettings: Codable, Equatable {
     /// Whether Cookie occasionally explores toys on her own (always optional).
     var autonomousToys: Bool = true
 
+    // Updates
+    var automaticallyCheckForUpdates: Bool = true
+
     init() {}
 
     private enum CodingKeys: String, CodingKey {
@@ -42,7 +45,7 @@ struct CookieSettings: Codable, Equatable {
         case cookieSize, animationIntensity, reducedMotionMode
         case soundEnabled, masterVolume, meowVolume, interactionSounds, purringSounds
         case activityLevel, randomInteractions, cursorInteraction, windowInteraction, sleepBehavior
-        case autonomousToys
+        case autonomousToys, automaticallyCheckForUpdates
     }
 
     init(from decoder: Decoder) throws {
@@ -64,6 +67,7 @@ struct CookieSettings: Codable, Equatable {
         windowInteraction = try container.decodeIfPresent(Bool.self, forKey: .windowInteraction) ?? false
         sleepBehavior = try container.decodeIfPresent(String.self, forKey: .sleepBehavior) ?? SleepBehavior.normal.rawValue
         autonomousToys = try container.decodeIfPresent(Bool.self, forKey: .autonomousToys) ?? true
+        automaticallyCheckForUpdates = try container.decodeIfPresent(Bool.self, forKey: .automaticallyCheckForUpdates) ?? true
     }
 
     var reducedMotion: ReducedMotionMode {
