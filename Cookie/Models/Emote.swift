@@ -19,6 +19,16 @@ enum EmoteId: String, CaseIterable, Identifiable, Codable {
         case .playful: return "Playful"
         }
     }
+
+    var emoji: String {
+        switch self {
+        case .wave: return "👋"
+        case .happy: return "✨"
+        case .love: return "🧡"
+        case .sleepy: return "💤"
+        case .playful: return "🧶"
+        }
+    }
 }
 
 /// Explicit lifecycle phases of an emote sequence.
@@ -51,6 +61,8 @@ struct Emote: Identifiable, Equatable, Hashable {
     let cooldown: TimeInterval
     /// Animation priority tier.
     let priority: CookieAnimationPriority
+    /// Representative emoji symbol.
+    var emoji: String { id.emoji }
 
     // MARK: - Predefined Catalog
 
