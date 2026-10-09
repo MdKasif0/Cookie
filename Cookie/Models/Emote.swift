@@ -57,11 +57,11 @@ struct Emote: Identifiable, Equatable, Hashable {
     static let wave = Emote(
         id: .wave,
         name: "Wave",
-        description: "Cookie raises a paw in a warm, welcoming greeting.",
+        description: "Cookie says hello.",
         icon: "hand.wave.fill",
         animationIdentifier: .wave,
         duration: 2.0,
-        soundIdentifier: .welcome,
+        soundIdentifier: .mew,
         cooldown: 2.0,
         priority: .emote
     )
@@ -69,23 +69,23 @@ struct Emote: Identifiable, Equatable, Hashable {
     static let happy = Emote(
         id: .happy,
         name: "Happy",
-        description: "Cookie bounces joyfully with rosy cheeks and a happy purr.",
+        description: "Cookie is feeling happy.",
         icon: "sparkles",
         animationIdentifier: .happyEmote,
         duration: 1.8,
         soundIdentifier: .happy,
-        cooldown: 1.5,
+        cooldown: 1.8,
         priority: .emote
     )
 
     static let love = Emote(
         id: .love,
         name: "Love",
-        description: "Cookie leans in with shy affection and deep purring.",
+        description: "Cookie sends you some love.",
         icon: "heart.fill",
         animationIdentifier: .love,
-        duration: 2.2,
-        soundIdentifier: .mew,
+        duration: 2.0,
+        soundIdentifier: .purr,
         cooldown: 2.0,
         priority: .emote
     )
@@ -93,22 +93,22 @@ struct Emote: Identifiable, Equatable, Hashable {
     static let sleepy = Emote(
         id: .sleepy,
         name: "Sleepy",
-        description: "Cookie stretches softly, yawns, and snuggles down.",
+        description: "Cookie needs a little nap.",
         icon: "moon.zzz.fill",
         animationIdentifier: .sleepy,
-        duration: 2.5,
+        duration: 4.0,
         soundIdentifier: .sleep,
-        cooldown: 2.5,
+        cooldown: 3.0,
         priority: .emote
     )
 
     static let playful = Emote(
         id: .playful,
         name: "Playful",
-        description: "Cookie wiggles eagerly, ready for pouncing and fun.",
+        description: "Cookie wants to play.",
         icon: "pawprint.fill",
         animationIdentifier: .playfulEmote,
-        duration: 2.0,
+        duration: 2.2,
         soundIdentifier: .toy,
         cooldown: 2.0,
         priority: .emote
