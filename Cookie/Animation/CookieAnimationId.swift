@@ -169,11 +169,11 @@ enum CookieAnimationId: String, CaseIterable {
         case .happyEmote:
             return .standard(.emotes, "happy", priority: .emote, looping: false, fps: 6)
         case .love:
-            return .standard(.emotes, "love", priority: .emote, looping: false, fps: 6)
+            return .standard(.emotes, "love", priority: .emote, looping: false, fps: 5)
         case .sleepy:
             return .standard(.emotes, "sleepy", priority: .emote, looping: false, fps: 4)
         case .playfulEmote:
-            return .standard(.emotes, "playful", priority: .emote, looping: false, fps: 6)
+            return .standard(.emotes, "playful", priority: .emote, looping: false, fps: 5)
         }
     }
 
