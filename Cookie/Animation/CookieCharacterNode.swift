@@ -355,31 +355,31 @@ final class CookieCharacterNode: SKNode, SpriteProviding {
             greetingNode.alpha = 0
 
             // Warm cream speech bubble with soft orange outline
-            let bgWidth: CGFloat = 48
-            let bgHeight: CGFloat = 20
+            let bgWidth: CGFloat = 64
+            let bgHeight: CGFloat = 26
             let bgRect = CGRect(x: -bgWidth / 2, y: -bgHeight / 2, width: bgWidth, height: bgHeight)
-            let bubble = SKShapeNode(rect: bgRect, cornerRadius: 10)
-            bubble.fillColor = SKColor(srgbRed: 0.99, green: 0.96, blue: 0.90, alpha: 0.95)
-            bubble.strokeColor = SKColor(srgbRed: 0.91, green: 0.61, blue: 0.41, alpha: 0.85)
-            bubble.lineWidth = 1.2
+            let bubble = SKShapeNode(rect: bgRect, cornerRadius: 13)
+            bubble.fillColor = SKColor(srgbRed: 0.99, green: 0.96, blue: 0.90, alpha: 0.96)
+            bubble.strokeColor = SKColor(srgbRed: 0.91, green: 0.61, blue: 0.41, alpha: 0.90)
+            bubble.lineWidth = 1.3
             greetingNode.addChild(bubble)
 
             // "Hii! ✨" label
             let label = SKLabelNode(text: "Hii! ✨")
             label.fontName = "Helvetica-Bold"
-            label.fontSize = 10.5
+            label.fontSize = 12.5
             label.fontColor = SKColor(srgbRed: 0.44, green: 0.31, blue: 0.22, alpha: 1.0)
             label.verticalAlignmentMode = .center
             label.horizontalAlignmentMode = .center
             greetingNode.addChild(label)
 
-            // Sparkling burst star near waving paw
-            let spark = SKLabelNode(text: "✦")
-            spark.fontName = "Helvetica-Bold"
-            spark.fontSize = 13
-            spark.fontColor = SKColor(srgbRed: 0.96, green: 0.72, blue: 0.35, alpha: 0.95)
-            spark.position = CGPoint(x: -28, y: -2)
-            greetingNode.addChild(spark)
+            // Prominent waving hand emoji near waving paw
+            let waveEmoji = SKLabelNode(text: "👋")
+            waveEmoji.fontSize = 24
+            waveEmoji.position = CGPoint(x: -36, y: -2)
+            waveEmoji.verticalAlignmentMode = .center
+            waveEmoji.horizontalAlignmentMode = .center
+            greetingNode.addChild(waveEmoji)
 
             container.addChild(greetingNode)
             activeEmoteEffect = greetingNode
@@ -404,7 +404,7 @@ final class CookieCharacterNode: SKNode, SpriteProviding {
                 ])
                 let fadeOut = SKAction.group([
                     .fadeOut(withDuration: 0.35),
-                    .scale(to: 0.8, duration: 0.35),
+                    .scale(to: 0.85, duration: 0.35),
                     .moveBy(x: 0, y: 4, duration: 0.35)
                 ])
                 greetingNode.setScale(0.5)
@@ -415,19 +415,33 @@ final class CookieCharacterNode: SKNode, SpriteProviding {
                     .run { [weak self] in self?.clearEmoteEffects() }
                 ]))
             }
+
         case .love:
-            let heart = SKShapeNode(path: Self.makeHeartPath(size: 14))
-            heart.fillColor = SKColor(srgbRed: 0.94, green: 0.62, blue: 0.50, alpha: 0.95)
-            heart.strokeColor = SKColor(srgbRed: 0.84, green: 0.48, blue: 0.38, alpha: 0.90)
-            heart.lineWidth = 1.0
-            heart.position = CGPoint(x: 24, y: 28)
-            heart.zPosition = 3.0
-            heart.alpha = 0
-            container.addChild(heart)
-            activeEmoteEffect = heart
+            let loveNode = SKNode()
+            loveNode.position = CGPoint(x: 24, y: 32)
+            loveNode.zPosition = 3.0
+            loveNode.alpha = 0
+
+            // Prominent warm heart emoji
+            let heartEmoji = SKLabelNode(text: "🧡")
+            heartEmoji.fontSize = 26
+            heartEmoji.verticalAlignmentMode = .center
+            heartEmoji.horizontalAlignmentMode = .center
+            loveNode.addChild(heartEmoji)
+
+            // Sweet sparkle companion
+            let sparkle = SKLabelNode(text: "✨")
+            sparkle.fontSize = 14
+            sparkle.position = CGPoint(x: 14, y: 14)
+            sparkle.verticalAlignmentMode = .center
+            sparkle.horizontalAlignmentMode = .center
+            loveNode.addChild(sparkle)
+
+            container.addChild(loveNode)
+            activeEmoteEffect = loveNode
 
             if MotionSettings.reduceMotion {
-                heart.run(.sequence([
+                loveNode.run(.sequence([
                     .fadeIn(withDuration: 0.3),
                     .wait(forDuration: 1.0),
                     .fadeOut(withDuration: 0.4),
@@ -438,15 +452,20 @@ final class CookieCharacterNode: SKNode, SpriteProviding {
                     .fadeIn(withDuration: 0.25),
                     .scale(to: 1.0, duration: 0.25)
                 ])
+                let pulse = SKAction.sequence([
+                    .scale(to: 1.15, duration: 0.25),
+                    .scale(to: 1.0, duration: 0.25)
+                ])
                 let drift = SKAction.group([
-                    .moveBy(x: 4, y: 16, duration: 1.2),
+                    .moveBy(x: 4, y: 18, duration: 1.3),
                     .sequence([
-                        .wait(forDuration: 0.8),
-                        .fadeOut(withDuration: 0.4)
+                        pulse,
+                        .wait(forDuration: 0.6),
+                        .fadeOut(withDuration: 0.45)
                     ])
                 ])
-                heart.setScale(0.5)
-                heart.run(.sequence([
+                loveNode.setScale(0.5)
+                loveNode.run(.sequence([
                     appear,
                     drift,
                     .run { [weak self] in self?.clearEmoteEffects() }
@@ -454,39 +473,44 @@ final class CookieCharacterNode: SKNode, SpriteProviding {
             }
 
         case .sleepy:
-            let zLabel = SKLabelNode(text: "z")
-            zLabel.fontName = "Helvetica-Bold"
-            zLabel.fontSize = 13
-            zLabel.fontColor = SKColor(srgbRed: 0.52, green: 0.45, blue: 0.38, alpha: 0.85)
-            zLabel.position = CGPoint(x: 20, y: 38)
-            zLabel.zPosition = 3.0
-            zLabel.alpha = 0
-            container.addChild(zLabel)
-            activeEmoteEffect = zLabel
+            let sleepNode = SKNode()
+            sleepNode.position = CGPoint(x: 22, y: 36)
+            sleepNode.zPosition = 3.0
+            sleepNode.alpha = 0
+
+            // Prominent sleepy emoji
+            let zzzEmoji = SKLabelNode(text: "💤")
+            zzzEmoji.fontSize = 24
+            zzzEmoji.verticalAlignmentMode = .center
+            zzzEmoji.horizontalAlignmentMode = .center
+            sleepNode.addChild(zzzEmoji)
+
+            container.addChild(sleepNode)
+            activeEmoteEffect = sleepNode
 
             if MotionSettings.reduceMotion {
-                zLabel.run(.sequence([
-                    .wait(forDuration: 1.4),
+                sleepNode.run(.sequence([
+                    .wait(forDuration: 1.2),
                     .fadeIn(withDuration: 0.3),
                     .wait(forDuration: 1.2),
                     .fadeOut(withDuration: 0.4),
                     .run { [weak self] in self?.clearEmoteEffects() }
                 ]))
             } else {
-                let delay = SKAction.wait(forDuration: 1.4)
+                let delay = SKAction.wait(forDuration: 1.0)
                 let appear = SKAction.group([
                     .fadeIn(withDuration: 0.3),
                     .scale(to: 1.0, duration: 0.3)
                 ])
                 let drift = SKAction.group([
-                    .moveBy(x: 3, y: 12, duration: 1.5),
+                    .moveBy(x: 4, y: 16, duration: 1.6),
                     .sequence([
-                        .wait(forDuration: 1.0),
+                        .wait(forDuration: 1.1),
                         .fadeOut(withDuration: 0.5)
                     ])
                 ])
-                zLabel.setScale(0.6)
-                zLabel.run(.sequence([
+                sleepNode.setScale(0.5)
+                sleepNode.run(.sequence([
                     delay,
                     appear,
                     drift,
@@ -496,18 +520,22 @@ final class CookieCharacterNode: SKNode, SpriteProviding {
 
         case .happy:
             let sparksNode = SKNode()
-            sparksNode.position = CGPoint(x: 0, y: 32)
+            sparksNode.position = CGPoint(x: 0, y: 34)
             sparksNode.zPosition = 3.0
             sparksNode.alpha = 0
 
             let leftSpark = SKLabelNode(text: "✨")
-            leftSpark.fontSize = 12
-            leftSpark.position = CGPoint(x: -24, y: 4)
+            leftSpark.fontSize = 24
+            leftSpark.position = CGPoint(x: -28, y: 6)
+            leftSpark.verticalAlignmentMode = .center
+            leftSpark.horizontalAlignmentMode = .center
             sparksNode.addChild(leftSpark)
 
             let rightSpark = SKLabelNode(text: "✨")
-            rightSpark.fontSize = 12
-            rightSpark.position = CGPoint(x: 24, y: 8)
+            rightSpark.fontSize = 24
+            rightSpark.position = CGPoint(x: 28, y: 12)
+            rightSpark.verticalAlignmentMode = .center
+            rightSpark.horizontalAlignmentMode = .center
             sparksNode.addChild(rightSpark)
 
             container.addChild(sparksNode)
@@ -523,10 +551,10 @@ final class CookieCharacterNode: SKNode, SpriteProviding {
             } else {
                 let appear = SKAction.group([
                     .fadeIn(withDuration: 0.20),
-                    .scale(to: 1.1, duration: 0.20)
+                    .scale(to: 1.15, duration: 0.20)
                 ])
                 let drift = SKAction.group([
-                    .moveBy(x: 0, y: 12, duration: 1.1),
+                    .moveBy(x: 0, y: 14, duration: 1.1),
                     .sequence([
                         .wait(forDuration: 0.7),
                         .fadeOut(withDuration: 0.4)
@@ -542,19 +570,24 @@ final class CookieCharacterNode: SKNode, SpriteProviding {
 
         case .playful:
             let toyNode = SKNode()
-            toyNode.position = CGPoint(x: 24, y: 26)
+            toyNode.position = CGPoint(x: 24, y: 28)
             toyNode.zPosition = 3.0
             toyNode.alpha = 0
 
             let yarn = SKLabelNode(text: "🧶")
-            yarn.fontSize = 13
+            yarn.fontSize = 25
             yarn.position = CGPoint(x: 0, y: 0)
+            yarn.verticalAlignmentMode = .center
+            yarn.horizontalAlignmentMode = .center
             toyNode.addChild(yarn)
 
             let spark = SKLabelNode(text: "✦")
-            spark.fontSize = 11
+            spark.fontName = "Helvetica-Bold"
+            spark.fontSize = 15
             spark.fontColor = SKColor(srgbRed: 0.95, green: 0.65, blue: 0.40, alpha: 0.95)
-            spark.position = CGPoint(x: -14, y: 12)
+            spark.position = CGPoint(x: -16, y: 14)
+            spark.verticalAlignmentMode = .center
+            spark.horizontalAlignmentMode = .center
             toyNode.addChild(spark)
 
             container.addChild(toyNode)
@@ -570,12 +603,12 @@ final class CookieCharacterNode: SKNode, SpriteProviding {
             } else {
                 let pop = SKAction.group([
                     .fadeIn(withDuration: 0.20),
-                    .scale(to: 1.1, duration: 0.20),
+                    .scale(to: 1.15, duration: 0.20),
                     .moveBy(x: 2, y: 6, duration: 0.20)
                 ])
                 let bounce = SKAction.sequence([
                     .moveBy(x: 0, y: -4, duration: 0.25),
-                    .moveBy(x: 0, y: 2, duration: 0.25),
+                    .moveBy(x: 0, y: 3, duration: 0.25),
                     .wait(forDuration: 0.6),
                     .fadeOut(withDuration: 0.35)
                 ])
@@ -588,6 +621,7 @@ final class CookieCharacterNode: SKNode, SpriteProviding {
             }
         }
     }
+
 
     private static func makeHeartPath(size: CGFloat) -> CGPath {
         let path = CGMutablePath()
