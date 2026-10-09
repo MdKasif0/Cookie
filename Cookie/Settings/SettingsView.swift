@@ -58,6 +58,20 @@ struct GeneralSettingsTab: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
+            Section {
+                Toggle("Automatically check for updates", isOn: $store.profile.settings.automaticallyCheckForUpdates)
+                    .accessibilityHint("Periodically checks for new releases of Cookie securely over HTTPS")
+
+                Button("Check for Updates Now…") {
+                    environment.checkForUpdates()
+                }
+                .accessibilityLabel("Check for Updates")
+                .accessibilityHint("Checks GitHub feed for new Cookie releases")
+            } header: {
+                Text("Updates")
+            } footer: {
+                Text("Cookie checks for updates securely using Sparkle with cryptographic EdDSA verification. No personal data is sent.")
+            }
         }
         .formStyle(.grouped)
     }
