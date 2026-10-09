@@ -269,6 +269,7 @@ struct PrivacySettingsTab: View {
 
 struct AboutSettingsTab: View {
     @EnvironmentObject private var store: CookieStore
+    @EnvironmentObject private var environment: AppEnvironment
 
     private var version: String {
         let short = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0.0"
@@ -286,6 +287,12 @@ struct AboutSettingsTab: View {
                 LabeledContent("Name", value: store.profile.displayName)
                 LabeledContent("Version", value: version)
                 LabeledContent("Category", value: "Desktop Companion")
+
+                Button("Check for Updates…") {
+                    environment.checkForUpdates()
+                }
+                .accessibilityLabel("Check for Updates")
+                .accessibilityHint("Checks for new Cookie updates")
             } header: {
                 Text("Cookie")
             }
