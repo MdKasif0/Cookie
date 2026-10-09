@@ -257,4 +257,37 @@ final class EmoteSystemTests: XCTestCase {
             XCTAssertNil(engine.activeEmote)
         }
     }
+
+    // MARK: - Emote UI & Menu Integration Tests
+
+    func testEmoteArtworkAssetNames() {
+        XCTAssertEqual(EmoteArtwork.assetName(for: .wave), "CookieArt")
+        XCTAssertEqual(EmoteArtwork.assetName(for: .happy), "cookie-eyes-close")
+        XCTAssertEqual(EmoteArtwork.assetName(for: .love), "cookie-shy")
+        XCTAssertEqual(EmoteArtwork.assetName(for: .sleepy), "cookie-sleep")
+        XCTAssertEqual(EmoteArtwork.assetName(for: .playful), "cookie-mischievous")
+    }
+
+    @MainActor
+    func testEmotePickerPanelAllowsKeyFocus() {
+        let panel = EmotePickerPanel()
+        XCTAssertTrue(panel.canBecomeKey, "EmotePickerPanel must be able to become key for keyboard navigation")
+        XCTAssertTrue(panel.canBecomeMain, "EmotePickerPanel must be able to become main")
+    }
+
+    @MainActor
+    func testMenuBarControllerIncludesEmotesEntry() {
+        let audio = AudioManager(store: store)
+        let env = AppEnvironment(store: store, audioManager: audio, behaviorEngine: engine)
+        let menuBar = MenuBarController(environment: env, store: store)
+        let menu = menuBar.createMenu()
+
+        let emoteItems = menu.items.filter { $0.title == "Emotes…" }
+        XCTAssertEqual(emoteItems.count, 1, "Menu bar must contain exactly one 'Emotes…' entry")
+
+        let emoteItem = emoteItems.first
+        XCTAssertEqual(emoteItem?.keyEquivalent, "e")
+        XCTAssertEqual(emoteItem?.keyEquivalentModifierMask, [.command])
+        XCTAssertNotNil(emoteItem?.action)
+    }
 }
