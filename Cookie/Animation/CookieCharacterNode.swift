@@ -129,8 +129,32 @@ final class CookieCharacterNode: SKNode, SpriteProviding {
             controller.setBase(.tired)
         case .inBox:
             updateBoxAppearance()
+        case .emoting:
+            break
         }
         controller.setFacing(newFacing)
+    }
+
+    /// Triggers a dedicated emote animation on Cookie with natural SpriteKit completion.
+    func playEmote(_ emote: Emote, completion: @escaping (Bool) -> Void) {
+        state = .emoting
+        controller.play(emote.animationIdentifier) { finished in
+            completion(finished)
+        }
+    }
+
+    /// Awakens Cookie naturally before seamlessly playing the requested emote.
+    func playWakeThenEmote(_ emote: Emote, completion: @escaping (Bool) -> Void) {
+        state = .emoting
+        controller.play(.wake) { [weak self] _ in
+            guard let self else {
+                completion(false)
+                return
+            }
+            self.controller.play(emote.animationIdentifier) { finished in
+                completion(finished)
+            }
+        }
     }
 
     private func updateBoxAppearance() {

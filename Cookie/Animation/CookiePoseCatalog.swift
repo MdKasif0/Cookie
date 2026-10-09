@@ -145,6 +145,26 @@ enum CookiePoseCatalog {
         "boxPeek": [
             CookiePose(squash: 0.94, bodyY: -3, headY: 3, pawLift: 4, eyeStyle: .wide),
             CookiePose(squash: 0.96, bodyY: -2, headY: 4, pawLift: 5, eyeStyle: .open)
+        ],
+        "wave": [
+            CookiePose(headTilt: 4, pawLift: 3, eyeStyle: .happy, blushScale: 1.3),
+            CookiePose(squash: 1.04, bodyY: 2, headTilt: 8, pawLift: 7, eyeStyle: .happy, blushScale: 1.4),
+            CookiePose(headTilt: 4, pawLift: 4, eyeStyle: .happy, blushScale: 1.3),
+            CookiePose(squash: 1.04, bodyY: 2, headTilt: 8, pawLift: 7, eyeStyle: .happy, blushScale: 1.4),
+            CookiePose(eyeStyle: .happy)
+        ],
+        "love": [
+            CookiePose(squash: 0.94, headTilt: 5, eyeStyle: .happy, blushScale: 1.5),
+            CookiePose(squash: 0.91, bodyY: -3, headTilt: 8, eyeStyle: .closed, blushScale: 1.7),
+            CookiePose(squash: 0.93, bodyY: -2, headTilt: 6, eyeStyle: .happy, blushScale: 1.6),
+            CookiePose(squash: 0.97, headTilt: 3, eyeStyle: .happy, blushScale: 1.4)
+        ],
+        "sleepy": [
+            CookiePose(squash: 0.98, eyeStyle: .half),
+            CookiePose(squash: 1.03, eyeStyle: .half, mouthStyle: .open),
+            CookiePose(squash: 1.04, eyeStyle: .closed, mouthStyle: .openWide),
+            CookiePose(squash: 0.95, bodyY: -3, headTilt: 5, eyeStyle: .closed),
+            CookiePose(squash: 0.93, bodyY: -4, headTilt: 6, eyeStyle: .closed)
         ]
     ]
 }

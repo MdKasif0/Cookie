@@ -71,34 +71,50 @@ final class SpriteSheetSource: AnimationFrameSource {
 
     private func loadUncached(_ animation: CookieAnimationId) -> LoadedAnimation? {
         let spec = animation.spec
-        let directory = "\(Self.rootDirectory)/\(spec.category.rawValue)"
+        let baseDir = "\(Self.rootDirectory)/\(spec.category.rawValue)"
+        let candidateDirectories = [
+            baseDir,
+            "\(baseDir)/\(spec.sheetName)",
+            "\(baseDir)/\(spec.sheetName.capitalized)"
+        ]
 
         var manifest: SheetManifest?
-        if let manifestURL = bundle.url(forResource: spec.sheetName, withExtension: "json", subdirectory: directory),
-           let data = try? Data(contentsOf: manifestURL) {
-            manifest = try? JSONDecoder().decode(SheetManifest.self, from: data)
+        for directory in candidateDirectories {
+            if let manifestURL = bundle.url(forResource: spec.sheetName, withExtension: "json", subdirectory: directory)
+                ?? bundle.url(forResource: "manifest", withExtension: "json", subdirectory: directory),
+               let data = try? Data(contentsOf: manifestURL) {
+                manifest = try? JSONDecoder().decode(SheetManifest.self, from: data)
+                if manifest != nil { break }
+            }
         }
 
-        if let sheetURL = bundle.url(forResource: spec.sheetName, withExtension: "png", subdirectory: directory),
-           let image = NSImage(contentsOf: sheetURL),
-           let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) {
-            return sliceSheet(cgImage, manifest: manifest, name: "\(spec.category.rawValue)/\(spec.sheetName)")
+        for directory in candidateDirectories {
+            let names = [spec.sheetName, spec.sheetName.capitalized, "sheet"]
+            for name in names {
+                if let sheetURL = bundle.url(forResource: name, withExtension: "png", subdirectory: directory),
+                   let image = NSImage(contentsOf: sheetURL),
+                   let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) {
+                    return sliceSheet(cgImage, manifest: manifest, name: "\(spec.category.rawValue)/\(spec.sheetName)")
+                }
+            }
         }
 
-        var frames: [SKTexture] = []
-        for index in 0..<Self.maxFrames where frames.count < Self.maxFrames {
-            guard let url = bundle.url(forResource: "frame\(index)", withExtension: "png", subdirectory: directory),
-                  let image = NSImage(contentsOf: url),
-                  let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else { break }
-            frames.append(SKTexture(cgImage: cgImage))
+        for directory in candidateDirectories {
+            var frames: [SKTexture] = []
+            for index in 0..<Self.maxFrames where frames.count < Self.maxFrames {
+                guard let url = bundle.url(forResource: "frame\(index)", withExtension: "png", subdirectory: directory),
+                      let image = NSImage(contentsOf: url),
+                      let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else { break }
+                frames.append(SKTexture(cgImage: cgImage))
+            }
+            if !frames.isEmpty {
+                if let order = manifest?.frames {
+                    frames = order.compactMap { frames.indices.contains($0) ? frames[$0] : nil }
+                }
+                return LoadedAnimation(textures: frames, manifest: manifest)
+            }
         }
-        if frames.isEmpty {
-            return nil
-        }
-        if let order = manifest?.frames {
-            frames = order.compactMap { frames.indices.contains($0) ? frames[$0] : nil }
-        }
-        return LoadedAnimation(textures: frames, manifest: manifest)
+        return nil
     }
 
     private func sliceSheet(_ cgImage: CGImage, manifest: SheetManifest?, name: String) -> LoadedAnimation {
