@@ -162,6 +162,15 @@ final class AppEnvironment: ObservableObject {
     func triggerEmote(_ emote: Emote) -> Bool { behaviorEngine.triggerEmote(emote) }
     func showEmotePicker() { windows.showEmotePicker() }
 
+    // Software updates
+    func checkForUpdates(userInitiated: Bool = true) {
+        UpdateManager.shared.checkForUpdates(userInitiated: userInitiated)
+    }
+
+    func showUpdatePrompt() {
+        windows.showUpdatePrompt()
+    }
+
     func createCookieMenu() -> NSMenu? {
         if menuBarController == nil {
             menuBarController = MenuBarController(environment: self, store: store)
