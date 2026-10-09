@@ -228,7 +228,28 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         careMenuItem.submenu = careMenu
         mainMenu.addItem(careMenuItem)
 
-        // 3. Feed Cookie menu
+        // 3. Emotes menu
+        let emotesMainMenu = NSMenuItem()
+        let emotesMenu = NSMenu(title: "Emotes")
+        for emote in Emote.allEmotes {
+            let item = NSMenuItem(
+                title: "\(emote.name) \(Self.emoteEmoji(for: emote.id))",
+                action: #selector(emoteAction(_:)),
+                keyEquivalent: ""
+            )
+            item.target = self
+            item.representedObject = emote
+            emotesMenu.addItem(item)
+        }
+        emotesMenu.addItem(.separator())
+        let openPickerItem = NSMenuItem(title: "Open Emotes…", action: #selector(openEmotesPickerAction), keyEquivalent: "e")
+        openPickerItem.keyEquivalentModifierMask = [.command]
+        openPickerItem.target = self
+        emotesMenu.addItem(openPickerItem)
+        emotesMainMenu.submenu = emotesMenu
+        mainMenu.addItem(emotesMainMenu)
+
+        // 4. Feed Cookie menu
         let feedMenuItem = NSMenuItem()
         let feedMenu = NSMenu(title: "Feed Cookie")
         for food in FoodKind.allCases {
@@ -240,7 +261,7 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         feedMenuItem.submenu = feedMenu
         mainMenu.addItem(feedMenuItem)
 
-        // 4. Toys menu
+        // 5. Toys menu
         let toysMenuItem = NSMenuItem()
         let toysMenu = NSMenu(title: "Toys")
         for toy in ToyKind.allCases {
@@ -256,7 +277,7 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         toysMenuItem.submenu = toysMenu
         mainMenu.addItem(toysMenuItem)
 
-        // 5. Window menu
+        // 6. Window menu
         let windowMenuItem = NSMenuItem()
         let windowMenu = NSMenu(title: "Window")
         windowMenu.addItem(NSMenuItem(title: "Minimize", action: #selector(NSWindow.performMiniaturize(_:)), keyEquivalent: "m"))
@@ -277,6 +298,25 @@ final class MenuBarController: NSObject, NSMenuDelegate {
 
     @objc private func petAction() {
         environment.petCookie()
+    }
+
+    @objc private func emoteAction(_ sender: NSMenuItem) {
+        guard let emote = sender.representedObject as? Emote else { return }
+        environment.triggerEmote(emote)
+    }
+
+    @objc private func openEmotesPickerAction() {
+        environment.showEmotePicker()
+    }
+
+    private static func emoteEmoji(for id: EmoteId) -> String {
+        switch id {
+        case .wave: return "👋"
+        case .happy: return "✨"
+        case .love: return "💖"
+        case .sleepy: return "💤"
+        case .playful: return "🐾"
+        }
     }
 
     @objc private func feedAction(_ sender: NSMenuItem) {
