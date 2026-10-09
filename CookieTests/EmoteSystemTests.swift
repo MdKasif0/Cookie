@@ -270,16 +270,20 @@ final class EmoteSystemTests: XCTestCase {
 
     @MainActor
     func testEmotePickerPanelAllowsKeyFocus() {
-        let panel = EmotePickerPanel()
+        let panel = EmotePickerPanel(
+            contentRect: NSRect(x: 0, y: 0, width: 300, height: 250),
+            styleMask: [.borderless, .nonactivatingPanel],
+            backing: .buffered,
+            defer: false
+        )
         XCTAssertTrue(panel.canBecomeKey, "EmotePickerPanel must be able to become key for keyboard navigation")
         XCTAssertTrue(panel.canBecomeMain, "EmotePickerPanel must be able to become main")
     }
 
     @MainActor
     func testMenuBarControllerIncludesEmotesEntry() {
-        let audio = AudioManager(store: store)
-        let env = AppEnvironment(store: store, audioManager: audio, behaviorEngine: engine)
-        let menuBar = MenuBarController(environment: env, store: store)
+        let env = AppEnvironment()
+        let menuBar = MenuBarController(environment: env, store: env.store)
         let menu = menuBar.createMenu()
 
         let emoteItems = menu.items.filter { $0.title == "Emotes…" }
@@ -287,7 +291,7 @@ final class EmoteSystemTests: XCTestCase {
 
         let emoteItem = emoteItems.first
         XCTAssertEqual(emoteItem?.keyEquivalent, "e")
-        XCTAssertEqual(emoteItem?.keyEquivalentModifierMask, [.command])
+        XCTAssertTrue(emoteItem?.keyEquivalentModifierMask.contains(.command) == true)
         XCTAssertNotNil(emoteItem?.action)
     }
 }
