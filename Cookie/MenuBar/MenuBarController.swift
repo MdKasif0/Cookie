@@ -118,6 +118,7 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         openPickerItem.keyEquivalentModifierMask = [.command]
         openPickerItem.target = self
         emotesSubmenu.addItem(openPickerItem)
+        emotesMenuItem.submenu = emotesSubmenu
         menu.addItem(emotesMenuItem)
 
         menu.addItem(.separator())
@@ -313,9 +314,9 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         switch id {
         case .wave: return "👋"
         case .happy: return "✨"
-        case .love: return "💖"
+        case .love: return "🧡"
         case .sleepy: return "💤"
-        case .playful: return "🐾"
+        case .playful: return "🧶"
         }
     }
 
