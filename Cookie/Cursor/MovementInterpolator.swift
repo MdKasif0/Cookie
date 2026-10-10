@@ -28,6 +28,26 @@ final class MovementInterpolator {
     /// Indicates whether the position has arrived at the target within threshold.
     private(set) var isArrived: Bool = true
 
+    /// Whether the interpolator is currently moving toward target.
+    var isMoving: Bool {
+        !isArrived
+    }
+
+    init(
+        initialPosition: CGFloat = 0,
+        acceleration: CGFloat = 360,
+        deceleration: CGFloat = 480,
+        maxSpeed: CGFloat = 180,
+        arrivalThreshold: CGFloat = 4.0
+    ) {
+        self.currentPosition = initialPosition
+        self.targetPosition = initialPosition
+        self.maxSpeed = maxSpeed
+        self.acceleration = acceleration
+        self.deceleration = deceleration
+        self.arrivalThreshold = arrivalThreshold
+    }
+
     init(
         initialPosition: CGFloat = 0,
         maxSpeed: CGFloat = 180,
@@ -59,11 +79,22 @@ final class MovementInterpolator {
         isArrived = true
     }
 
+    /// Alias for reset(to:) providing an intuitive snapping API.
+    func snap(to position: CGFloat) {
+        reset(to: position)
+    }
+
     /// Cancels active translation, holding the current position and zeroing velocity.
     func stop() {
         targetPosition = currentPosition
         currentVelocity = 0
         isArrived = true
+    }
+
+    /// Advances the interpolation by `dt` seconds using trapezoidal velocity profiling.
+    @discardableResult
+    func update(deltaTime dt: TimeInterval) -> (position: CGFloat, velocity: CGFloat) {
+        update(dt: dt)
     }
 
     /// Advances the interpolation by `dt` seconds using trapezoidal velocity profiling.

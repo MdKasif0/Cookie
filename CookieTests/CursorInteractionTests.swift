@@ -3,6 +3,7 @@ import AppKit
 import SpriteKit
 @testable import Cookie
 
+@MainActor
 final class CursorInteractionTests: XCTestCase {
 
     // MARK: - Proximity Zones & Scaling

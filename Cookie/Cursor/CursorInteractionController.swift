@@ -28,12 +28,34 @@ final class CursorInteractionController: ObservableObject {
     /// Active playful reaction to be expressed, if any.
     @Published private(set) var activeReaction: CursorPlayfulReaction?
 
+    /// Whether the cursor is currently in any awareness or interaction zone.
+    var isCursorNear: Bool {
+        currentZone != .departure
+    }
+
     // MARK: - Constants & Configuration
 
     private static let baseAwarenessRadius: CGFloat = 250
     private static let baseInteractionRadius: CGFloat = 120
     private static let baseCloseContactRadius: CGFloat = 55
     private static let baseDepartureRadius: CGFloat = 350
+
+    /// Radius calculation helpers respecting character rendered scale.
+    func awarenessRadius(forScale scale: CGFloat = 1.0) -> CGFloat {
+        Self.baseAwarenessRadius * scale
+    }
+
+    func interactionRadius(forScale scale: CGFloat = 1.0) -> CGFloat {
+        Self.baseInteractionRadius * scale
+    }
+
+    func closeContactRadius(forScale scale: CGFloat = 1.0) -> CGFloat {
+        Self.baseCloseContactRadius * scale
+    }
+
+    func departureRadius(forScale scale: CGFloat = 1.0) -> CGFloat {
+        Self.baseDepartureRadius * scale
+    }
 
     /// Hysteresis buffer in points to prevent boundary state chatter.
     private static let hysteresisMargin: CGFloat = 12
@@ -73,7 +95,19 @@ final class CursorInteractionController: ObservableObject {
     }
 
     deinit {
-        teardown()
+        if let monitor = globalEventMonitor {
+            NSEvent.removeMonitor(monitor)
+        }
+        for observer in screenObservers {
+            NotificationCenter.default.removeObserver(observer)
+        }
+    }
+
+    /// Starts event-driven mouse tracking if not already active.
+    func startTracking() {
+        if globalEventMonitor == nil {
+            setupGlobalEventMonitor()
+        }
     }
 
     /// Cleans up event monitors and notification observers cleanly.
@@ -86,6 +120,8 @@ final class CursorInteractionController: ObservableObject {
             NotificationCenter.default.removeObserver(observer)
         }
         screenObservers.removeAll()
+        resetInteractionState()
+        currentZone = .departure
     }
 
     // MARK: - Event Monitoring
@@ -148,6 +184,41 @@ final class CursorInteractionController: ObservableObject {
         let viewPoint = view.convert(windowPoint, from: nil)
         // 3. Convert view coordinates into SpriteKit scene coordinates
         return scene.convertPoint(fromView: viewPoint)
+    }
+
+    /// Converts screen coordinates to scene coordinates given a window frame and scene size (useful for geometry tests).
+    func convertScreenPointToScene(
+        _ screenPoint: NSPoint,
+        windowFrame: CGRect,
+        sceneSize: CGSize
+    ) -> CGPoint {
+        let localX = screenPoint.x - windowFrame.midX
+        let localY = screenPoint.y - windowFrame.midY
+        return CGPoint(x: localX, y: localY)
+    }
+
+    /// Computes the anatomically clamped look angle in radians toward cursor.
+    func calculateLookAngle(
+        fromCookie cookiePos: CGPoint,
+        toCursor cursorPos: CGPoint,
+        facingRight: Bool
+    ) -> CGFloat {
+        let dx = cursorPos.x - cookiePos.x
+        let dy = cursorPos.y - cookiePos.y
+        let angle = atan2(dy, abs(dx))
+        return max(-0.20, min(0.20, angle))
+    }
+
+    /// Classifies cursor velocity into motion states.
+    func classifyMotion(velocity: CGVector) -> CursorMotionState {
+        let speed = hypot(velocity.dx, velocity.dy)
+        if speed < 30 {
+            return .stationary
+        } else if speed > 580 {
+            return .rapid
+        } else {
+            return .slow
+        }
     }
 
     // MARK: - Frame Update Cycle
