@@ -236,7 +236,7 @@ final class CursorInteractionTests: XCTestCase {
         let engine = CookieBehaviorEngine(store: store)
 
         // Start following cursor
-        engine.state = .followingCursor
+        engine.enter(.followingCursor)
         XCTAssertEqual(engine.state, .followingCursor)
 
         // User starts dragging Cookie (Priority 1)
@@ -250,13 +250,13 @@ final class CursorInteractionTests: XCTestCase {
         let store = CookieStore(storageURL: FileManager.default.temporaryDirectory.appendingPathComponent("test-cursor-emote.json"))
         let engine = CookieBehaviorEngine(store: store)
 
-        engine.state = .followingCursor
+        engine.enter(.followingCursor)
         XCTAssertEqual(engine.state, .followingCursor)
 
         // User triggers wave emote (Priority 2)
         engine.triggerEmote(.wave)
         XCTAssertEqual(engine.state, .emoting)
-        XCTAssertEqual(engine.activeEmote?.type, .wave)
+        XCTAssertEqual(engine.activeEmote?.id, .wave)
         XCTAssertFalse(engine.movementInterpolator.isMoving)
     }
 

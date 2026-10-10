@@ -33,20 +33,6 @@ final class MovementInterpolator {
         !isArrived
     }
 
-    init(
-        initialPosition: CGFloat = 0,
-        acceleration: CGFloat = 360,
-        deceleration: CGFloat = 480,
-        maxSpeed: CGFloat = 180,
-        arrivalThreshold: CGFloat = 4.0
-    ) {
-        self.currentPosition = initialPosition
-        self.targetPosition = initialPosition
-        self.maxSpeed = maxSpeed
-        self.acceleration = acceleration
-        self.deceleration = deceleration
-        self.arrivalThreshold = arrivalThreshold
-    }
 
     init(
         initialPosition: CGFloat = 0,
