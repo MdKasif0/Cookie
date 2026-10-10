@@ -234,6 +234,7 @@ final class CursorInteractionTests: XCTestCase {
     func testBehaviorPriorityDraggingOverridesCursor() {
         let store = CookieStore(storageURL: FileManager.default.temporaryDirectory.appendingPathComponent("test-cursor-drag.json"))
         let engine = CookieBehaviorEngine(store: store)
+        engine.start()
 
         // Start following cursor
         engine.enter(.followingCursor)
@@ -249,12 +250,14 @@ final class CursorInteractionTests: XCTestCase {
     func testBehaviorPriorityEmoteOverridesCursor() {
         let store = CookieStore(storageURL: FileManager.default.temporaryDirectory.appendingPathComponent("test-cursor-emote.json"))
         let engine = CookieBehaviorEngine(store: store)
+        engine.start()
 
         engine.enter(.followingCursor)
         XCTAssertEqual(engine.state, .followingCursor)
 
         // User triggers wave emote (Priority 2)
-        engine.triggerEmote(.wave)
+        let didTrigger = engine.triggerEmote(.wave)
+        XCTAssertTrue(didTrigger)
         XCTAssertEqual(engine.state, .emoting)
         XCTAssertEqual(engine.activeEmote?.id, .wave)
         XCTAssertFalse(engine.movementInterpolator.isMoving)
