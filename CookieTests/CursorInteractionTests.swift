@@ -81,11 +81,11 @@ final class CursorInteractionTests: XCTestCase {
     // MARK: - Movement Interpolator
 
     func testMovementInterpolatorAccelerationAndArrival() {
-        var interpolator = MovementInterpolator(
+        let interpolator = MovementInterpolator(
             initialPosition: 0,
+            maxSpeed: 200,
             acceleration: 400,
             deceleration: 500,
-            maxSpeed: 200,
             arrivalThreshold: 2.0
         )
 
@@ -116,11 +116,11 @@ final class CursorInteractionTests: XCTestCase {
     }
 
     func testMovementInterpolatorMaxSpeedCap() {
-        var interpolator = MovementInterpolator(
+        let interpolator = MovementInterpolator(
             initialPosition: 0,
+            maxSpeed: 150,
             acceleration: 1000,
             deceleration: 1000,
-            maxSpeed: 150,
             arrivalThreshold: 1.0
         )
 
