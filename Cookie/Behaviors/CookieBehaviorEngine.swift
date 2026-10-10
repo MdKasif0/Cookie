@@ -869,7 +869,7 @@ final class CookieBehaviorEngine: ObservableObject {
             weights[.special] = 0; weights[.eating] = 0; weights[.drinking] = 0
             weights[.followingCursor] = 0
         }
-        if !settings.cursorInteraction { weights[.followingCursor] = 0 }
+        if !settings.cursorInteraction || !settings.cursorFollowingEnabled { weights[.followingCursor] = 0 }
         if settings.sleep == .none { weights[.sleeping] = 0 }
         for (candidate, factor) in timeOfDay(now()).weightMultipliers {
             weights[candidate]? *= factor
