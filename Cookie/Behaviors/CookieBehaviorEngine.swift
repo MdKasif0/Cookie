@@ -973,12 +973,62 @@ final class CookieBehaviorEngine: ObservableObject {
         if let plan {
             setFacing(plan.targetX >= lastKnownX ? .right : .left)
         }
+        if newState == .followingCursor {
+            let intensity = store.profile.settings.followingIntensity
+            movementInterpolator.maxSpeed = intensity.maxSpeed
+            movementInterpolator.reset(to: lastKnownX)
+            if let target = plan?.targetX {
+                movementInterpolator.setTarget(target)
+            }
+        } else if state == .followingCursor {
+            movementInterpolator.stop()
+        }
         log.debug("State → \(newState.rawValue, privacy: .public) (~\(String(format: "%.1f", self.currentDuration), privacy: .public)s)")
     }
 
     // MARK: - Locomotion
 
     private func advanceLocomotion(dt: TimeInterval, currentX: CGFloat) {
+        if state == .followingCursor {
+            // Rapid cursor movements or departure: stop chasing, watch curious
+            if cursorController.cursorMotionState == .rapid || cursorController.currentZone == .departure {
+                locomotionVelocity = 0
+                movementInterpolator.stop()
+                enter(.curious, duration: 2.2)
+                return
+            }
+
+            if let targetX = cursorController.followTargetX {
+                movementInterpolator.setTarget(clampX(targetX))
+                let (_, vel) = movementInterpolator.update(dt: dt)
+                locomotionVelocity = vel
+                if abs(vel) > 3 {
+                    setFacing(vel > 0 ? .right : .left)
+                }
+                if movementInterpolator.isArrived {
+                    locomotionVelocity = 0
+                    handleArrived()
+                }
+                return
+            } else if let lastCursorX {
+                movementInterpolator.setTarget(clampX(lastCursorX))
+                let (_, vel) = movementInterpolator.update(dt: dt)
+                locomotionVelocity = vel
+                if abs(vel) > 3 {
+                    setFacing(vel > 0 ? .right : .left)
+                }
+                if movementInterpolator.isArrived {
+                    locomotionVelocity = 0
+                    handleArrived()
+                }
+                return
+            } else {
+                locomotionVelocity = 0
+                handleArrived()
+                return
+            }
+        }
+
         guard var plan else {
             handleArrived()
             return
