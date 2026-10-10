@@ -48,11 +48,21 @@ final class CookieBehaviorEngine: ObservableObject {
     private(set) var locomotionVelocity: CGFloat = 0
 
     // Seams for determinism in tests.
-    var now: () -> Date = { Date() }
+    var now: () -> Date = { Date() } {
+        didSet {
+            cursorController.now = now
+        }
+    }
     var visibleXRange: () -> ClosedRange<Double>? = {
         guard let frame = NSScreen.main?.visibleFrame else { return nil }
         return Double(frame.minX)...Double(frame.maxX)
     }
+
+    // MARK: - Cursor Interaction & Locomotion Controllers
+    let cursorController: CursorInteractionController
+    let movementInterpolator: MovementInterpolator
+    private var lastKnownPosition: NSPoint = .zero
+    private var lastCursorPosition: NSPoint?
 
     private let store: CookieStore
     private let log = Logger(subsystem: "com.cookie.mac", category: "Behavior")
@@ -116,8 +126,17 @@ final class CookieBehaviorEngine: ObservableObject {
         var timeUntilNextPause: TimeInterval = 3
     }
 
-    init(store: CookieStore) {
+    init(store: CookieStore, cursorController: CursorInteractionController? = nil) {
         self.store = store
+        let controller = cursorController ?? CursorInteractionController()
+        self.cursorController = controller
+        let intensity = store.profile.settings.followingIntensity
+        self.movementInterpolator = MovementInterpolator(
+            maxSpeed: intensity.maxSpeed,
+            acceleration: 340,
+            deceleration: 480,
+            arrivalThreshold: 5.0
+        )
     }
 
     // MARK: - Lifecycle
@@ -138,12 +157,36 @@ final class CookieBehaviorEngine: ObservableObject {
     // MARK: - Tick
 
     func tick(dt: TimeInterval, currentX: CGFloat, cursorX: CGFloat?) {
+        let currentPos = NSPoint(x: currentX, y: lastKnownPosition.y != 0 ? lastKnownPosition.y : 100)
+        let cursorPt = cursorX.map { NSPoint(x: $0, y: lastCursorPosition?.y ?? 100) }
+        tick(dt: dt, currentPosition: currentPos, cursorPosition: cursorPt)
+    }
+
+    func tick(dt: TimeInterval, currentPosition: NSPoint, cursorPosition: NSPoint?) {
         guard isRunning, dt > 0 else { return }
-        lastKnownX = currentX
-        if let cursorX { lastCursorX = cursorX }
+        lastKnownX = currentPosition.x
+        lastKnownPosition = currentPosition
+        if let cursorPosition {
+            lastCursorX = cursorPosition.x
+            lastCursorPosition = cursorPosition
+        }
         stateElapsed += dt
         pruneRecentPets()
-        maybeNoticeCursor(dt: dt)
+
+        // 1. Update intelligent cursor interaction controller
+        let isInterrupted = (state == .beingDragged || state == .emoting || isPressed)
+        cursorController.update(
+            dt: dt,
+            cookieCenterScreen: currentPosition,
+            cookieSize: store.profile.settings.cookieSize,
+            settings: store.profile.settings,
+            isInterrupted: isInterrupted
+        )
+
+        // 2. Process reactions and following triggers if not interrupted
+        if !isInterrupted {
+            handleCursorReactions(dt: dt)
+        }
 
         switch state {
         case .beingDragged:
@@ -156,7 +199,7 @@ final class CookieBehaviorEngine: ObservableObject {
             }
             return // autonomous state changes do not interrupt active emote
         case .walking, .running, .followingCursor:
-            advanceLocomotion(dt: dt, currentX: currentX)
+            advanceLocomotion(dt: dt, currentX: currentPosition.x)
         default:
             locomotionVelocity = 0
         }
@@ -197,6 +240,83 @@ final class CookieBehaviorEngine: ObservableObject {
         }
     }
 
+    // MARK: - Cursor Reaction Handling
+
+    private func handleCursorReactions(dt: TimeInterval) {
+        // High-priority states do not accept ambient cursor interactions
+        switch state {
+        case .beingDragged, .emoting, .eating, .drinking, .inBox:
+            return
+        default:
+            break
+        }
+
+        // 1. Playful dodge reaction
+        if cursorController.activeReaction == .dodge {
+            cursorController.clearActiveReaction()
+            executePlayfulDodge()
+            return
+        }
+
+        // 2. Close contact playful reactions
+        if let reactionKind = cursorController.activeReaction {
+            cursorController.clearActiveReaction()
+            switch reactionKind {
+            case .happyChirp:
+                reaction = .happy
+                noticeCount += 1
+                store.statistics.affection += 1
+            case .pawReach:
+                if state != .playing && state != .investigating {
+                    enter(.investigating, duration: 1.8)
+                }
+            case .headTilt:
+                if state == .idle || state == .sitting {
+                    enter(.curious, duration: 2.2)
+                }
+            case .glance, .approach, .dodge:
+                break
+            }
+        }
+
+        // 3. Orient toward cursor when in awareness / interaction zone and not sleeping
+        if cursorController.currentZone != .departure,
+           let cursorPt = lastCursorPosition,
+           state != .sleeping,
+           !state.isLocomotion {
+            setFacing(cursorPt.x >= lastKnownX ? .right : .left)
+        }
+
+        // 4. Trigger playful following
+        if store.profile.settings.cursorFollowingEnabled,
+           cursorController.currentZone == .interaction,
+           let followTarget = cursorController.followTargetX,
+           cursorController.cursorMotionState == .slow,
+           state != .followingCursor,
+           state != .sleeping,
+           worldItem == nil {
+            let intensity = store.profile.settings.followingIntensity
+            movementInterpolator.maxSpeed = intensity.maxSpeed
+            movementInterpolator.reset(to: lastKnownX)
+            movementInterpolator.setTarget(clampX(followTarget))
+            enter(.followingCursor, duration: 8.0)
+        }
+    }
+
+    private func executePlayfulDodge() {
+        guard let cursorPt = lastCursorPosition else { return }
+        // Step gently away from the approaching pointer (45-65pt)
+        let awayDirection: CGFloat = cursorPt.x >= lastKnownX ? -1 : 1
+        let dodgeTarget = clampX(lastKnownX + (awayDirection * CGFloat.random(in: 45...65)))
+        setFacing(awayDirection > 0 ? .right : .left)
+        sessionTargetX = dodgeTarget
+        reaction = .surprised
+        enter(.walking, sequence: [
+            (.curious, 2.0),
+            (.idle, 3.0)
+        ], duration: 1.0)
+    }
+
     // MARK: - Events
 
     /// Mouse down. Pressing only pauses strolling — a real drag commits
@@ -205,6 +325,8 @@ final class CookieBehaviorEngine: ObservableObject {
     func handlePress() {
         guard isRunning else { return }
         isPressed = true
+        cursorController.resetInteractionState()
+        movementInterpolator.stop()
         if state.isLocomotion {
             enter(.idle)
         }

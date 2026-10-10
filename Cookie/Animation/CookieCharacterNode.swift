@@ -137,6 +137,42 @@ final class CookieCharacterNode: SKNode, SpriteProviding {
             break
         }
         controller.setFacing(newFacing)
+        if newState == .sleeping || newState == .inBox || newState == .beingDragged {
+            setCursorLookAngle(nil)
+        }
+    }
+
+    // MARK: - Cursor Look Orientation
+
+    /// Subtly adjusts Cookie's head/body orientation toward the cursor within natural anatomical limits.
+    /// Preserves original artwork proportions without distortion.
+    func setCursorLookAngle(_ angle: CGFloat?) {
+        guard let angle else {
+            if container.zRotation != 0 {
+                container.removeAction(forKey: "cursorTilt")
+                container.run(SKAction.rotate(toAngle: 0, duration: 0.22), withKey: "cursorTilt")
+            }
+            return
+        }
+
+        // Only apply subtle glance tilt while in receptive states
+        switch state {
+        case .sleeping, .inBox, .emoting, .eating, .drinking, .beingDragged:
+            if container.zRotation != 0 {
+                container.removeAction(forKey: "cursorTilt")
+                container.zRotation = 0
+            }
+            return
+        default:
+            break
+        }
+
+        // Clamp to subtle, anatomically plausible angle: ±11.5° (±0.20 rad)
+        let clamped = max(-0.20, min(0.20, angle))
+        let effective = controller.facing == .left ? -clamped : clamped
+
+        container.removeAction(forKey: "cursorTilt")
+        container.run(SKAction.rotate(toAngle: effective, duration: 0.12), withKey: "cursorTilt")
     }
 
     /// Triggers a dedicated emote animation on Cookie with natural SpriteKit completion.

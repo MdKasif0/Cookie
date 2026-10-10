@@ -28,6 +28,9 @@ struct CookieSettings: Codable, Equatable {
     var activityLevel: String = ActivityLevel.balanced.rawValue
     var randomInteractions: Bool = true
     var cursorInteraction: Bool = true
+    var cursorFollowingEnabled: Bool = true
+    var cursorDodgingEnabled: Bool = true
+    var cursorFollowingIntensity: String = CursorFollowingIntensity.balanced.rawValue
     /// Reserved for the upcoming window-interaction milestone.
     var windowInteraction: Bool = false
     /// "normal", "longer", or "none".
@@ -44,7 +47,7 @@ struct CookieSettings: Codable, Equatable {
         case launchAtLogin, showOnStartup, rememberPosition
         case cookieSize, animationIntensity, reducedMotionMode
         case soundEnabled, masterVolume, meowVolume, interactionSounds, purringSounds
-        case activityLevel, randomInteractions, cursorInteraction, windowInteraction, sleepBehavior
+        case activityLevel, randomInteractions, cursorInteraction, cursorFollowingEnabled, cursorDodgingEnabled, cursorFollowingIntensity, windowInteraction, sleepBehavior
         case autonomousToys, automaticallyCheckForUpdates
     }
 
@@ -64,6 +67,9 @@ struct CookieSettings: Codable, Equatable {
         activityLevel = try container.decodeIfPresent(String.self, forKey: .activityLevel) ?? ActivityLevel.balanced.rawValue
         randomInteractions = try container.decodeIfPresent(Bool.self, forKey: .randomInteractions) ?? true
         cursorInteraction = try container.decodeIfPresent(Bool.self, forKey: .cursorInteraction) ?? true
+        cursorFollowingEnabled = try container.decodeIfPresent(Bool.self, forKey: .cursorFollowingEnabled) ?? true
+        cursorDodgingEnabled = try container.decodeIfPresent(Bool.self, forKey: .cursorDodgingEnabled) ?? true
+        cursorFollowingIntensity = try container.decodeIfPresent(String.self, forKey: .cursorFollowingIntensity) ?? CursorFollowingIntensity.balanced.rawValue
         windowInteraction = try container.decodeIfPresent(Bool.self, forKey: .windowInteraction) ?? false
         sleepBehavior = try container.decodeIfPresent(String.self, forKey: .sleepBehavior) ?? SleepBehavior.normal.rawValue
         autonomousToys = try container.decodeIfPresent(Bool.self, forKey: .autonomousToys) ?? true
@@ -80,6 +86,17 @@ struct CookieSettings: Codable, Equatable {
 
     var sleep: SleepBehavior {
         SleepBehavior(rawValue: sleepBehavior) ?? .normal
+    }
+
+    var followingIntensity: CursorFollowingIntensity {
+        CursorFollowingIntensity(rawValue: cursorFollowingIntensity) ?? .balanced
+    }
+
+    mutating func resetCursorInteractionSettings() {
+        cursorInteraction = true
+        cursorFollowingEnabled = true
+        cursorDodgingEnabled = true
+        cursorFollowingIntensity = CursorFollowingIntensity.balanced.rawValue
     }
 }
 
