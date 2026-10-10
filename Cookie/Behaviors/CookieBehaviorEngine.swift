@@ -958,7 +958,7 @@ final class CookieBehaviorEngine: ObservableObject {
         }
     }
 
-    private func enter(_ newState: CookieState, sequence: [(state: CookieState, duration: TimeInterval?)]? = nil, duration: TimeInterval? = nil) {
+    func enter(_ newState: CookieState, sequence: [(state: CookieState, duration: TimeInterval?)]? = nil, duration: TimeInterval? = nil) {
         state = newState
         stateElapsed = 0
         // Passing no sequence keeps the existing queue, so multi-step
