@@ -488,6 +488,8 @@ final class CookieBehaviorEngine: ObservableObject {
         guard isRunning else { return }
         endPress()
         cancelActiveEmote()
+        cursorController.resetInteractionState()
+        movementInterpolator.stop()
         sequenceQueue = []
         if worldItem != nil { clearSession() }
         enter(.beingDragged, duration: .infinity)
