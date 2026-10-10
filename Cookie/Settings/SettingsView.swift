@@ -220,14 +220,41 @@ struct BehaviorSettingsTab: View {
                     .accessibilityHint("Allows Cookie to autonomously stretch, play, and stroll")
                 Toggle("Autonomous toys", isOn: $store.profile.settings.autonomousToys)
                     .accessibilityHint("Allows Cookie to occasionally explore toys on her own")
-                Toggle("Cursor interaction", isOn: $store.profile.settings.cursorInteraction)
-                    .accessibilityHint("Allows Cookie to notice and glance toward your cursor")
                 Toggle("Window interaction", isOn: $store.profile.settings.windowInteraction)
                     .accessibilityHint("Reserved for future window perching behavior")
             } header: {
                 Text("Interactions")
             } footer: {
                 Text("Random interactions let Cookie stretch, play, and wander on her own. Autonomous toys let her occasionally explore a toy on the desk. All toys are optional.")
+            }
+            Section {
+                Toggle("Enable cursor interactions", isOn: $store.profile.settings.cursorInteraction)
+                    .accessibilityHint("Allows Cookie to notice and glance toward your cursor")
+                Toggle("Enable playful following", isOn: $store.profile.settings.cursorFollowingEnabled)
+                    .disabled(!store.profile.settings.cursorInteraction)
+                    .accessibilityHint("Allows Cookie to curiously follow slow cursor movements")
+                Toggle("Enable playful dodging", isOn: $store.profile.settings.cursorDodgingEnabled)
+                    .disabled(!store.profile.settings.cursorInteraction)
+                    .accessibilityHint("Allows Cookie to playfully step back when the cursor rushes in")
+                Picker("Following intensity", selection: $store.profile.settings.cursorFollowingIntensity) {
+                    ForEach(CursorFollowingIntensity.allCases) { intensity in
+                        Text(intensity.displayName).tag(intensity.rawValue)
+                    }
+                }
+                .disabled(!store.profile.settings.cursorInteraction || !store.profile.settings.cursorFollowingEnabled)
+                .accessibilityLabel("Following Intensity")
+                .accessibilityHint("Sets how quickly and closely Cookie follows the cursor")
+
+                Button("Reset Cursor Settings to Defaults") {
+                    store.profile.settings.resetCursorInteractionSettings()
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(Color.accentColor)
+                .font(.callout)
+            } header: {
+                Text("Cursor Interaction")
+            } footer: {
+                Text("Cookie observes your cursor within an awareness radius and can curiously walk nearby or playfully step back. Rapid cursor movements are never chased.")
             }
             Section {
                 Picker("Sleep behavior", selection: $store.profile.settings.sleepBehavior) {

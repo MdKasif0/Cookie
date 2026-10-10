@@ -1111,8 +1111,13 @@ final class CookieBehaviorEngine: ObservableObject {
         let target: CGFloat
         switch state {
         case .followingCursor:
-            guard let lastCursorX else { return nil }
-            target = clampX(lastCursorX)
+            if let followTarget = cursorController.followTargetX {
+                target = clampX(followTarget)
+            } else if let lastCursorX {
+                target = clampX(lastCursorX)
+            } else {
+                return nil
+            }
         default:
             guard visibleXRange() != nil else { return nil }
             if let sessionTarget = sessionTargetX {

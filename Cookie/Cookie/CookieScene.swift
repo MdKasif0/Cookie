@@ -165,6 +165,13 @@ final class CookieScene: SKScene {
                     self.executeEmote(emote)
                 }
                 .store(in: &cancellables)
+
+            engine.cursorController.$lookAngle
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] angle in
+                    self?.character.setCursorLookAngle(angle)
+                }
+                .store(in: &cancellables)
         }
     }
 
@@ -246,8 +253,9 @@ final class CookieScene: SKScene {
 
         guard let engine = behaviorEngine, engine.isRunning, dt > 0 else { return }
 
-        let centerX = view?.window.map { $0.frame.midX } ?? 0
-        engine.tick(dt: dt, currentX: centerX, cursorX: NSEvent.mouseLocation.x)
+        let centerPoint = view?.window.map { NSPoint(x: $0.frame.midX, y: $0.frame.midY) } ?? .zero
+        let mouseLoc = NSEvent.mouseLocation
+        engine.tick(dt: dt, currentPosition: centerPoint, cursorPosition: mouseLoc)
         applyLocomotion(from: engine, dt: CGFloat(dt))
     }
 
