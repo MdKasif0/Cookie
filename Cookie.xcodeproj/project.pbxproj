@@ -23,6 +23,7 @@
 		3DEA590BC8C767CA7D1A12AA /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 613133357693FE46B49F3796 /* Sparkle */; };
 		3E3C863DEB21A842A439B102 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BC6B895FFF0816B8909B8F5D /* Assets.xcassets */; };
 		405993F169208FED17B6143B /* UpdatePromptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECD9E8F9620E1410DFE3E299 /* UpdatePromptView.swift */; };
+		42D6ED1B1D452F8CA9136532 /* WindowInteractionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC84FC7AEDFF34AA7D3B7B34 /* WindowInteractionTests.swift */; };
 		4E92C5A109EBB37A1FEE4EC8 /* UpdateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD2B11A3AA269E2F8A3417BF /* UpdateManager.swift */; };
 		51C51C0A3A571D55A5088ECA /* Sounds in Resources */ = {isa = PBXBuildFile; fileRef = 7DDDA556F5DF54B178912C38 /* Sounds */; };
 		546767E6E49244AB8787D26B /* DesktopCoordinateSpace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C03A13EDEC1491EE74403B2 /* DesktopCoordinateSpace.swift */; };
@@ -146,6 +147,7 @@
 		BB0ED0D19E3B07DA7B1231A4 /* ExpressionArtSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpressionArtSource.swift; sourceTree = "<group>"; };
 		BC201CE915B5D96AB2C0B573 /* CookieState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieState.swift; sourceTree = "<group>"; };
 		BC6B895FFF0816B8909B8F5D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		BC84FC7AEDFF34AA7D3B7B34 /* WindowInteractionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowInteractionTests.swift; sourceTree = "<group>"; };
 		C955CF1C62621FE185D438EF /* WindowInteractionController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowInteractionController.swift; sourceTree = "<group>"; };
 		CA085C2C2832438FF2316878 /* SpriteAnimationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpriteAnimationController.swift; sourceTree = "<group>"; };
 		CA97B56C89CF6D05039E4F73 /* Cookie.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Cookie.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -405,6 +407,7 @@
 				848ECC2F921BCCC66CB74AE7 /* DockInteractionTests.swift */,
 				B801E5668BCB18DF49A0C355 /* EmoteSystemTests.swift */,
 				37B57951740F67F0F96827AD /* UpdateSystemTests.swift */,
+				BC84FC7AEDFF34AA7D3B7B34 /* WindowInteractionTests.swift */,
 			);
 			path = CookieTests;
 			sourceTree = "<group>";
@@ -610,6 +613,7 @@
 				96A72443EB9159126E9EB18C /* DockInteractionTests.swift in Sources */,
 				CFDD1E098A8F37701A33B219 /* EmoteSystemTests.swift in Sources */,
 				728C3CEC316659FB59C5A3F2 /* UpdateSystemTests.swift in Sources */,
+				42D6ED1B1D452F8CA9136532 /* WindowInteractionTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
