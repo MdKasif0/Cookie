@@ -16,13 +16,13 @@ final class MovementInterpolator {
     /// Arrival threshold in points — closer than this snaps to target and zeroes velocity.
     var arrivalThreshold: CGFloat
 
-    /// Current interpolated position.
+    /// Current interpolated position (1D X).
     private(set) var currentPosition: CGFloat
 
-    /// Current signed velocity in points per second.
+    /// Current signed velocity in points per second (1D X).
     private(set) var currentVelocity: CGFloat = 0
 
-    /// Desired destination position.
+    /// Desired destination position (1D X).
     private(set) var targetPosition: CGFloat
 
     /// Indicates whether the position has arrived at the target within threshold.
@@ -33,6 +33,24 @@ final class MovementInterpolator {
         !isArrived
     }
 
+    // MARK: - 2D Vector State
+
+    /// Current interpolated 2D position in screen coordinates.
+    private(set) var currentPosition2D: CGPoint = .zero
+
+    /// Current 2D velocity vector in points per second.
+    private(set) var currentVelocity2D: CGVector = .zero
+
+    /// Desired 2D destination in screen coordinates.
+    private(set) var targetPosition2D: CGPoint = .zero
+
+    /// Indicates whether the 2D position has arrived at target within threshold.
+    private(set) var isArrived2D: Bool = true
+
+    /// Whether 2D motion is active.
+    var isMoving2D: Bool {
+        !isArrived2D
+    }
 
     init(
         initialPosition: CGFloat = 0,
@@ -43,17 +61,23 @@ final class MovementInterpolator {
     ) {
         self.currentPosition = initialPosition
         self.targetPosition = initialPosition
+        self.currentPosition2D = CGPoint(x: initialPosition, y: 0)
+        self.targetPosition2D = CGPoint(x: initialPosition, y: 0)
         self.maxSpeed = maxSpeed
         self.acceleration = acceleration
         self.deceleration = deceleration
         self.arrivalThreshold = arrivalThreshold
     }
 
+    // MARK: - 1D Controls
+
     /// Sets a new target position. If the distance exceeds arrival threshold, marks active.
     func setTarget(_ target: CGFloat) {
         targetPosition = target
+        targetPosition2D.x = target
         if abs(targetPosition - currentPosition) > arrivalThreshold {
             isArrived = false
+            isArrived2D = false
         }
     }
 
@@ -63,6 +87,11 @@ final class MovementInterpolator {
         targetPosition = position
         currentVelocity = 0
         isArrived = true
+
+        currentPosition2D.x = position
+        targetPosition2D.x = position
+        currentVelocity2D.dx = 0
+        isArrived2D = true
     }
 
     /// Alias for reset(to:) providing an intuitive snapping API.
@@ -72,6 +101,52 @@ final class MovementInterpolator {
 
     /// Cancels active translation, holding the current position and zeroing velocity.
     func stop() {
+        targetPosition = currentPosition
+        currentVelocity = 0
+        isArrived = true
+
+        targetPosition2D = currentPosition2D
+        currentVelocity2D = .zero
+        isArrived2D = true
+    }
+
+    // MARK: - 2D Vector Controls
+
+    /// Sets a new 2D target position.
+    func setTarget2D(_ target: CGPoint) {
+        targetPosition2D = target
+        targetPosition = target.x
+        let dist = hypot(targetPosition2D.x - currentPosition2D.x, targetPosition2D.y - currentPosition2D.y)
+        if dist > arrivalThreshold {
+            isArrived2D = false
+            isArrived = false
+        }
+    }
+
+    /// Teleports 2D position immediately to a point and halts velocity.
+    func reset2D(to position: CGPoint) {
+        currentPosition2D = position
+        targetPosition2D = position
+        currentVelocity2D = .zero
+        isArrived2D = true
+
+        currentPosition = position.x
+        targetPosition = position.x
+        currentVelocity = 0
+        isArrived = true
+    }
+
+    /// Snaps 2D position immediately to target point.
+    func snap2D(to position: CGPoint) {
+        reset2D(to: position)
+    }
+
+    /// Stops 2D motion immediately, zeroing velocity.
+    func stop2D() {
+        targetPosition2D = currentPosition2D
+        currentVelocity2D = .zero
+        isArrived2D = true
+
         targetPosition = currentPosition
         currentVelocity = 0
         isArrived = true
@@ -128,6 +203,73 @@ final class MovementInterpolator {
         }
 
         currentPosition += currentVelocity * CGFloat(dt)
+        currentPosition2D.x = currentPosition
         return (currentPosition, currentVelocity)
+    }
+
+    /// Advances 2D vector interpolation by `dt` seconds using trapezoidal velocity profiling.
+    ///
+    /// - Parameter dt: Delta time in seconds elapsed since last update.
+    /// - Returns: Tuple of updated `(position: CGPoint, velocity: CGVector)`.
+    @discardableResult
+    func update2D(dt: TimeInterval) -> (position: CGPoint, velocity: CGVector) {
+        guard dt > 0 else { return (currentPosition2D, currentVelocity2D) }
+
+        let dx = targetPosition2D.x - currentPosition2D.x
+        let dy = targetPosition2D.y - currentPosition2D.y
+        let distance = hypot(dx, dy)
+
+        let currentSpeed = hypot(currentVelocity2D.dx, currentVelocity2D.dy)
+
+        // Arrived condition: within threshold and moving slowly
+        if distance <= arrivalThreshold && currentSpeed <= (acceleration * CGFloat(dt) * 1.5) {
+            currentPosition2D = targetPosition2D
+            currentVelocity2D = .zero
+            isArrived2D = true
+            currentPosition = currentPosition2D.x
+            currentVelocity = 0
+            isArrived = true
+            return (currentPosition2D, .zero)
+        }
+
+        guard distance > 0.001 else {
+            currentPosition2D = targetPosition2D
+            currentVelocity2D = .zero
+            isArrived2D = true
+            currentPosition = currentPosition2D.x
+            currentVelocity = 0
+            isArrived = true
+            return (currentPosition2D, .zero)
+        }
+
+        let dirX = dx / distance
+        let dirY = dy / distance
+
+        // Physics braking formula: v^2 = 2 * a * d => stoppingDistance = v^2 / (2 * decel)
+        let stoppingDistance = (currentSpeed * currentSpeed) / (2.0 * max(10, deceleration))
+
+        var newSpeed = currentSpeed
+        if distance <= stoppingDistance {
+            // Need to decelerate / brake
+            let decelStep = deceleration * CGFloat(dt)
+            newSpeed = max(0, currentSpeed - decelStep)
+        } else {
+            // Accelerate towards maxSpeed
+            let accelStep = acceleration * CGFloat(dt)
+            newSpeed = min(maxSpeed, currentSpeed + accelStep)
+        }
+
+        currentVelocity2D = CGVector(dx: dirX * newSpeed, dy: dirY * newSpeed)
+        currentPosition2D = CGPoint(
+            x: currentPosition2D.x + currentVelocity2D.dx * CGFloat(dt),
+            y: currentPosition2D.y + currentVelocity2D.dy * CGFloat(dt)
+        )
+
+        currentPosition = currentPosition2D.x
+        currentVelocity = currentVelocity2D.dx
+        targetPosition = targetPosition2D.x
+        isArrived = isArrived2D
+
+        return (currentPosition2D, currentVelocity2D)
     }
 }
