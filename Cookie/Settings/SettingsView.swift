@@ -257,6 +257,32 @@ struct BehaviorSettingsTab: View {
                 Text("Cookie observes your cursor within an awareness radius and can curiously walk nearby or playfully step back. Rapid cursor movements are never chased.")
             }
             Section {
+                Toggle("Enable Dock interactions", isOn: $store.profile.settings.dockInteraction)
+                    .accessibilityHint("Allows Cookie to recognize and interact with the macOS Dock")
+                Toggle("Enable autonomous Dock exploration", isOn: $store.profile.settings.autonomousDockExploration)
+                    .disabled(!store.profile.settings.dockInteraction)
+                    .accessibilityHint("Allows Cookie to occasionally and naturally stroll toward the Dock on her own")
+                Picker("Exploration frequency", selection: $store.profile.settings.dockExplorationFrequency) {
+                    ForEach(DockExplorationFrequency.allCases) { freq in
+                        Text(freq.displayName).tag(freq.rawValue)
+                    }
+                }
+                .disabled(!store.profile.settings.dockInteraction || !store.profile.settings.autonomousDockExploration)
+                .accessibilityLabel("Dock Exploration Frequency")
+                .accessibilityHint("Controls how often Cookie wanders to the Dock")
+
+                Button("Reset Desktop Exploration to Defaults") {
+                    store.profile.settings.resetDockSettings()
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(Color.accentColor)
+                .font(.callout)
+            } header: {
+                Text("Desktop Exploration")
+            } footer: {
+                Text("Cookie detects the macOS Dock orientation and safe edges, occasionally approaching to curiously look at application icons. Dock clicks are never intercepted.")
+            }
+            Section {
                 Picker("Sleep behavior", selection: $store.profile.settings.sleepBehavior) {
                     ForEach(SleepBehavior.allCases) { behavior in
                         Text(behavior.displayName).tag(behavior.rawValue)

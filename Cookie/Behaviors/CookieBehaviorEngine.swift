@@ -53,6 +53,7 @@ final class CookieBehaviorEngine: ObservableObject {
     var now: () -> Date = { Date() } {
         didSet {
             cursorController.now = now
+            dockController.now = now
         }
     }
     var visibleXRange: () -> ClosedRange<Double>? = {

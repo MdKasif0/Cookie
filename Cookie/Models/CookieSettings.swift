@@ -38,6 +38,11 @@ struct CookieSettings: Codable, Equatable {
     /// Whether Cookie occasionally explores toys on her own (always optional).
     var autonomousToys: Bool = true
 
+    // Desktop & Dock Exploration
+    var dockInteraction: Bool = true
+    var autonomousDockExploration: Bool = true
+    var dockExplorationFrequency: String = DockExplorationFrequency.occasional.rawValue
+
     // Updates
     var automaticallyCheckForUpdates: Bool = true
 
@@ -48,7 +53,7 @@ struct CookieSettings: Codable, Equatable {
         case cookieSize, animationIntensity, reducedMotionMode
         case soundEnabled, masterVolume, meowVolume, interactionSounds, purringSounds
         case activityLevel, randomInteractions, cursorInteraction, cursorFollowingEnabled, cursorDodgingEnabled, cursorFollowingIntensity, windowInteraction, sleepBehavior
-        case autonomousToys, automaticallyCheckForUpdates
+        case autonomousToys, dockInteraction, autonomousDockExploration, dockExplorationFrequency, automaticallyCheckForUpdates
     }
 
     init(from decoder: Decoder) throws {
@@ -73,6 +78,9 @@ struct CookieSettings: Codable, Equatable {
         windowInteraction = try container.decodeIfPresent(Bool.self, forKey: .windowInteraction) ?? false
         sleepBehavior = try container.decodeIfPresent(String.self, forKey: .sleepBehavior) ?? SleepBehavior.normal.rawValue
         autonomousToys = try container.decodeIfPresent(Bool.self, forKey: .autonomousToys) ?? true
+        dockInteraction = try container.decodeIfPresent(Bool.self, forKey: .dockInteraction) ?? true
+        autonomousDockExploration = try container.decodeIfPresent(Bool.self, forKey: .autonomousDockExploration) ?? true
+        dockExplorationFrequency = try container.decodeIfPresent(String.self, forKey: .dockExplorationFrequency) ?? DockExplorationFrequency.occasional.rawValue
         automaticallyCheckForUpdates = try container.decodeIfPresent(Bool.self, forKey: .automaticallyCheckForUpdates) ?? true
     }
 
@@ -92,11 +100,21 @@ struct CookieSettings: Codable, Equatable {
         CursorFollowingIntensity(rawValue: cursorFollowingIntensity) ?? .balanced
     }
 
+    var dockFrequency: DockExplorationFrequency {
+        DockExplorationFrequency(rawValue: dockExplorationFrequency) ?? .occasional
+    }
+
     mutating func resetCursorInteractionSettings() {
         cursorInteraction = true
         cursorFollowingEnabled = true
         cursorDodgingEnabled = true
         cursorFollowingIntensity = CursorFollowingIntensity.balanced.rawValue
+    }
+
+    mutating func resetDockSettings() {
+        dockInteraction = true
+        autonomousDockExploration = true
+        dockExplorationFrequency = DockExplorationFrequency.occasional.rawValue
     }
 }
 
