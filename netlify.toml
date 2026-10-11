@@ -5,7 +5,7 @@
   # Directory that contains the deploy-ready HTML files and assets
   publish = "website"
   # Build command (ensures downloads/ is populated even if built on Netlify CI)
-  command = "mkdir -p website/downloads && cp -f dist/Cookie-1.0.0.dmg website/downloads/Cookie-1.0.0.dmg || true"
+  command = "mkdir -p website/downloads && cp -f dist/Cookie-1.1.0.dmg website/downloads/Cookie-1.1.0.dmg || true"
 
 # Global security headers & HTML revalidation
 [[headers]]
@@ -29,7 +29,7 @@
   for = "/downloads/*"
   [headers.values]
     Cache-Control = "public, max-age=86400"
-    Content-Disposition = "attachment; filename=\"Cookie-1.0.0.dmg\""
+    Content-Disposition = "attachment; filename=\"Cookie-1.1.0.dmg\""
 
 # Revalidate stylesheets and scripts so updates apply immediately
 [[headers]]
@@ -45,7 +45,7 @@
 # Convenient redirects
 [[redirects]]
   from = "/download"
-  to = "/downloads/Cookie-1.0.0.dmg"
+  to = "/downloads/Cookie-1.1.0.dmg"
   status = 302
   force = true
 

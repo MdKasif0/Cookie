@@ -23,7 +23,8 @@
         sparkle:version="2"
         sparkle:shortVersionString="1.1.0"
         length="22314150"
-        type="application/octet-stream"/>
+        type="application/octet-stream"
+        sparkle:edSignature="/7WSauwUxmOrhKHecN5tROCaKxbuCU8zfj/JKJ7lNBZPJg8iS8gejOM+OwQF/7/vaIEJpDLjVS/5mNAPE22oAw=="/>
     </item>
     <item>
       <title>Cookie 1.0.0</title>
