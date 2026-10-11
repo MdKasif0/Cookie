@@ -550,6 +550,10 @@ final class CookieBehaviorEngine: ObservableObject {
         case .landing:
             locomotionVelocity = 0
             locomotionVelocity2D = .zero
+            behaviorMemory.recordJump()
+            if let activeId = windowController.activeWindow?.id {
+                behaviorMemory.recordWindowVisit(windowId: activeId)
+            }
             if state != .sitting && state != .idle {
                 enter(.sitting, duration: 1.0)
             }
@@ -613,6 +617,7 @@ final class CookieBehaviorEngine: ObservableObject {
         case .inspectingIcon:
             locomotionVelocity = 0
             locomotionVelocity2D = .zero
+            behaviorMemory.recordDockVisit(regionX: currentPosition.x)
             if state != .investigating && state != .curious {
                 enter(.investigating, duration: 2.5)
             }

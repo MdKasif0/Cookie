@@ -203,25 +203,44 @@ struct BehaviorSettingsTab: View {
     var body: some View {
         Form {
             Section {
+                Toggle("Autonomous behavior enabled", isOn: $store.profile.settings.autonomousBehaviorEnabled)
+                    .accessibilityHint("Allows Cookie to autonomously choose behaviors based on desktop context")
+                Toggle("Pause autonomous behavior", isOn: $store.profile.settings.pauseAutonomousBehavior)
+                    .accessibilityHint("Temporarily pauses all autonomous wandering and exploration")
                 Picker("Activity level", selection: $store.profile.settings.activityLevel) {
                     ForEach(ActivityLevel.allCases) { level in
                         Text(level.displayName).tag(level.rawValue)
                     }
                 }
                 .accessibilityLabel("Activity Level")
-                .accessibilityHint("Controls how often Cookie walks around or rests")
+                .accessibilityHint("Controls how often Cookie walks around or rests: Calm, Balanced, or Playful")
+
+                Toggle("Cursor interaction enabled", isOn: $store.profile.settings.cursorInteraction)
+                    .accessibilityHint("Allows Cookie to notice and interact with your cursor")
+                Toggle("Dock exploration enabled", isOn: $store.profile.settings.dockInteraction)
+                    .accessibilityHint("Allows Cookie to explore the macOS Dock")
+                Toggle("Window exploration enabled", isOn: $store.profile.settings.windowInteraction)
+                    .accessibilityHint("Allows Cookie to walk along visible window edges")
+                Toggle("Window jumping enabled", isOn: $store.profile.settings.windowJumpingEnabled)
+                    .disabled(!store.profile.settings.windowInteraction)
+                    .accessibilityHint("Allows Cookie to jump between adjacent windows and reachable surfaces")
+
+                Button("Reset Personality & Activity to Defaults") {
+                    store.profile.settings.resetPersonalityAndActivitySettings()
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(Color.accentColor)
+                .font(.callout)
             } header: {
-                Text("Energy")
+                Text("Personality & Activity")
             } footer: {
-                Text("Calm Cookie strolls less and rests more; lively Cookie wanders and plays often.")
+                Text("Cookie adapts naturally to active applications, cursor stillness, and desktop surfaces. Pausing leaves Cookie peacefully resting in place.")
             }
             Section {
                 Toggle("Random interactions", isOn: $store.profile.settings.randomInteractions)
                     .accessibilityHint("Allows Cookie to autonomously stretch, play, and stroll")
                 Toggle("Autonomous toys", isOn: $store.profile.settings.autonomousToys)
                     .accessibilityHint("Allows Cookie to occasionally explore toys on her own")
-                Toggle("Window interaction", isOn: $store.profile.settings.windowInteraction)
-                    .accessibilityHint("Reserved for future window perching behavior")
             } header: {
                 Text("Interactions")
             } footer: {
