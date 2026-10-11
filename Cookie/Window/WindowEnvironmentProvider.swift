@@ -33,6 +33,9 @@ final class WindowEnvironmentProvider: ObservableObject {
         DesktopCoordinateSpace.primaryScreenHeight()
     }
 
+    /// Seam for time in tests.
+    var now: () -> Date = { Date() }
+
     /// Minimum window dimensions considered usable for edge exploration.
     var minimumWindowSize = CGSize(width: 160, height: 160)
     var minimumWindowArea: CGFloat = 30000
@@ -52,11 +55,11 @@ final class WindowEnvironmentProvider: ObservableObject {
     /// Refreshes candidate windows and navigable edge paths with throttling protection.
     @discardableResult
     func refreshWindows(force: Bool = false) -> [ObservableWindow] {
-        let now = Date()
-        guard force || now.timeIntervalSince(lastScanTime) >= scanThrottleInterval else {
+        let currentTime = now()
+        guard force || currentTime.timeIntervalSince(lastScanTime) >= scanThrottleInterval else {
             return candidateWindows
         }
-        lastScanTime = now
+        lastScanTime = currentTime
 
         guard let rawList = windowListProvider() else {
             candidateWindows = []
@@ -294,14 +297,15 @@ final class WindowEnvironmentProvider: ObservableObject {
     }
 
     /// Finds candidate window closest to a given screen point.
-    func findClosestCandidate(to point: CGPoint, maxDistance: CGFloat = 450) -> ObservableWindow? {
+    func findClosestCandidate(to point: CGPoint, maxDistance: CGFloat = 650) -> ObservableWindow? {
         var closestWindow: ObservableWindow?
         var minDistance: CGFloat = maxDistance
 
         for win in candidateWindows where !win.isOccluded {
-            // Check distance to window top edge
-            let topMid = CGPoint(x: win.bounds.midX, y: win.bounds.maxY)
-            let dist = hypot(topMid.x - point.x, topMid.y - point.y)
+            // Distance from point to closest point on the window rectangle
+            let clampedX = max(win.bounds.minX, min(win.bounds.maxX, point.x))
+            let clampedY = max(win.bounds.minY, min(win.bounds.maxY, point.y))
+            let dist = hypot(clampedX - point.x, clampedY - point.y)
             if dist < minDistance {
                 minDistance = dist
                 closestWindow = win
