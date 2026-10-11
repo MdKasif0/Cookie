@@ -215,7 +215,31 @@ final class CookieBehaviorEngine: ObservableObject {
             isInterrupted: isInterrupted
         )
 
-        // 2. Process reactions and following triggers if not interrupted
+        // 2. Update intelligent macOS Dock interaction controller (Phase 2)
+        if store.profile.settings.dockInteraction, !isInterrupted {
+            let charSize = CookieScreenGeometry.basePanelSize(for: store.profile.settings.cookieSize)
+            dockController.tick(
+                dt: dt,
+                cookiePosition: currentPosition,
+                characterSize: charSize,
+                frequency: store.profile.settings.dockFrequency
+            )
+
+            if let cursorPosition {
+                dockController.handleCursorNearDock(
+                    cursorLocation: cursorPosition,
+                    cookieCenter: currentPosition,
+                    environment: dockDetector.currentEnvironment,
+                    settingsEnabled: store.profile.settings.dockInteraction
+                )
+            }
+
+            handleDockExploration(dt: dt, currentPosition: currentPosition)
+        } else if isInterrupted || !store.profile.settings.dockInteraction {
+            dockController.cancelExploration()
+        }
+
+        // 3. Process reactions and following triggers if not interrupted
         if !isInterrupted {
             handleCursorReactions(dt: dt)
         }
@@ -350,6 +374,72 @@ final class CookieBehaviorEngine: ObservableObject {
             (.curious, 2.0),
             (.idle, 3.0)
         ], duration: 1.0)
+    }
+
+    // MARK: - Dock Exploration Handling (Phase 2)
+
+    private func handleDockExploration(dt: TimeInterval, currentPosition: NSPoint) {
+        guard dockController.isExploringDock else { return }
+
+        // High priority states abort dock exploration immediately
+        switch state {
+        case .beingDragged, .emoting, .eating, .drinking, .inBox:
+            dockController.cancelExploration()
+            return
+        default:
+            break
+        }
+
+        if worldItem != nil || isPressed {
+            dockController.cancelExploration()
+            return
+        }
+
+        // Apply any playful reaction triggered during Dock play
+        if let reactionKind = dockController.playfulReaction {
+            dockController.clearPlayfulReaction()
+            self.reaction = reactionKind
+        }
+
+        switch dockController.currentPhase {
+        case .idle:
+            break
+
+        case .anticipating:
+            locomotionVelocity = 0
+            locomotionVelocity2D = .zero
+            if state != .curious {
+                enter(.curious, duration: 1.2)
+            }
+            if let targetPt = dockController.destinationPoint {
+                setFacing(targetPt.x >= currentPosition.x ? .right : .left)
+            }
+
+        case .approaching, .pacingEdge, .departing:
+            guard let dest = dockController.destinationPoint else { return }
+            let clampedDest = clampPoint(dest)
+            if state != .walking && state != .running {
+                enter(.walking, duration: 10.0)
+            }
+            movementInterpolator.maxSpeed = 135
+            movementInterpolator.setTarget2D(clampedDest)
+            let (_, vel2D) = movementInterpolator.update2D(dt: dt)
+            locomotionVelocity2D = vel2D
+            locomotionVelocity = vel2D.dx
+            if abs(vel2D.dx) > 3 {
+                setFacing(vel2D.dx > 0 ? .right : .left)
+            }
+
+        case .inspectingIcon:
+            locomotionVelocity = 0
+            locomotionVelocity2D = .zero
+            if state != .investigating && state != .curious {
+                enter(.investigating, duration: 2.5)
+            }
+            if let iconPt = dockController.activeInspectionTarget?.screenPoint {
+                setFacing(iconPt.x >= currentPosition.x ? .right : .left)
+            }
+        }
     }
 
     // MARK: - Events
