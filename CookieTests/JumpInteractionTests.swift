@@ -142,9 +142,12 @@ final class JumpInteractionTests: XCTestCase {
             style: .playful
         )
 
-        XCTAssertNotNil(proposal)
-        XCTAssertTrue(proposal?.isSafe ?? false)
-        XCTAssertEqual(proposal?.verticalDifference, 90, accuracy: 1.0)
+        guard let prop = proposal else {
+            XCTFail("Proposal expected")
+            return
+        }
+        XCTAssertTrue(prop.isSafe)
+        XCTAssertEqual(prop.verticalDifference, 90, accuracy: 1.0)
     }
 
     func testJumpPlannerAcceptsJumpToLowerSurface() {
@@ -168,9 +171,12 @@ final class JumpInteractionTests: XCTestCase {
             surfaces: [targetSurface]
         )
 
-        XCTAssertNotNil(proposal)
-        XCTAssertTrue(proposal?.isSafe ?? false)
-        XCTAssertEqual(proposal?.verticalDifference, -140, accuracy: 1.0)
+        guard let prop = proposal else {
+            XCTFail("Proposal expected")
+            return
+        }
+        XCTAssertTrue(prop.isSafe)
+        XCTAssertEqual(prop.verticalDifference, -140, accuracy: 1.0)
     }
 
     func testJumpPlannerRejectsExcessiveDistance() {
