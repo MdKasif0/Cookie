@@ -287,6 +287,26 @@ struct BehaviorSettingsTab: View {
                 .accessibilityLabel("Window Exploration Frequency")
                 .accessibilityHint("Controls how often Cookie approaches and explores application window perimeters")
 
+                Toggle("Enable window-to-window jumping", isOn: $store.profile.settings.windowJumpingEnabled)
+                    .disabled(!store.profile.settings.windowInteraction)
+                    .accessibilityHint("Allows Cookie to leap between adjacent windows and reachable surfaces")
+                Picker("Jump frequency", selection: $store.profile.settings.jumpFrequency) {
+                    ForEach(JumpFrequency.allCases) { freq in
+                        Text(freq.displayName).tag(freq.rawValue)
+                    }
+                }
+                .disabled(!store.profile.settings.windowInteraction || !store.profile.settings.windowJumpingEnabled)
+                .accessibilityLabel("Jump Frequency")
+                .accessibilityHint("Controls how often Cookie considers jumping between surfaces")
+                Picker("Jump style", selection: $store.profile.settings.jumpStyle) {
+                    ForEach(JumpStyle.allCases) { style in
+                        Text(style.displayName).tag(style.rawValue)
+                    }
+                }
+                .disabled(!store.profile.settings.windowInteraction || !store.profile.settings.windowJumpingEnabled)
+                .accessibilityLabel("Jump Style")
+                .accessibilityHint("Choose between gentle and playful trajectory arcs")
+
                 Button("Reset Desktop Exploration to Defaults") {
                     store.profile.settings.resetDesktopExplorationSettings()
                 }
