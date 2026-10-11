@@ -55,6 +55,9 @@ final class CookieBehaviorEngine: ObservableObject {
             cursorController.now = now
             dockController.now = now
             windowController.now = now
+            contextDetector.now = now
+            behaviorMemory.now = now
+            scheduler.now = now
         }
     }
     var visibleXRange: () -> ClosedRange<Double>? = {
@@ -86,6 +89,9 @@ final class CookieBehaviorEngine: ObservableObject {
     let windowProvider: WindowEnvironmentProvider
     let windowController: WindowInteractionController
     let movementInterpolator: MovementInterpolator
+    let contextDetector: ApplicationContextDetector
+    let behaviorMemory: BehaviorMemory
+    let scheduler: BehaviorScheduler
     private var lastKnownPosition: NSPoint = .zero
     private var lastCursorPosition: NSPoint?
 
@@ -157,7 +163,10 @@ final class CookieBehaviorEngine: ObservableObject {
         dockDetector: DockEnvironmentDetector? = nil,
         dockController: DockInteractionController? = nil,
         windowProvider: WindowEnvironmentProvider? = nil,
-        windowController: WindowInteractionController? = nil
+        windowController: WindowInteractionController? = nil,
+        contextDetector: ApplicationContextDetector? = nil,
+        behaviorMemory: BehaviorMemory? = nil,
+        scheduler: BehaviorScheduler? = nil
     ) {
         self.store = store
         let cController = cursorController ?? CursorInteractionController()
@@ -170,6 +179,12 @@ final class CookieBehaviorEngine: ObservableObject {
         self.windowProvider = wProvider
         let wController = windowController ?? WindowInteractionController(provider: wProvider)
         self.windowController = wController
+        let mem = behaviorMemory ?? BehaviorMemory()
+        self.behaviorMemory = mem
+        let cDetector = contextDetector ?? ApplicationContextDetector(windowProvider: wProvider)
+        self.contextDetector = cDetector
+        let sched = scheduler ?? BehaviorScheduler(memory: mem, windowProvider: wProvider)
+        self.scheduler = sched
         let intensity = store.profile.settings.followingIntensity
         self.movementInterpolator = MovementInterpolator(
             maxSpeed: intensity.maxSpeed,
@@ -177,6 +192,37 @@ final class CookieBehaviorEngine: ObservableObject {
             deceleration: 480,
             arrivalThreshold: 5.0
         )
+        setupContextSubscription()
+    }
+
+    private func setupContextSubscription() {
+        contextDetector.onApplicationSwitched = { [weak self] context in
+            self?.handleApplicationSwitched(context)
+        }
+    }
+
+    func handleApplicationSwitched(_ context: ApplicationContext) {
+        guard isRunning, state != .beingDragged, !isPressed, state != .emoting else { return }
+
+        if context.isCookieActive {
+            reaction = .happy
+            noticeCount += 1
+            behaviorMemory.recordAppSwitchReaction()
+            log.info("Cookie focused: responsive reaction triggered")
+            return
+        }
+
+        guard behaviorMemory.canReactToAppSwitch() else { return }
+        behaviorMemory.recordAppSwitchReaction()
+
+        if state == .idle || state == .sitting {
+            if let bounds = context.frontmostWindowBounds {
+                setFacing(bounds.midX >= lastKnownX ? .right : .left)
+            }
+            reaction = .curious
+            enter(.curious, duration: 1.5)
+            log.info("Noticed application switch to \(context.applicationName ?? "app", privacy: .public): curious glance")
+        }
     }
 
     // MARK: - Lifecycle

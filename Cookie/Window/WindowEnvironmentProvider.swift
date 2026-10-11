@@ -44,10 +44,29 @@ final class WindowEnvironmentProvider: ObservableObject {
     private var lastScanTime = Date.distantPast
     private let scanThrottleInterval: TimeInterval = 0.4
 
+    private var screenParamsObserver: NSObjectProtocol?
+
     // MARK: - Initialization
 
     init() {
         refreshWindows(force: true)
+        setupNotificationObservers()
+    }
+
+    deinit {
+        if let screenParamsObserver {
+            NotificationCenter.default.removeObserver(screenParamsObserver)
+        }
+    }
+
+    private func setupNotificationObservers() {
+        screenParamsObserver = NotificationCenter.default.addObserver(
+            forName: NSApplication.didChangeScreenParametersNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.refreshWindows(force: true)
+        }
     }
 
     // MARK: - Window Discovery & Filtering

@@ -24,9 +24,11 @@ struct CookieSettings: Codable, Equatable {
     var purringSounds: Bool = true
 
     // Behavior
-    /// "calm", "balanced", or "lively".
+    /// "calm", "balanced", or "lively" / "playful".
     var activityLevel: String = ActivityLevel.balanced.rawValue
     var randomInteractions: Bool = true
+    var autonomousBehaviorEnabled: Bool = true
+    var pauseAutonomousBehavior: Bool = false
     var cursorInteraction: Bool = true
     var cursorFollowingEnabled: Bool = true
     var cursorDodgingEnabled: Bool = true
@@ -56,7 +58,7 @@ struct CookieSettings: Codable, Equatable {
         case launchAtLogin, showOnStartup, rememberPosition
         case cookieSize, animationIntensity, reducedMotionMode
         case soundEnabled, masterVolume, meowVolume, interactionSounds, purringSounds
-        case activityLevel, randomInteractions, cursorInteraction, cursorFollowingEnabled, cursorDodgingEnabled, cursorFollowingIntensity, windowInteraction, windowVerticalClimbing, windowExplorationFrequency, windowJumpingEnabled, jumpFrequency, jumpStyle, sleepBehavior
+        case activityLevel, randomInteractions, autonomousBehaviorEnabled, pauseAutonomousBehavior, cursorInteraction, cursorFollowingEnabled, cursorDodgingEnabled, cursorFollowingIntensity, windowInteraction, windowVerticalClimbing, windowExplorationFrequency, windowJumpingEnabled, jumpFrequency, jumpStyle, sleepBehavior
         case autonomousToys, dockInteraction, autonomousDockExploration, dockExplorationFrequency, automaticallyCheckForUpdates
     }
 
@@ -75,6 +77,8 @@ struct CookieSettings: Codable, Equatable {
         purringSounds = try container.decodeIfPresent(Bool.self, forKey: .purringSounds) ?? true
         activityLevel = try container.decodeIfPresent(String.self, forKey: .activityLevel) ?? ActivityLevel.balanced.rawValue
         randomInteractions = try container.decodeIfPresent(Bool.self, forKey: .randomInteractions) ?? true
+        autonomousBehaviorEnabled = try container.decodeIfPresent(Bool.self, forKey: .autonomousBehaviorEnabled) ?? true
+        pauseAutonomousBehavior = try container.decodeIfPresent(Bool.self, forKey: .pauseAutonomousBehavior) ?? false
         cursorInteraction = try container.decodeIfPresent(Bool.self, forKey: .cursorInteraction) ?? true
         cursorFollowingEnabled = try container.decodeIfPresent(Bool.self, forKey: .cursorFollowingEnabled) ?? true
         cursorDodgingEnabled = try container.decodeIfPresent(Bool.self, forKey: .cursorDodgingEnabled) ?? true
@@ -155,6 +159,23 @@ struct CookieSettings: Codable, Equatable {
         resetWindowSettings()
         resetJumpSettings()
     }
+
+    mutating func resetPersonalityAndActivitySettings() {
+        autonomousBehaviorEnabled = true
+        pauseAutonomousBehavior = false
+        activityLevel = ActivityLevel.balanced.rawValue
+        randomInteractions = true
+        cursorInteraction = true
+        cursorFollowingEnabled = true
+        cursorDodgingEnabled = true
+        cursorFollowingIntensity = CursorFollowingIntensity.balanced.rawValue
+        dockInteraction = true
+        autonomousDockExploration = true
+        windowInteraction = true
+        windowJumpingEnabled = true
+        jumpFrequency = JumpFrequency.balanced.rawValue
+        jumpStyle = JumpStyle.gentle.rawValue
+    }
 }
 
 enum ReducedMotionMode: String, CaseIterable, Identifiable {
@@ -184,7 +205,16 @@ enum ActivityLevel: String, CaseIterable, Identifiable {
         switch self {
         case .calm: return "Calm"
         case .balanced: return "Balanced"
-        case .lively: return "Lively"
+        case .lively: return "Playful"
+        }
+    }
+
+    init?(rawValue: String) {
+        switch rawValue.lowercased() {
+        case "calm": self = .calm
+        case "balanced": self = .balanced
+        case "lively", "playful": self = .lively
+        default: return nil
         }
     }
 
