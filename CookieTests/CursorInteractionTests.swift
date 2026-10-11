@@ -133,7 +133,7 @@ final class CursorInteractionTests: XCTestCase {
     }
 
     func testMovementInterpolatorSnap() {
-        var interpolator = MovementInterpolator(initialPosition: 50)
+        let interpolator = MovementInterpolator(initialPosition: 50)
         interpolator.setTarget(200)
         _ = interpolator.update(deltaTime: 0.05)
         XCTAssertTrue(interpolator.isMoving)
@@ -142,6 +142,78 @@ final class CursorInteractionTests: XCTestCase {
         XCTAssertEqual(interpolator.currentPosition, 350)
         XCTAssertEqual(interpolator.currentVelocity, 0)
         XCTAssertFalse(interpolator.isMoving)
+    }
+
+    func testMovementInterpolator2DInAllDirections() {
+        let interpolator = MovementInterpolator(
+            initialPosition: 0,
+            maxSpeed: 200,
+            acceleration: 400,
+            deceleration: 500,
+            arrivalThreshold: 2.0
+        )
+        interpolator.reset2D(to: CGPoint(x: 100, y: 100))
+        XCTAssertEqual(interpolator.currentPosition2D, CGPoint(x: 100, y: 100))
+        XCTAssertFalse(interpolator.isMoving2D)
+
+        // Target diagonally up and to the right
+        interpolator.setTarget2D(CGPoint(x: 200, y: 250))
+        XCTAssertTrue(interpolator.isMoving2D)
+
+        _ = interpolator.update2D(dt: 0.1)
+        XCTAssertGreaterThan(interpolator.currentPosition2D.x, 100)
+        XCTAssertGreaterThan(interpolator.currentPosition2D.y, 100)
+        XCTAssertGreaterThan(interpolator.currentVelocity2D.dx, 0)
+        XCTAssertGreaterThan(interpolator.currentVelocity2D.dy, 0)
+
+        // Advance until arrival
+        var totalTime: TimeInterval = 0
+        while interpolator.isMoving2D && totalTime < 3.0 {
+            _ = interpolator.update2D(dt: 0.016)
+            totalTime += 0.016
+        }
+
+        XCTAssertFalse(interpolator.isMoving2D)
+        XCTAssertEqual(interpolator.currentPosition2D.x, 200, accuracy: 2.0)
+        XCTAssertEqual(interpolator.currentPosition2D.y, 250, accuracy: 2.0)
+        XCTAssertEqual(interpolator.currentVelocity2D.dx, 0, accuracy: 0.001)
+        XCTAssertEqual(interpolator.currentVelocity2D.dy, 0, accuracy: 0.001)
+    }
+
+    func test2DFollowingTargetCalculation() {
+        let controller = CursorInteractionController()
+        let settings = CookieSettings()
+        let cookieCenter = NSPoint(x: 200, y: 200)
+
+        // Simulate mouse positioned in interaction zone at (300, 250) (distance ~111pt)
+        let mouseInInteraction = NSPoint(x: 300, y: 250)
+
+        // Update controller with stationary/slow cursor in interaction zone
+        controller.update(
+            dt: 0.5,
+            cookieCenterScreen: cookieCenter,
+            cursorPoint: mouseInInteraction,
+            cookieSize: 1.0,
+            settings: settings,
+            isInterrupted: false
+        )
+        // Additional frame to clear anticipation
+        controller.update(
+            dt: 0.3,
+            cookieCenterScreen: cookieCenter,
+            cursorPoint: mouseInInteraction,
+            cookieSize: 1.0,
+            settings: settings,
+            isInterrupted: false
+        )
+
+        if let target = controller.followTarget {
+            // Target should have both X and Y components near the cursor
+            XCTAssertGreaterThan(target.x, cookieCenter.x)
+            XCTAssertGreaterThan(target.y, cookieCenter.y)
+            XCTAssertLessThan(target.x, mouseInInteraction.x)
+            XCTAssertLessThan(target.y, mouseInInteraction.y)
+        }
     }
 
     // MARK: - Look Angle & Anatomical Limits

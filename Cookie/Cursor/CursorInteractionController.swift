@@ -19,8 +19,18 @@ final class CursorInteractionController: ObservableObject {
     /// Character orientation angle in radians for subtle head/body glance toward cursor.
     @Published private(set) var lookAngle: CGFloat?
 
-    /// Desired horizontal locomotion destination when Cookie is approaching or following the cursor.
-    @Published private(set) var followTargetX: CGFloat?
+    /// Desired 2D locomotion destination in global screen coordinates when Cookie is following the cursor.
+    @Published private(set) var followTarget: CGPoint?
+
+    /// Desired horizontal locomotion destination (for backward compatibility).
+    var followTargetX: CGFloat? {
+        followTarget?.x
+    }
+
+    /// Desired vertical locomotion destination.
+    var followTargetY: CGFloat? {
+        followTarget?.y
+    }
 
     /// Current cursor motion classification (stationary, slow, or rapid).
     @Published private(set) var cursorMotionState: CursorMotionState = .stationary
@@ -228,12 +238,14 @@ final class CursorInteractionController: ObservableObject {
     /// - Parameters:
     ///   - dt: Delta time in seconds since the previous frame.
     ///   - cookieCenterScreen: Center of Cookie's rendered sprite in macOS global screen coordinates.
+    ///   - cursorPoint: Optional cursor point override (useful for deterministic tests or multi-window routing).
     ///   - cookieSize: Current scale multiplier from CookieSettings.
     ///   - settings: User preferences governing cursor interaction.
     ///   - isInterrupted: True if high-priority behaviors (dragging, emotes) are active.
     func update(
         dt: TimeInterval,
         cookieCenterScreen: NSPoint,
+        cursorPoint: NSPoint? = nil,
         cookieSize: Double,
         settings: CookieSettings,
         isInterrupted: Bool
@@ -246,8 +258,8 @@ final class CursorInteractionController: ObservableObject {
             return
         }
 
-        // Lightweight throttled fallback sampling (ensures updates even when global event monitor is dormant)
-        let rawCursor = NSEvent.mouseLocation
+        // Lightweight throttled fallback sampling or explicit cursor point
+        let rawCursor = cursorPoint ?? NSEvent.mouseLocation
         lastGlobalCursorPoint = rawCursor
 
         // 1. Calculate Cursor Velocity & Dynamics
@@ -413,7 +425,7 @@ final class CursorInteractionController: ObservableObject {
             // If cursor moves rapidly, pause following — curious cat watches rather than chasing
             if cursorMotionState == .rapid {
                 isAnticipatingFollow = false
-                followTargetX = nil
+                followTarget = nil
                 activeReaction = .glance
                 return
             }
@@ -428,18 +440,34 @@ final class CursorInteractionController: ObservableObject {
             if isAnticipatingFollow {
                 if anticipationRemaining > 0 {
                     anticipationRemaining -= dt
-                    followTargetX = nil
+                    followTarget = nil
                 } else if settings.cursorFollowingEnabled {
-                    // Calculate comfortable trailing position
-                    let side: CGFloat = dx >= 0 ? -1 : 1
-                    let targetX = lastGlobalCursorPoint.x + (side * intensity.trailingDistance)
-                    followTargetX = targetX
+                    // Calculate comfortable trailing position in 2D
+                    let fromCursorX = cookieCenterScreen.x - lastGlobalCursorPoint.x
+                    let fromCursorY = cookieCenterScreen.y - lastGlobalCursorPoint.y
+                    let d = hypot(fromCursorX, fromCursorY)
+
+                    let target: CGPoint
+                    if d > 0.001 {
+                        let unitX = fromCursorX / d
+                        let unitY = fromCursorY / d
+                        target = CGPoint(
+                            x: lastGlobalCursorPoint.x + unitX * intensity.trailingDistance,
+                            y: lastGlobalCursorPoint.y + unitY * intensity.trailingDistance
+                        )
+                    } else {
+                        target = CGPoint(
+                            x: lastGlobalCursorPoint.x - intensity.trailingDistance,
+                            y: lastGlobalCursorPoint.y
+                        )
+                    }
+                    followTarget = target
                 }
             }
 
         case .closeContact:
             // Arrived at close contact: stop translation, trigger playful reaction
-            followTargetX = nil
+            followTarget = nil
             isAnticipatingFollow = false
             interactionDwellTime = 0
 
@@ -460,7 +488,7 @@ final class CursorInteractionController: ObservableObject {
             // Cursor is visible but in outer zone: hold position, watch curiously
             interactionDwellTime = 0
             isAnticipatingFollow = false
-            followTargetX = nil
+            followTarget = nil
 
         case .departure:
             resetInteractionState()
@@ -472,7 +500,7 @@ final class CursorInteractionController: ObservableObject {
         interactionDwellTime = 0
         anticipationRemaining = 0
         isAnticipatingFollow = false
-        followTargetX = nil
+        followTarget = nil
         lookAngle = nil
         activeReaction = nil
     }

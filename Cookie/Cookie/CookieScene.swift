@@ -261,23 +261,36 @@ final class CookieScene: SKScene {
 
     private func applyLocomotion(from engine: CookieBehaviorEngine, dt: CGFloat) {
         let isLocomotion = engine.state.isLocomotion
-        if isLocomotion, engine.locomotionVelocity != 0,
+        let vel2D = engine.locomotionVelocity2D
+        let hasVelocity = (vel2D.dx != 0 || vel2D.dy != 0 || engine.locomotionVelocity != 0)
+        if isLocomotion, hasVelocity,
            let window = view?.window {
-            let direction: CookieEdge = engine.locomotionVelocity > 0 ? .right : .left
+            let vx = vel2D.dx != 0 ? vel2D.dx : engine.locomotionVelocity
+            let vy = vel2D.dy
             var frame = window.frame
             let visible = (window.screen ?? NSScreen.main)?.visibleFrame
             let margin: CGFloat = 8
-            var newX = frame.origin.x + engine.locomotionVelocity * dt
+
+            var newX = frame.origin.x + vx * dt
+            var newY = frame.origin.y + vy * dt
+
             let minX = (visible?.minX ?? newX) + margin
             let maxX = (visible?.maxX ?? newX) - frame.width - margin
-            if direction == .left, newX <= minX {
+            let minY = (visible?.minY ?? newY) + margin
+            let maxY = (visible?.maxY ?? newY) - frame.height - margin
+
+            if vx < 0, newX <= minX {
                 newX = minX
                 engine.handleEdgeReached(.left)
-            } else if direction == .right, newX >= maxX {
+            } else if vx > 0, newX >= maxX {
                 newX = maxX
                 engine.handleEdgeReached(.right)
             }
-            frame.origin.x = newX
+
+            newX = max(minX, min(maxX, newX))
+            newY = max(minY, min(maxY, newY))
+
+            frame.origin = CGPoint(x: newX, y: newY)
             window.setFrameOrigin(frame.origin)
         } else if wasInLocomotion, let window = view?.window {
             onPositionSettled?(window.frame.origin)

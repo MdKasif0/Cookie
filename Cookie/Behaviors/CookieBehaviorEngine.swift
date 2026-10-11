@@ -46,6 +46,8 @@ final class CookieBehaviorEngine: ObservableObject {
     private(set) var isRunning = false
     /// Signed panel speed in points per second (0 when not moving).
     private(set) var locomotionVelocity: CGFloat = 0
+    /// 2D panel velocity in points per second (supports full omnidirectional movement).
+    private(set) var locomotionVelocity2D: CGVector = .zero
 
     // Seams for determinism in tests.
     var now: () -> Date = { Date() } {
@@ -56,6 +58,23 @@ final class CookieBehaviorEngine: ObservableObject {
     var visibleXRange: () -> ClosedRange<Double>? = {
         guard let frame = NSScreen.main?.visibleFrame else { return nil }
         return Double(frame.minX)...Double(frame.maxX)
+    }
+    var visibleYRange: () -> ClosedRange<Double>? = {
+        guard let frame = NSScreen.main?.visibleFrame else { return nil }
+        return Double(frame.minY)...Double(frame.maxY)
+    }
+
+    /// Clamps 2D points safely within visible desktop boundaries.
+    func clampPoint(_ point: CGPoint) -> CGPoint {
+        var x = point.x
+        if let xRange = visibleXRange() {
+            x = CGFloat(max(xRange.lowerBound + 90, min(xRange.upperBound - 90, Double(x))))
+        }
+        var y = point.y
+        if let yRange = visibleYRange() {
+            y = CGFloat(max(yRange.lowerBound + 90, min(yRange.upperBound - 90, Double(y))))
+        }
+        return CGPoint(x: x, y: y)
     }
 
     // MARK: - Cursor Interaction & Locomotion Controllers
@@ -178,6 +197,7 @@ final class CookieBehaviorEngine: ObservableObject {
         cursorController.update(
             dt: dt,
             cookieCenterScreen: currentPosition,
+            cursorPoint: cursorPosition,
             cookieSize: store.profile.settings.cookieSize,
             settings: store.profile.settings,
             isInterrupted: isInterrupted
@@ -191,17 +211,20 @@ final class CookieBehaviorEngine: ObservableObject {
         switch state {
         case .beingDragged:
             locomotionVelocity = 0
+            locomotionVelocity2D = .zero
             return // held by the user; time does not advance
         case .emoting:
             locomotionVelocity = 0
+            locomotionVelocity2D = .zero
             if stateElapsed >= currentDuration {
                 completeEmote()
             }
             return // autonomous state changes do not interrupt active emote
         case .walking, .running, .followingCursor:
-            advanceLocomotion(dt: dt, currentX: currentPosition.x)
+            advanceLocomotion(dt: dt, currentPosition: currentPosition)
         default:
             locomotionVelocity = 0
+            locomotionVelocity2D = .zero
         }
 
         // Box peeking: while she is inside, she occasionally pokes her
@@ -290,15 +313,15 @@ final class CookieBehaviorEngine: ObservableObject {
         // 4. Trigger playful following
         if store.profile.settings.cursorFollowingEnabled,
            cursorController.currentZone == .interaction,
-           let followTarget = cursorController.followTargetX,
+           let followTarget = cursorController.followTarget,
            cursorController.cursorMotionState == .slow,
            state != .followingCursor,
            state != .sleeping,
            worldItem == nil {
             let intensity = store.profile.settings.followingIntensity
             movementInterpolator.maxSpeed = intensity.maxSpeed
-            movementInterpolator.reset(to: lastKnownX)
-            movementInterpolator.setTarget(clampX(followTarget))
+            movementInterpolator.reset2D(to: lastKnownPosition)
+            movementInterpolator.setTarget2D(clampPoint(followTarget))
             enter(.followingCursor, duration: 8.0)
         }
     }
@@ -968,6 +991,7 @@ final class CookieBehaviorEngine: ObservableObject {
         }
         currentDuration = duration ?? sampledDuration(for: newState)
         locomotionVelocity = 0
+        locomotionVelocity2D = .zero
         plan = makeLocomotionPlan(for: newState)
         currentTargetX = plan?.targetX
         if let plan {
@@ -976,12 +1000,14 @@ final class CookieBehaviorEngine: ObservableObject {
         if newState == .followingCursor {
             let intensity = store.profile.settings.followingIntensity
             movementInterpolator.maxSpeed = intensity.maxSpeed
-            movementInterpolator.reset(to: lastKnownX)
-            if let target = plan?.targetX {
-                movementInterpolator.setTarget(target)
+            movementInterpolator.reset2D(to: lastKnownPosition)
+            if let target = cursorController.followTarget {
+                movementInterpolator.setTarget2D(clampPoint(target))
+            } else if let targetX = plan?.targetX {
+                movementInterpolator.setTarget(targetX)
             }
         } else if state == .followingCursor {
-            movementInterpolator.stop()
+            movementInterpolator.stop2D()
         }
         log.debug("State → \(newState.rawValue, privacy: .public) (~\(String(format: "%.1f", self.currentDuration), privacy: .public)s)")
     }
@@ -989,41 +1015,49 @@ final class CookieBehaviorEngine: ObservableObject {
     // MARK: - Locomotion
 
     private func advanceLocomotion(dt: TimeInterval, currentX: CGFloat) {
+        advanceLocomotion(dt: dt, currentPosition: NSPoint(x: currentX, y: lastKnownPosition.y))
+    }
+
+    private func advanceLocomotion(dt: TimeInterval, currentPosition: NSPoint) {
+        let currentX = currentPosition.x
         if state == .followingCursor {
             // Rapid cursor movements or departure: stop chasing, watch curious
             if cursorController.cursorMotionState == .rapid || cursorController.currentZone == .departure {
                 locomotionVelocity = 0
-                movementInterpolator.stop()
+                locomotionVelocity2D = .zero
+                movementInterpolator.stop2D()
                 enter(.curious, duration: 2.2)
                 return
             }
 
-            if let targetX = cursorController.followTargetX {
-                movementInterpolator.setTarget(clampX(targetX))
-                let (_, vel) = movementInterpolator.update(dt: dt)
-                locomotionVelocity = vel
-                if abs(vel) > 3 {
-                    setFacing(vel > 0 ? .right : .left)
-                }
-                if movementInterpolator.isArrived {
-                    locomotionVelocity = 0
-                    handleArrived()
-                }
-                return
+            let targetPt: CGPoint?
+            if let followTarget = cursorController.followTarget {
+                targetPt = clampPoint(followTarget)
+            } else if let lastCursorPosition {
+                targetPt = clampPoint(lastCursorPosition)
             } else if let lastCursorX {
-                movementInterpolator.setTarget(clampX(lastCursorX))
-                let (_, vel) = movementInterpolator.update(dt: dt)
-                locomotionVelocity = vel
-                if abs(vel) > 3 {
-                    setFacing(vel > 0 ? .right : .left)
+                targetPt = clampPoint(CGPoint(x: lastCursorX, y: currentPosition.y))
+            } else {
+                targetPt = nil
+            }
+
+            if let targetPt {
+                movementInterpolator.setTarget2D(targetPt)
+                let (_, vel2D) = movementInterpolator.update2D(dt: dt)
+                locomotionVelocity2D = vel2D
+                locomotionVelocity = vel2D.dx
+                if abs(vel2D.dx) > 3 {
+                    setFacing(vel2D.dx > 0 ? .right : .left)
                 }
-                if movementInterpolator.isArrived {
+                if movementInterpolator.isArrived2D {
                     locomotionVelocity = 0
+                    locomotionVelocity2D = .zero
                     handleArrived()
                 }
                 return
             } else {
                 locomotionVelocity = 0
+                locomotionVelocity2D = .zero
                 handleArrived()
                 return
             }
@@ -1052,6 +1086,7 @@ final class CookieBehaviorEngine: ObservableObject {
         if plan.isPaused {
             plan.pauseRemaining -= dt
             locomotionVelocity = 0
+            locomotionVelocity2D = .zero
             if plan.pauseRemaining <= 0 {
                 plan.isPaused = false
                 plan.timeUntilNextPause = Double.random(in: 2.5...6)
@@ -1060,12 +1095,14 @@ final class CookieBehaviorEngine: ObservableObject {
             plan.timeUntilNextPause -= dt
             let speed = currentWalkSpeed
             locomotionVelocity = direction * speed
+            locomotionVelocity2D = CGVector(dx: locomotionVelocity, dy: 0)
             setFacing(direction > 0 ? .right : .left)
             // Walks include little pauses; runs do not.
             if state == .walking, plan.timeUntilNextPause <= 0 {
                 plan.isPaused = true
                 plan.pauseRemaining = Double.random(in: 0.6...1.6)
                 locomotionVelocity = 0
+                locomotionVelocity2D = .zero
             }
         }
         self.plan = plan
@@ -1074,6 +1111,7 @@ final class CookieBehaviorEngine: ObservableObject {
     private func handleArrived() {
         plan = nil
         locomotionVelocity = 0
+        locomotionVelocity2D = .zero
         if sessionTargetX != nil || !sequenceQueue.isEmpty {
             sessionTargetX = nil
             stateExpired()
