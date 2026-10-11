@@ -3,7 +3,8 @@ import Combine
 import os
 
 /// Dedicated controller governing Cookie's window edge exploration, approach,
-/// top-edge traversal, corner transitions, simulated vertical climbing, and departure.
+/// top-edge traversal, corner transitions, simulated vertical climbing,
+/// intelligent window-to-window jumping, and safe departure.
 @MainActor
 final class WindowInteractionController: ObservableObject {
     // MARK: - Published Properties
@@ -32,17 +33,37 @@ final class WindowInteractionController: ObservableObject {
     /// Playful one-shot reaction produced during window play (e.g. curious glance, proud pose).
     @Published private(set) var playfulReaction: CookieReaction?
 
+    /// Active jump trajectory when Cookie is airborne.
+    @Published private(set) var activeJumpTrajectory: JumpTrajectory?
+
+    /// Progress along active jump trajectory in [0.0 ... 1.0].
+    @Published private(set) var jumpProgress: CGFloat = 0.0
+
+    /// Subtle shadow scale factor during flight [0.75 ... 1.0].
+    @Published private(set) var jumpShadowScale: CGFloat = 1.0
+
+    /// Subtle shadow opacity factor during flight [0.055 ... 0.09].
+    @Published private(set) var jumpShadowAlpha: CGFloat = 0.09
+
     /// Whether Cookie is currently engaged in any window exploration activity.
     var isExploringWindow: Bool {
         currentPhase != .idle
     }
 
+    /// Whether Cookie is currently airborne during a jump.
+    var isJumping: Bool {
+        currentPhase == .jumping
+    }
+
     // MARK: - Dependencies & Seams
 
     let provider: WindowEnvironmentProvider
+    let jumpPlanner: JumpPlanner
+
     var now: () -> Date = { Date() } {
         didSet {
             provider.now = now
+            jumpPlanner.now = now
         }
     }
 
@@ -56,11 +77,19 @@ final class WindowInteractionController: ObservableObject {
     private var sessionElapsed: TimeInterval = 0
     private var sessionMaxDuration: TimeInterval = 14
     private var lastReconcileTime = Date.distantPast
+    private(set) var pendingJumpProposal: JumpProposal?
 
     // MARK: - Initialization
 
-    init(provider: WindowEnvironmentProvider? = nil) {
-        self.provider = provider ?? WindowEnvironmentProvider()
+    init(
+        provider: WindowEnvironmentProvider? = nil,
+        jumpPlanner: JumpPlanner? = nil
+    ) {
+        let prov = provider ?? WindowEnvironmentProvider()
+        self.provider = prov
+        let planner = jumpPlanner ?? JumpPlanner()
+        self.jumpPlanner = planner
+        planner.now = now
     }
 
     // MARK: - Lifecycle & Interruption
@@ -76,6 +105,11 @@ final class WindowInteractionController: ObservableObject {
         activeEdgePath = nil
         windowLookAngle = nil
         playfulReaction = nil
+        activeJumpTrajectory = nil
+        pendingJumpProposal = nil
+        jumpProgress = 0.0
+        jumpShadowScale = 1.0
+        jumpShadowAlpha = 0.09
         phaseElapsed = 0
         edgeProgress = 0
     }
@@ -103,14 +137,13 @@ final class WindowInteractionController: ObservableObject {
         // Frequency-tuned probability check
         let roll = Double.random(in: 0...1)
         guard roll < frequency.triggerProbability else {
-            // Short backoff before next check
             cooldownUntil = date.addingTimeInterval(Double.random(in: 15...30))
             return false
         }
 
         // Must have at least one reachable candidate window nearby
         provider.refreshWindows()
-        return provider.findClosestCandidate(to: cookiePosition, maxDistance: 450) != nil
+        return provider.findClosestCandidate(to: cookiePosition, maxDistance: 650) != nil
     }
 
     /// Begins a structured window exploration session targeting the nearest candidate window.
@@ -164,6 +197,35 @@ final class WindowInteractionController: ObservableObject {
         log.info("Started window edge exploration on \(win.ownerName, privacy: .public) (#\(win.id, privacy: .public))")
     }
 
+    // MARK: - Jumping Preparation & Launch
+
+    /// Prepares and executes a calculated jump trajectory to a target surface.
+    func startJump(proposal: JumpProposal) {
+        guard proposal.isSafe else {
+            log.notice("Cannot start jump: \(proposal.rejectionReason ?? "unsafe", privacy: .public)")
+            return
+        }
+
+        self.pendingJumpProposal = proposal
+        let trajectory = JumpTrajectory(
+            startPoint: proposal.startPoint,
+            endPoint: proposal.targetSurface.landingPoint,
+            duration: proposal.jumpDuration,
+            apexHeight: proposal.apexHeight,
+            style: proposal.style
+        )
+        self.activeJumpTrajectory = trajectory
+        self.destinationPoint = proposal.targetSurface.landingPoint
+        self.jumpProgress = 0.0
+
+        currentPhase = .preparingJump
+        phaseElapsed = 0
+        phaseDuration = Double.random(in: 0.40...0.65)
+        playfulReaction = .curious
+        updateLookAngle(from: proposal.startPoint, toward: proposal.targetSurface.landingPoint)
+        log.info("Preparing jump to \(proposal.targetSurface.ownerName, privacy: .public) [style: \(proposal.style.rawValue, privacy: .public), dist: \(Int(proposal.totalEuclideanDistance), privacy: .public)pt]")
+    }
+
     // MARK: - Frame Update
 
     /// Primary tick cycle called each frame by the behavior engine.
@@ -172,22 +234,25 @@ final class WindowInteractionController: ObservableObject {
         cookiePosition: NSPoint,
         characterSize: CGSize,
         frequency: WindowExplorationFrequency,
-        verticalClimbingEnabled: Bool
+        verticalClimbingEnabled: Bool,
+        jumpingEnabled: Bool = true,
+        jumpFrequency: JumpFrequency = .balanced,
+        jumpStyle: JumpStyle = .gentle
     ) {
         guard currentPhase != .idle, dt > 0 else { return }
 
         phaseElapsed += dt
         sessionElapsed += dt
 
-        // 1. Periodic window position reconciliation (~2 Hz)
+        // 1. Periodic window position reconciliation (~2 Hz) unless airborne
         let date = now()
-        if date.timeIntervalSince(lastReconcileTime) >= 0.5 {
+        if currentPhase != .jumping && date.timeIntervalSince(lastReconcileTime) >= 0.5 {
             lastReconcileTime = date
             reconcileActiveWindow()
         }
 
-        // 2. Session timeout safety: never get stuck on an edge indefinitely
-        if sessionElapsed >= sessionMaxDuration {
+        // 2. Session timeout safety: never get stuck on an edge indefinitely (do not interrupt mid-jump)
+        if currentPhase != .jumping && currentPhase != .preparingJump && sessionElapsed >= sessionMaxDuration {
             concludeExploration(from: cookiePosition)
             return
         }
@@ -253,10 +318,28 @@ final class WindowInteractionController: ObservableObject {
             }
 
         case .cornerTransition:
-            // Paused at corner: orient character, evaluate whether to turn around or climb
+            // Paused at corner: evaluate jump opportunities first, then vertical climb or turn
             if phaseElapsed >= phaseDuration {
+                // 1. Evaluate window jumping if enabled
+                if jumpingEnabled {
+                    let screen = NSScreen.screens.first(where: { $0.visibleFrame.contains(cookiePosition) }) ?? NSScreen.main
+                    let surfaces = jumpPlanner.extractJumpSurfaces(from: provider.candidateWindows, screenVisibleFrame: screen?.visibleFrame)
+                    if let jumpProposal = jumpPlanner.evaluateBestJump(
+                        from: cookiePosition,
+                        currentWindowId: activeWindow?.id,
+                        surfaces: surfaces,
+                        style: jumpStyle
+                    ) {
+                        let roll = Double.random(in: 0...1)
+                        if roll < jumpFrequency.triggerProbability {
+                            startJump(proposal: jumpProposal)
+                            return
+                        }
+                    }
+                }
+
+                // 2. Evaluate vertical climbing if enabled
                 if verticalClimbingEnabled, let win = activeWindow {
-                    // Transition to vertical edge climbing
                     let isRightCorner = edgeProgress >= 0.9
                     let verticalType: WindowEdgeType = isRightCorner ? .rightVertical : .leftVertical
                     if let vertPath = provider.navigablePaths.first(where: { $0.windowId == win.id && $0.edgeType == verticalType }) {
@@ -270,7 +353,7 @@ final class WindowInteractionController: ObservableObject {
                     }
                 }
 
-                // Default corner action: turn around and walk back along the top edge or conclude
+                // 3. Default corner action: turn around and walk back along the top edge or conclude
                 let roll = Double.random(in: 0...1)
                 if roll < 0.65 {
                     traversalDirection = -traversalDirection
@@ -310,6 +393,126 @@ final class WindowInteractionController: ObservableObject {
             // Brief observation pause on the edge
             if phaseElapsed >= phaseDuration {
                 concludeExploration(from: cookiePosition)
+            }
+
+        case .preparingJump:
+            guard let proposal = pendingJumpProposal, let trajectory = activeJumpTrajectory else {
+                currentPhase = .idle
+                return
+            }
+            updateLookAngle(from: cookiePosition, toward: proposal.targetSurface.landingPoint)
+
+            if phaseElapsed >= phaseDuration {
+                // Pre-launch validation: ensure target window is still present and valid
+                provider.refreshWindows()
+                if let targetWinId = proposal.targetSurface.windowId {
+                    guard let updatedWin = provider.candidateWindows.first(where: { $0.id == targetWinId && !$0.isOccluded }) else {
+                        log.notice("Pre-launch target window closed or occluded — cancelling jump safely")
+                        pendingJumpProposal = nil
+                        activeJumpTrajectory = nil
+                        windowLookAngle = nil
+                        if activeWindow != nil {
+                            currentPhase = .walkingTopEdge
+                            phaseElapsed = 0
+                            phaseDuration = 3.0
+                        } else {
+                            concludeExploration(from: cookiePosition)
+                        }
+                        return
+                    }
+
+                    // Check for abrupt window movement before takeoff
+                    let landingX = updatedWin.bounds.midX
+                    let landingY = updatedWin.bounds.maxY + proposal.targetSurface.footOffset
+                    let drift = hypot(landingX - proposal.targetSurface.landingPoint.x, landingY - proposal.targetSurface.landingPoint.y)
+                    if drift > 60 {
+                        log.notice("Pre-launch target window moved significantly — cancelling jump safely")
+                        pendingJumpProposal = nil
+                        activeJumpTrajectory = nil
+                        windowLookAngle = nil
+                        concludeExploration(from: cookiePosition)
+                        return
+                    }
+                }
+
+                // Launch into flight along trajectory
+                currentPhase = .jumping
+                phaseElapsed = 0
+                phaseDuration = trajectory.duration
+                jumpProgress = 0.0
+                windowLookAngle = nil
+                playfulReaction = .happy
+                log.info("Launched jump toward \(proposal.targetSurface.ownerName, privacy: .public)")
+            }
+
+        case .jumping:
+            guard let proposal = pendingJumpProposal, let trajectory = activeJumpTrajectory else {
+                currentPhase = .idle
+                return
+            }
+
+            let progress = min(1.0, CGFloat(phaseElapsed / max(0.01, phaseDuration)))
+            jumpProgress = progress
+
+            // Evaluate current point along parabolic arc
+            destinationPoint = trajectory.point(at: progress)
+            jumpShadowScale = trajectory.shadowScale(at: progress)
+            jumpShadowAlpha = trajectory.shadowAlpha(at: progress)
+
+            // Touchdown when flight duration completes
+            if progress >= 1.0 || phaseElapsed >= phaseDuration {
+                destinationPoint = trajectory.endPoint
+                jumpShadowScale = 1.0
+                jumpShadowAlpha = 0.09
+                jumpProgress = 1.0
+
+                currentPhase = .landing
+                phaseElapsed = 0
+                phaseDuration = Double.random(in: 0.28...0.45)
+                playfulReaction = .dropped
+
+                jumpPlanner.recordJumpCompleted(to: proposal.targetSurface.windowId)
+                log.info("Touchdown landed on \(proposal.targetSurface.ownerName, privacy: .public)")
+            }
+
+        case .landing:
+            guard let proposal = pendingJumpProposal else {
+                currentPhase = .idle
+                return
+            }
+
+            if phaseElapsed >= phaseDuration {
+                // Post-landing surface establishment
+                pendingJumpProposal = nil
+                activeJumpTrajectory = nil
+                jumpProgress = 0.0
+                jumpShadowScale = 1.0
+                jumpShadowAlpha = 0.09
+
+                provider.refreshWindows()
+
+                if let targetWinId = proposal.targetSurface.windowId,
+                   let win = provider.candidateWindows.first(where: { $0.id == targetWinId && !$0.isOccluded }),
+                   let topPath = provider.navigablePaths.first(where: { $0.windowId == win.id && $0.edgeType == .topHorizontal }) {
+                    // Successfully landed on a window! Transition to top-edge walk
+                    self.activeWindow = win
+                    self.activeEdgePath = topPath
+                    let (_, p) = topPath.closestPoint(to: cookiePosition)
+                    self.edgeProgress = p
+                    self.traversalDirection = (p < 0.5) ? 1.0 : -1.0
+                    currentPhase = .walkingTopEdge
+                    phaseElapsed = 0
+                    phaseDuration = Double.random(in: 4.0...7.0)
+                    playfulReaction = .happy
+                    log.info("Established top-edge traversal on landed window \(win.ownerName, privacy: .public)")
+                } else if proposal.targetSurface.surfaceKind == .desktopGround {
+                    // Landed on desktop ground
+                    concludeExploration(from: cookiePosition)
+                } else {
+                    // Fallback recovery if surface was lost or closed
+                    log.info("Landed surface lost — recovering smoothly to ground")
+                    concludeExploration(from: cookiePosition)
+                }
             }
 
         case .departing:

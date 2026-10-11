@@ -173,6 +173,13 @@ final class CookieScene: SKScene {
                     self?.character.setCursorLookAngle(effectiveAngle)
                 }
                 .store(in: &cancellables)
+
+            Publishers.CombineLatest(engine.windowController.$jumpShadowScale, engine.windowController.$jumpShadowAlpha)
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] scale, alpha in
+                    self?.character.setJumpShadow(scale: scale, alpha: alpha)
+                }
+                .store(in: &cancellables)
         }
     }
 

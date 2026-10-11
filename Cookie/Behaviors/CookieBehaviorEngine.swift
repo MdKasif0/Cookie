@@ -232,7 +232,10 @@ final class CookieBehaviorEngine: ObservableObject {
                 cookiePosition: currentPosition,
                 characterSize: charSize,
                 frequency: store.profile.settings.windowFrequency,
-                verticalClimbingEnabled: store.profile.settings.windowVerticalClimbing
+                verticalClimbingEnabled: store.profile.settings.windowVerticalClimbing,
+                jumpingEnabled: store.profile.settings.windowJumpingEnabled,
+                jumpFrequency: store.profile.settings.jumpFrequencySetting,
+                jumpStyle: store.profile.settings.jumpStyleSetting
             )
             handleWindowExploration(dt: dt, currentPosition: currentPosition)
         } else if isInterrupted || !store.profile.settings.windowInteraction {
@@ -471,6 +474,38 @@ final class CookieBehaviorEngine: ObservableObject {
             locomotionVelocity2D = .zero
             if state != .sitting && state != .curious {
                 enter(.sitting, duration: 2.0)
+            }
+
+        case .preparingJump:
+            locomotionVelocity = 0
+            locomotionVelocity2D = .zero
+            if state != .curious && state != .sitting {
+                enter(.curious, duration: 1.2)
+            }
+            if let targetPt = windowController.destinationPoint {
+                setFacing(targetPt.x >= currentPosition.x ? .right : .left)
+            }
+
+        case .jumping:
+            guard let dest = windowController.destinationPoint else { return }
+            let clampedDest = clampPoint(dest)
+            if state != .special {
+                enter(.special, duration: 2.0)
+            }
+            movementInterpolator.maxSpeed = 380
+            movementInterpolator.setTarget2D(clampedDest)
+            let (_, vel2D) = movementInterpolator.update2D(dt: dt)
+            locomotionVelocity2D = vel2D
+            locomotionVelocity = vel2D.dx
+            if abs(vel2D.dx) > 3 {
+                setFacing(vel2D.dx > 0 ? .right : .left)
+            }
+
+        case .landing:
+            locomotionVelocity = 0
+            locomotionVelocity2D = .zero
+            if state != .sitting && state != .idle {
+                enter(.sitting, duration: 1.0)
             }
         }
     }

@@ -175,6 +175,13 @@ final class CookieCharacterNode: SKNode, SpriteProviding {
         container.run(SKAction.rotate(toAngle: effective, duration: 0.12), withKey: "cursorTilt")
     }
 
+    /// Dynamically scales and adjusts shadow opacity when Cookie is airborne during a jump.
+    func setJumpShadow(scale: CGFloat, alpha: CGFloat) {
+        shadow.xScale = scale
+        shadow.yScale = scale
+        shadow.fillColor = SKColor.black.withAlphaComponent(alpha)
+    }
+
     /// Triggers a dedicated emote animation on Cookie with natural SpriteKit completion.
     func playEmote(_ emote: Emote, completion: @escaping (Bool) -> Void) {
         state = .emoting
