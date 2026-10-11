@@ -34,6 +34,9 @@ struct CookieSettings: Codable, Equatable {
     var windowInteraction: Bool = true
     var windowVerticalClimbing: Bool = false
     var windowExplorationFrequency: String = WindowExplorationFrequency.occasional.rawValue
+    var windowJumpingEnabled: Bool = true
+    var jumpFrequency: String = JumpFrequency.balanced.rawValue
+    var jumpStyle: String = JumpStyle.gentle.rawValue
     /// "normal", "longer", or "none".
     var sleepBehavior: String = SleepBehavior.normal.rawValue
     /// Whether Cookie occasionally explores toys on her own (always optional).
@@ -53,7 +56,7 @@ struct CookieSettings: Codable, Equatable {
         case launchAtLogin, showOnStartup, rememberPosition
         case cookieSize, animationIntensity, reducedMotionMode
         case soundEnabled, masterVolume, meowVolume, interactionSounds, purringSounds
-        case activityLevel, randomInteractions, cursorInteraction, cursorFollowingEnabled, cursorDodgingEnabled, cursorFollowingIntensity, windowInteraction, windowVerticalClimbing, windowExplorationFrequency, sleepBehavior
+        case activityLevel, randomInteractions, cursorInteraction, cursorFollowingEnabled, cursorDodgingEnabled, cursorFollowingIntensity, windowInteraction, windowVerticalClimbing, windowExplorationFrequency, windowJumpingEnabled, jumpFrequency, jumpStyle, sleepBehavior
         case autonomousToys, dockInteraction, autonomousDockExploration, dockExplorationFrequency, automaticallyCheckForUpdates
     }
 
