@@ -182,12 +182,15 @@ final class JumpPlanner {
                 continue
             }
 
-            // 2. Adjust landing target horizontally to align with startPoint when possible
+            // 2. Adjust landing target within safe edge corridor
             var landingPt = surface.landingPoint
-            if surface.surfaceKind == .windowTopEdge {
+            if surface.surfaceKind == .windowTopEdge && surface.bounds.width > 0 {
                 let inset: CGFloat = 25.0
-                let clampedX = max(surface.bounds.minX + inset, min(surface.bounds.maxX - inset, startPoint.x))
-                landingPt = CGPoint(x: clampedX, y: surface.bounds.maxY + surface.footOffset)
+                let minX = surface.bounds.minX + inset
+                let maxX = surface.bounds.maxX - inset
+                if minX <= maxX {
+                    landingPt.x = max(minX, min(maxX, surface.landingPoint.x))
+                }
             } else if surface.surfaceKind == .desktopGround {
                 landingPt = CGPoint(x: startPoint.x, y: surface.landingPoint.y)
             }
