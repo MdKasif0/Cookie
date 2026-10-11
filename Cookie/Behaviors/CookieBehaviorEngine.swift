@@ -630,6 +630,7 @@ final class CookieBehaviorEngine: ObservableObject {
     func handlePress() {
         guard isRunning else { return }
         isPressed = true
+        behaviorMemory.recordDirectInteraction()
         dockController.cancelExploration()
         windowController.cancelExploration()
         cursorController.resetInteractionState()
@@ -648,6 +649,7 @@ final class CookieBehaviorEngine: ObservableObject {
     /// pets delight her — with some variety so she stays unpredictable.
     func handleClick(zone: CookieZone?) {
         guard isRunning else { return }
+        behaviorMemory.recordDirectInteraction()
         if state == .beingDragged {
             // Safety: a click that arrives while carried ends the carry.
             enter(.idle)
@@ -794,6 +796,7 @@ final class CookieBehaviorEngine: ObservableObject {
     func handleGrab(zone: CookieZone? = nil) {
         guard isRunning else { return }
         endPress()
+        behaviorMemory.recordDirectInteraction()
         cancelActiveEmote()
         dockController.cancelExploration()
         windowController.cancelExploration()
@@ -941,6 +944,7 @@ final class CookieBehaviorEngine: ObservableObject {
         guard state != .beingDragged && !isPressed else { return false }
         guard activeEmote == nil else { return false }
         guard cooldownRemaining(for: emote.id) <= 0 else { return false }
+        guard behaviorMemory.canPlayEmote(id: emote.id.rawValue) else { return false }
         return true
     }
 
@@ -954,6 +958,8 @@ final class CookieBehaviorEngine: ObservableObject {
 
         let date = now()
         emoteCooldowns[emote.id] = date.addingTimeInterval(emote.cooldown)
+        behaviorMemory.recordDirectInteraction()
+        behaviorMemory.recordEmote(id: emote.id.rawValue)
         wasSleepingBeforeEmote = (state == .sleeping)
 
         // Cancel active locomotion smoothly — keep position stable, no sudden jump
