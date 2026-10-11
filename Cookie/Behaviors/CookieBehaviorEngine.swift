@@ -1069,6 +1069,8 @@ final class CookieBehaviorEngine: ObservableObject {
 
     private func maybeTriggerSpecialEvent(date: Date) -> Bool {
         guard store.profile.settings.randomInteractions,
+              store.profile.settings.autonomousBehaviorEnabled,
+              !store.profile.settings.pauseAutonomousBehavior,
               date >= specialCooldownUntil,
               date >= sulksUntil,
               state != .beingDragged,
@@ -1086,6 +1088,8 @@ final class CookieBehaviorEngine: ObservableObject {
     private func maybeTriggerAutonomousToy(date: Date) -> Bool {
         guard store.profile.settings.autonomousToys,
               store.profile.settings.randomInteractions,
+              store.profile.settings.autonomousBehaviorEnabled,
+              !store.profile.settings.pauseAutonomousBehavior,
               date >= autonomousToyCooldownUntil,
               date >= sulksUntil,
               state != .beingDragged,
@@ -1103,6 +1107,8 @@ final class CookieBehaviorEngine: ObservableObject {
 
     private func maybeTriggerWindowExploration(date: Date) -> Bool {
         guard store.profile.settings.windowInteraction,
+              store.profile.settings.autonomousBehaviorEnabled,
+              !store.profile.settings.pauseAutonomousBehavior,
               state != .beingDragged,
               worldItem == nil,
               !isPressed,
@@ -1123,6 +1129,8 @@ final class CookieBehaviorEngine: ObservableObject {
     private func maybeTriggerDockExploration(date: Date) -> Bool {
         guard store.profile.settings.dockInteraction,
               store.profile.settings.autonomousDockExploration,
+              store.profile.settings.autonomousBehaviorEnabled,
+              !store.profile.settings.pauseAutonomousBehavior,
               state != .beingDragged,
               worldItem == nil,
               !isPressed,
