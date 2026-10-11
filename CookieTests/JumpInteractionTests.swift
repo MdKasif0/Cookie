@@ -404,6 +404,93 @@ final class JumpInteractionTests: XCTestCase {
         XCTAssertNil(controller.activeJumpTrajectory)
     }
 
+    func testPreLaunchCancellationOnWindowMoving() {
+        let provider = WindowEnvironmentProvider()
+        provider.primaryScreenHeightProvider = { 1080.0 }
+
+        var windowBX: CGFloat = 550
+        provider.windowListProvider = {
+            [
+                self.makeRawWindowDict(id: 201, ownerPID: 2001, ownerName: "WindowA", layer: 0, x: 100, y: 100, width: 400, height: 600),
+                self.makeRawWindowDict(id: 202, ownerPID: 2002, ownerName: "WindowB", layer: 0, x: windowBX, y: 100, width: 400, height: 600)
+            ]
+        }
+        var simDate = Date()
+        provider.now = { simDate }
+        provider.refreshWindows(force: true)
+
+        let controller = WindowInteractionController(provider: provider)
+        controller.now = { simDate }
+
+        // Start Cookie on Window A
+        controller.startExploration(fromPosition: NSPoint(x: 250, y: 994), frequency: .frequent)
+
+        // Prepare jump to Window B
+        let proposal = JumpProposal(
+            startPoint: CGPoint(x: 480, y: 994),
+            targetSurface: JumpTargetSurface(
+                id: "win-202-top",
+                windowId: 202,
+                ownerName: "WindowB",
+                surfaceKind: .windowTopEdge,
+                bounds: NSRect(x: 550, y: 380, width: 400, height: 600),
+                landingPoint: CGPoint(x: 600, y: 994),
+                landingWidth: 360
+            ),
+            horizontalDistance: 120,
+            verticalDifference: 0,
+            jumpDuration: 0.8,
+            apexHeight: 40,
+            style: .gentle,
+            isSafe: true,
+            rejectionReason: nil
+        )
+
+        controller.startJump(proposal: proposal)
+        XCTAssertEqual(controller.currentPhase, .preparingJump)
+
+        // User or system abruptly moves Window B by 250pt to the right before launch!
+        windowBX = 800
+        provider.refreshWindows(force: true)
+
+        // Tick past preparation duration (~0.6s)
+        simDate = simDate.addingTimeInterval(0.7)
+        controller.tick(
+            dt: 0.7,
+            cookiePosition: CGPoint(x: 480, y: 994),
+            characterSize: CGSize(width: 80, height: 80),
+            frequency: .frequent,
+            verticalClimbingEnabled: false
+        )
+
+        // Pre-launch bounds drift check cancels jump safely
+        XCTAssertNotEqual(controller.currentPhase, .jumping)
+        XCTAssertNil(controller.activeJumpTrajectory)
+    }
+
+    func testJumpPlannerAcceptsDockAndDesktopSurfaces() {
+        let planner = JumpPlanner()
+        let start = CGPoint(x: 850, y: 200)
+
+        let desktop = NSRect(x: 0, y: 0, width: 1920, height: 1080)
+        let dock = NSRect(x: 500, y: 0, width: 920, height: 70)
+
+        let surfaces = planner.extractJumpSurfaces(
+            from: [],
+            screenVisibleFrame: desktop,
+            dockSurface: dock
+        )
+
+        XCTAssertTrue(surfaces.contains(where: { $0.surfaceKind == .desktopGround }))
+        XCTAssertTrue(surfaces.contains(where: { $0.surfaceKind == .dockEdge }))
+
+        // Evaluate jump to dock edge
+        let dockSurface = surfaces.first(where: { $0.surfaceKind == .dockEdge })!
+        let proposal = planner.evaluateAllJumps(from: start, currentWindowId: nil, surfaces: [dockSurface])[0]
+        XCTAssertTrue(proposal.isSafe)
+        XCTAssertEqual(proposal.targetSurface.surfaceKind, .dockEdge)
+    }
+
     // MARK: - 5. Complete Flight and Landing Execution
 
     func testInFlightTrajectoryAndLandingOnNewWindow() {
