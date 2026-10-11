@@ -11,7 +11,7 @@
 
 /downloads/*
   Cache-Control: public, max-age=86400
-  Content-Disposition: attachment; filename="Cookie-1.0.0.dmg"
+  Content-Disposition: attachment; filename="Cookie-1.1.0.dmg"
 
 /*.css
   Cache-Control: public, max-age=0, must-revalidate
