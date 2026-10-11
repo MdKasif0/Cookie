@@ -190,4 +190,23 @@ final class UpdateSystemTests: XCTestCase {
             XCTFail("Expected error state")
         }
     }
+
+    @MainActor
+    func testPostponeAndSkipUpdate() {
+        let manager = UpdateManager.shared
+        manager.isShowingUpdatePrompt = true
+
+        manager.postponeUpdate()
+        XCTAssertFalse(manager.isShowingUpdatePrompt)
+        XCTAssertNotNil(UserDefaults.standard.object(forKey: "CookiePostponedDate"))
+
+        manager.isShowingUpdatePrompt = true
+        manager.skipVersion("9.9.9")
+        XCTAssertFalse(manager.isShowingUpdatePrompt)
+        XCTAssertEqual(UserDefaults.standard.string(forKey: "CookieSkippedVersion"), "9.9.9")
+
+        // Clean up
+        UserDefaults.standard.removeObject(forKey: "CookiePostponedDate")
+        UserDefaults.standard.removeObject(forKey: "CookieSkippedVersion")
+    }
 }
