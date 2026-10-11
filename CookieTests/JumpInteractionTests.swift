@@ -462,7 +462,8 @@ final class JumpInteractionTests: XCTestCase {
         simDate = simDate.addingTimeInterval(0.45)
         controller.tick(dt: 0.45, cookiePosition: controller.destinationPoint!, characterSize: CGSize(width: 80, height: 80), frequency: .frequent, verticalClimbingEnabled: false)
         XCTAssertEqual(controller.currentPhase, .landing)
-        XCTAssertEqual(controller.destinationPoint?.x ?? 0, 650, accuracy: 2.0)
+        let destX = controller.destinationPoint?.x ?? 0
+        XCTAssertEqual(destX, 650, accuracy: 2.0)
         XCTAssertEqual(controller.jumpShadowScale, 1.0) // Restored on touchdown
 
         // 4. Recovery absorption completes -> transitions to walking on Window B!
