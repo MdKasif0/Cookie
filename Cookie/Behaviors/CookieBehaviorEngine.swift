@@ -1225,8 +1225,8 @@ final class CookieBehaviorEngine: ObservableObject {
             weights[candidate]? *= factor
         }
         let settings = store.profile.settings
-        if !settings.randomInteractions {
-            // The user prefers a quiet companion: no autonomous antics.
+        if !settings.randomInteractions || !settings.autonomousBehaviorEnabled || settings.pauseAutonomousBehavior {
+            // The user prefers a quiet companion or paused: no autonomous antics.
             weights[.walking] = 0; weights[.running] = 0; weights[.playing] = 0
             weights[.special] = 0; weights[.eating] = 0; weights[.drinking] = 0
             weights[.followingCursor] = 0
@@ -1257,6 +1257,24 @@ final class CookieBehaviorEngine: ObservableObject {
         if maybeTriggerAutonomousToy(date: date) { return }
         if maybeTriggerWindowExploration(date: date) { return }
         if maybeTriggerDockExploration(date: date) { return }
+
+        // Scheduler evaluation for ambient behaviors (Phase 5)
+        let settings = store.profile.settings
+        if let ambient = scheduler.selectNextAmbientBehavior(
+            currentState: state,
+            cookiePosition: lastKnownPosition,
+            cursorPosition: lastCursorPosition,
+            cursorVelocity: cursorController.cursorVelocity,
+            cursorZone: cursorController.currentZone,
+            context: contextDetector.currentContext,
+            settings: settings,
+            isPressed: isPressed,
+            isEmoting: activeEmote != nil,
+            worldItemActive: worldItem != nil
+        ) {
+            executeAmbientBehavior(ambient, date: date)
+            return
+        }
 
         let weights = behaviorWeights()
         let total = weights.values.reduce(0, +)
@@ -1290,6 +1308,64 @@ final class CookieBehaviorEngine: ObservableObject {
             return
         }
         enterPicked(resolved)
+    }
+
+    private func executeAmbientBehavior(_ ambient: AmbientBehaviorKind, date: Date) {
+        switch ambient {
+        case .curiousObservation:
+            if let bounds = contextDetector.currentContext.frontmostWindowBounds {
+                setFacing(bounds.midX >= lastKnownX ? .right : .left)
+            } else if let win = windowProvider.findClosestCandidate(to: lastKnownPosition) {
+                setFacing(win.bounds.midX >= lastKnownX ? .right : .left)
+            }
+            reaction = .curious
+            enter(.curious, duration: Double.random(in: 1.8...2.8))
+
+        case .shortDesktopPatrol:
+            reaction = .happy
+            enter(.walking)
+            let away: CGFloat = (Double.random(in: 0...1) > 0.5) ? 1 : -1
+            let targetX = clampX(lastKnownX + (away * CGFloat.random(in: 120...220)))
+            setFacing(away > 0 ? .right : .left)
+            plan = LocomotionPlan(
+                targetX: targetX,
+                timeUntilNextPause: Double.random(in: 2.0...3.5)
+            )
+
+        case .windowInspection:
+            if maybeTriggerWindowExploration(date: date) { return }
+            enter(.curious, duration: 2.0)
+
+        case .gentleDockVisit:
+            if maybeTriggerDockExploration(date: date) { return }
+            enter(.curious, duration: 2.0)
+
+        case .surfaceTransition:
+            if maybeTriggerWindowExploration(date: date) { return }
+            enter(.idle, duration: 3.0)
+
+        case .cursorInvitation:
+            if let cursorPt = lastCursorPosition {
+                setFacing(cursorPt.x >= lastKnownX ? .right : .left)
+            }
+            reaction = .happy
+            enter(.sitting, sequence: [
+                (.curious, 2.0),
+                (.idle, 4.0)
+            ], duration: 2.5)
+
+        case .returnToRest:
+            enter(.sitting, duration: Double.random(in: 4...8))
+
+        case .briefCelebration:
+            reaction = .happy
+            enter(.reacting, duration: 1.5)
+
+        case .recoveryBehavior:
+            dockController.cancelExploration()
+            windowController.cancelExploration()
+            enter(.idle, duration: 2.0)
+        }
     }
 
     private var spontaneousMeowChance: Double {
