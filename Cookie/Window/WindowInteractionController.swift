@@ -422,10 +422,11 @@ final class WindowInteractionController: ObservableObject {
                     }
 
                     // Check for abrupt window movement before takeoff
-                    let landingX = updatedWin.bounds.midX
-                    let landingY = updatedWin.bounds.maxY + proposal.targetSurface.footOffset
-                    let drift = hypot(landingX - proposal.targetSurface.landingPoint.x, landingY - proposal.targetSurface.landingPoint.y)
-                    if drift > 60 {
+                    let boundsDrift = hypot(
+                        updatedWin.bounds.origin.x - proposal.targetSurface.bounds.origin.x,
+                        updatedWin.bounds.origin.y - proposal.targetSurface.bounds.origin.y
+                    )
+                    if boundsDrift > 60 {
                         log.notice("Pre-launch target window moved significantly — cancelling jump safely")
                         pendingJumpProposal = nil
                         activeJumpTrajectory = nil
