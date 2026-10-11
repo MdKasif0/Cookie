@@ -53,7 +53,9 @@ final class ApplicationContextDetector: ObservableObject {
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            self?.refreshContext()
+            MainActor.assumeIsolated {
+                self?.refreshContext()
+            }
         }
 
         deactivateObserver = NSWorkspace.shared.notificationCenter.addObserver(
@@ -61,7 +63,9 @@ final class ApplicationContextDetector: ObservableObject {
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            self?.refreshContext()
+            MainActor.assumeIsolated {
+                self?.refreshContext()
+            }
         }
     }
 

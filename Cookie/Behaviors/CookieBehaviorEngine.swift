@@ -219,7 +219,7 @@ final class CookieBehaviorEngine: ObservableObject {
             if let bounds = context.frontmostWindowBounds {
                 setFacing(bounds.midX >= lastKnownX ? .right : .left)
             }
-            reaction = .curious
+            reaction = .surprised
             enter(.curious, duration: 1.5)
             log.info("Noticed application switch to \(context.applicationName ?? "app", privacy: .public): curious glance")
         }
@@ -1329,7 +1329,7 @@ final class CookieBehaviorEngine: ObservableObject {
             } else if let win = windowProvider.findClosestCandidate(to: lastKnownPosition) {
                 setFacing(win.bounds.midX >= lastKnownX ? .right : .left)
             }
-            reaction = .curious
+            reaction = .surprised
             enter(.curious, duration: Double.random(in: 1.8...2.8))
 
         case .shortDesktopPatrol:

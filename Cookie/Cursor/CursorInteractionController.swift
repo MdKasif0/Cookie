@@ -79,7 +79,7 @@ final class CursorInteractionController: ObservableObject {
     // Position memory
     private(set) var lastGlobalCursorPoint: NSPoint = .zero
     private var previousCursorPoint: NSPoint = .zero
-    private var cursorVelocity: CGFloat = 0
+    private(set) var cursorVelocity: CGFloat = 0
     private var smoothedCursorVelocity: CGFloat = 0
     private var isApproachingCookie: Bool = false
 

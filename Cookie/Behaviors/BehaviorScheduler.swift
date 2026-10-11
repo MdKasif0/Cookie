@@ -46,7 +46,7 @@ final class BehaviorScheduler {
         cookiePosition: CGPoint,
         cursorPosition: CGPoint?,
         cursorVelocity: CGFloat,
-        cursorZone: CursorZone,
+        cursorZone: CursorProximityZone,
         context: ApplicationContext,
         settings: CookieSettings,
         isPressed: Bool,
