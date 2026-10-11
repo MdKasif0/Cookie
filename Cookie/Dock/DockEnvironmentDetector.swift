@@ -2,6 +2,22 @@ import AppKit
 import Combine
 import os
 
+/// Geometry observation of a physical display containing full screen frame and usable visible frame.
+struct ScreenGeometry: Equatable {
+    let frame: NSRect
+    let visibleFrame: NSRect
+
+    init(frame: NSRect, visibleFrame: NSRect) {
+        self.frame = frame
+        self.visibleFrame = visibleFrame
+    }
+
+    init(screen: NSScreen) {
+        self.frame = screen.frame
+        self.visibleFrame = screen.visibleFrame
+    }
+}
+
 /// Dedicated detector responsible for observing macOS screen layouts, detecting Dock orientation,
 /// geometry, and visibility state across single and multi-display configurations.
 ///
@@ -9,35 +25,42 @@ import os
 /// along with supported system preference inspection (`com.apple.dock`) as a clean, non-intrusive fallback.
 /// Does NOT inject into Dock.app, scrape private memory, or modify system settings.
 @MainActor
-public final class DockEnvironmentDetector: ObservableObject {
+final class DockEnvironmentDetector: ObservableObject {
     // MARK: - Published Properties
 
     /// Current cached desktop environment representation.
-    @Published public private(set) var currentEnvironment: DesktopEnvironment
+    @Published private(set) var currentEnvironment: DesktopEnvironment
 
     /// Active Dock orientation detected from screen geometry or system preferences.
-    @Published public private(set) var dockOrientation: DockOrientation = .bottom
+    @Published private(set) var dockOrientation: DockOrientation = .bottom
 
     /// Bounding rectangle of the Dock in macOS global screen coordinates.
-    @Published public private(set) var dockFrame: NSRect = .zero
+    @Published private(set) var dockFrame: NSRect = .zero
 
     /// Whether the Dock is currently autohidden.
-    @Published public private(set) var isAutohidden: Bool = false
+    @Published private(set) var isAutohidden: Bool = false
 
     // MARK: - Configuration & Seams for Deterministic Testing
 
-    /// Seam for providing screens during tests.
-    public var screensProvider: () -> [NSScreen] = { NSScreen.screens }
+    /// Seam for providing screen geometries during tests or from live NSScreen instances.
+    var screenGeometriesProvider: () -> [ScreenGeometry] = {
+        let screens = NSScreen.screens
+        guard !screens.isEmpty else {
+            return [ScreenGeometry(frame: NSRect(x: 0, y: 0, width: 1440, height: 900),
+                                   visibleFrame: NSRect(x: 0, y: 70, width: 1440, height: 805))]
+        }
+        return screens.map { ScreenGeometry(screen: $0) }
+    }
 
     /// Seam for reading Dock user preferences.
-    public var dockDefaultsProvider: () -> UserDefaults? = { UserDefaults(suiteName: "com.apple.dock") }
+    var dockDefaultsProvider: () -> UserDefaults? = { UserDefaults(suiteName: "com.apple.dock") }
 
     private var screenObservers: [NSObjectProtocol] = []
     private let log = Logger(subsystem: "com.cookie.mac", category: "DockDetector")
 
     // MARK: - Initialization & Teardown
 
-    public init() {
+    init() {
         self.currentEnvironment = DesktopEnvironment.fallback
         setupNotifications()
         refreshEnvironment()
@@ -49,7 +72,7 @@ public final class DockEnvironmentDetector: ObservableObject {
         }
     }
 
-    public func teardown() {
+    func teardown() {
         for observer in screenObservers {
             NotificationCenter.default.removeObserver(observer)
         }
@@ -92,7 +115,7 @@ public final class DockEnvironmentDetector: ObservableObject {
 
     /// Refreshes the cached desktop environment for Cookie's current position.
     @discardableResult
-    public func refreshEnvironment(forPoint point: CGPoint? = nil) -> DesktopEnvironment {
+    func refreshEnvironment(forPoint point: CGPoint? = nil) -> DesktopEnvironment {
         let env = detectEnvironment(forPoint: point)
         self.currentEnvironment = env
         self.dockOrientation = env.dockOrientation
@@ -103,14 +126,14 @@ public final class DockEnvironmentDetector: ObservableObject {
 
     /// Evaluates all active screens to locate the Dock, determining its orientation, thickness,
     /// visibility, and reachable safe-walking boundaries.
-    public func detectEnvironment(forPoint point: CGPoint? = nil) -> DesktopEnvironment {
-        let screens = screensProvider()
+    func detectEnvironment(forPoint point: CGPoint? = nil) -> DesktopEnvironment {
+        let screens = screenGeometriesProvider()
         guard !screens.isEmpty else {
             return DesktopEnvironment.fallback
         }
 
         // 1. Identify which screen has the physical Dock or hosts the queried position
-        var targetScreen: NSScreen?
+        var targetScreen: ScreenGeometry?
         var detectedOrientation: DockOrientation = .unknown
         var detectedThickness: CGFloat = 0
 
@@ -166,17 +189,17 @@ public final class DockEnvironmentDetector: ObservableObject {
             let tileSize = defaults?.object(forKey: "tilesize") as? CGFloat ?? 48
             detectedThickness = max(40, tileSize + 20)
 
-            // Screen selection: prioritize screen containing queried point or main display
+            // Screen selection: prioritize screen containing queried point or first display
             if let point, let containingScreen = screens.first(where: { $0.frame.contains(point) }) {
                 targetScreen = containingScreen
             } else {
-                targetScreen = NSScreen.main ?? screens[0]
+                targetScreen = screens[0]
             }
         } else {
             isAutoHidden = prefAutohide
         }
 
-        guard let screen = targetScreen ?? NSScreen.main ?? screens.first else {
+        guard let screen = targetScreen ?? screens.first else {
             return DesktopEnvironment.fallback
         }
 

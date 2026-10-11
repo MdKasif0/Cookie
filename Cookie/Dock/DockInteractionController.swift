@@ -6,33 +6,33 @@ import os
 /// including natural approach, safe edge pacing, application icon awareness, gaze orientation,
 /// and cursor-dock coordination.
 @MainActor
-public final class DockInteractionController: ObservableObject {
+final class DockInteractionController: ObservableObject {
     // MARK: - Published Properties
 
     /// Current phase in the Dock exploration state machine.
-    @Published public private(set) var currentPhase: DockSessionPhase = .idle
+    @Published private(set) var currentPhase: DockSessionPhase = .idle
 
     /// Target destination along the safe Dock walking surface.
-    @Published public private(set) var destinationPoint: CGPoint?
+    @Published private(set) var destinationPoint: CGPoint?
 
     /// Active application icon region being inspected, if any.
-    @Published public private(set) var activeInspectionTarget: DockInspectionTarget?
+    @Published private(set) var activeInspectionTarget: DockInspectionTarget?
 
     /// Anatomically plausible look angle in radians toward the Dock or inspected icon.
-    @Published public private(set) var dockLookAngle: CGFloat?
+    @Published private(set) var dockLookAngle: CGFloat?
 
     /// Playful one-shot reaction produced during Dock play (e.g. curious glance, sniff, chirp).
-    @Published public private(set) var playfulReaction: CookieReaction?
+    @Published private(set) var playfulReaction: CookieReaction?
 
     /// Whether Cookie is currently engaged in any Dock exploration activity.
-    public var isExploringDock: Bool {
+    var isExploringDock: Bool {
         currentPhase != .idle
     }
 
     // MARK: - Dependencies & Seams
 
-    public let detector: DockEnvironmentDetector
-    public var now: () -> Date = { Date() }
+    let detector: DockEnvironmentDetector
+    var now: () -> Date = { Date() }
 
     private let log = Logger(subsystem: "com.cookie.mac", category: "DockInteraction")
 
@@ -47,14 +47,14 @@ public final class DockInteractionController: ObservableObject {
 
     // MARK: - Initialization
 
-    public init(detector: DockEnvironmentDetector? = nil) {
+    init(detector: DockEnvironmentDetector? = nil) {
         self.detector = detector ?? DockEnvironmentDetector()
     }
 
     // MARK: - Lifecycle & Interruption
 
     /// Immediately aborts any ongoing Dock exploration session (e.g. user dragged Cookie or triggered an emote).
-    public func cancelExploration() {
+    func cancelExploration() {
         if currentPhase != .idle {
             log.info("Dock exploration cancelled")
         }
@@ -67,7 +67,7 @@ public final class DockInteractionController: ObservableObject {
     }
 
     /// Sets the cooldown timer based on user frequency preference.
-    public func applyCooldown(for frequency: DockExplorationFrequency) {
+    func applyCooldown(for frequency: DockExplorationFrequency) {
         let range = frequency.cooldownRange
         let interval = Double.random(in: range)
         cooldownUntil = now().addingTimeInterval(interval)
@@ -77,7 +77,7 @@ public final class DockInteractionController: ObservableObject {
 
     /// Builds estimated inspection targets along the Dock span using running applications.
     /// Uses official `NSWorkspace.shared.runningApplications` without private Dock memory scraping.
-    public func refreshInspectionTargets(environment: DesktopEnvironment) {
+    func refreshInspectionTargets(environment: DesktopEnvironment) {
         let runningApps = NSWorkspace.shared.runningApplications
             .filter { $0.activationPolicy == .regular }
             .compactMap { app -> (name: String, bundleId: String)? in
@@ -141,7 +141,7 @@ public final class DockInteractionController: ObservableObject {
     // MARK: - Exploration Triggering
 
     /// Evaluates whether Cookie should autonomously begin approaching the Dock.
-    public func shouldTriggerAutonomousExploration(
+    func shouldTriggerAutonomousExploration(
         cookiePosition: NSPoint,
         frequency: DockExplorationFrequency,
         settingsEnabled: Bool,
@@ -163,7 +163,7 @@ public final class DockInteractionController: ObservableObject {
     }
 
     /// Begins a structured Dock exploration session.
-    public func startExploration(
+    func startExploration(
         fromPosition cookiePosition: NSPoint,
         frequency: DockExplorationFrequency,
         targetIconIndex: Int? = nil
@@ -211,7 +211,7 @@ public final class DockInteractionController: ObservableObject {
     // MARK: - Frame Update
 
     /// Primary tick cycle called each frame by the behavior engine.
-    public func tick(
+    func tick(
         dt: TimeInterval,
         cookiePosition: NSPoint,
         characterSize: CGSize,
@@ -317,7 +317,7 @@ public final class DockInteractionController: ObservableObject {
     // MARK: - Cursor & Dock Coordination
 
     /// Handles cursor interaction when user moves pointer near or over the Dock.
-    public func handleCursorNearDock(
+    func handleCursorNearDock(
         cursorLocation: NSPoint,
         cookieCenter: NSPoint,
         environment: DesktopEnvironment,
@@ -351,7 +351,7 @@ public final class DockInteractionController: ObservableObject {
     // MARK: - Geometry & Safe Navigation Helpers
 
     /// Computes the point on the safe walking surface closest to a given target point.
-    public func pointOnSafeSurface(closestTo point: CGPoint, environment: DesktopEnvironment) -> CGPoint {
+    func pointOnSafeSurface(closestTo point: CGPoint, environment: DesktopEnvironment) -> CGPoint {
         let surface = environment.safeWalkingSurface
         switch environment.dockOrientation {
         case .bottom:
@@ -369,7 +369,7 @@ public final class DockInteractionController: ObservableObject {
     }
 
     /// Selects a reasonable default point on the safe walking surface.
-    public func defaultPointOnSafeSurface(environment: DesktopEnvironment) -> CGPoint {
+    func defaultPointOnSafeSurface(environment: DesktopEnvironment) -> CGPoint {
         let surface = environment.safeWalkingSurface
         return CGPoint(x: surface.midX, y: surface.midY)
     }
@@ -428,7 +428,7 @@ public final class DockInteractionController: ObservableObject {
     }
 
     /// Clears any transient playful reaction once consumed by the behavior engine.
-    public func clearPlayfulReaction() {
+    func clearPlayfulReaction() {
         playfulReaction = nil
     }
 }

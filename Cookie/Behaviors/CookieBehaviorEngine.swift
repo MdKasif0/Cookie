@@ -450,6 +450,7 @@ final class CookieBehaviorEngine: ObservableObject {
     func handlePress() {
         guard isRunning else { return }
         isPressed = true
+        dockController.cancelExploration()
         cursorController.resetInteractionState()
         movementInterpolator.stop()
         if state.isLocomotion {
@@ -613,6 +614,7 @@ final class CookieBehaviorEngine: ObservableObject {
         guard isRunning else { return }
         endPress()
         cancelActiveEmote()
+        dockController.cancelExploration()
         cursorController.resetInteractionState()
         movementInterpolator.stop()
         sequenceQueue = []
@@ -664,6 +666,7 @@ final class CookieBehaviorEngine: ObservableObject {
     func handleFeed(food: FoodKind? = nil) {
         guard isRunning, state != .beingDragged else { return }
         clearSession()
+        dockController.cancelExploration()
         sequenceQueue = []
         let chosenFood = food ?? FoodKind.allCases.randomElement() ?? .fish
         let offset: CGFloat = facing == .right ? 110 : -110
@@ -687,6 +690,7 @@ final class CookieBehaviorEngine: ObservableObject {
     func handleOfferToy(_ toy: ToyKind) {
         guard isRunning, state != .beingDragged else { return }
         clearSession()
+        dockController.cancelExploration()
         sequenceQueue = []
         let offset: CGFloat = facing == .right ? 120 : -120
         let targetX = clampX(lastKnownX + offset)
@@ -773,6 +777,7 @@ final class CookieBehaviorEngine: ObservableObject {
         locomotionVelocity = 0
         sessionTargetX = nil
         sequenceQueue.removeAll()
+        dockController.cancelExploration()
 
         activeEmote = emote
         emotePlaybackPhase = .starting
@@ -911,8 +916,28 @@ final class CookieBehaviorEngine: ObservableObject {
         return true
     }
 
+    private func maybeTriggerDockExploration(date: Date) -> Bool {
+        guard store.profile.settings.dockInteraction,
+              store.profile.settings.autonomousDockExploration,
+              state != .beingDragged,
+              worldItem == nil,
+              !isPressed,
+              date >= sulksUntil else { return false }
+
+        if dockController.shouldTriggerAutonomousExploration(
+            cookiePosition: lastKnownPosition,
+            frequency: store.profile.settings.dockFrequency,
+            settingsEnabled: store.profile.settings.dockInteraction,
+            isInterrupted: isPressed || worldItem != nil
+        ) {
+            dockController.startExploration(fromPosition: lastKnownPosition, frequency: store.profile.settings.dockFrequency)
+            return true
+        }
+        return false
+    }
+
     func handleEdgeReached(_ edge: CookieEdge) {
-        guard isRunning, state.isLocomotion else { return }
+        guard isRunning, state.isLocomotion, !dockController.isExploringDock else { return }
         log.info("Reached the \(edge == .left ? "left" : "right", privacy: .public) edge")
         edgeCooldownUntil = now().addingTimeInterval(Double.random(in: 25...50))
         let roll = Double.random(in: 0...1)
@@ -1018,6 +1043,7 @@ final class CookieBehaviorEngine: ObservableObject {
         let date = now()
         if maybeTriggerSpecialEvent(date: date) { return }
         if maybeTriggerAutonomousToy(date: date) { return }
+        if maybeTriggerDockExploration(date: date) { return }
 
         let weights = behaviorWeights()
         let total = weights.values.reduce(0, +)
@@ -1121,6 +1147,9 @@ final class CookieBehaviorEngine: ObservableObject {
     }
 
     private func advanceLocomotion(dt: TimeInterval, currentPosition: NSPoint) {
+        if dockController.isExploringDock {
+            return
+        }
         let currentX = currentPosition.x
         if state == .followingCursor {
             // Rapid cursor movements or departure: stop chasing, watch curious
