@@ -300,14 +300,15 @@ final class WindowInteractionTests: XCTestCase {
                 self.makeRawWindowDict(id: 701, ownerPID: 7001, ownerName: "Safari", layer: 0, x: 200, y: 100, width: 800, height: 600)
             ]
         }
+        var simulatedTime = Date()
+        provider.now = { simulatedTime }
         provider.refreshWindows(force: true)
 
         let controller = WindowInteractionController(provider: provider)
-        var simulatedTime = Date()
         controller.now = { simulatedTime }
 
-        // Start from below the window
-        let cookiePos = NSPoint(x: 250, y: 300)
+        // Start Cookie near top edge (top edge is at y = 994, x: 220...980)
+        let cookiePos = NSPoint(x: 250, y: 994)
         controller.startExploration(fromPosition: cookiePos, frequency: .frequent)
 
         XCTAssertTrue(controller.isExploringWindow)
@@ -316,21 +317,25 @@ final class WindowInteractionTests: XCTestCase {
         XCTAssertNotNil(controller.windowLookAngle) // Gazing toward target
 
         // Tick past anticipation duration (~0.7s)
-        controller.tick(dt: 0.8, cookiePosition: cookiePos, characterSize: CGSize(width: 80, height: 80), frequency: .frequent, verticalClimbingEnabled: false)
+        simulatedTime = simulatedTime.addingTimeInterval(0.7)
+        controller.tick(dt: 0.7, cookiePosition: cookiePos, characterSize: CGSize(width: 80, height: 80), frequency: .frequent, verticalClimbingEnabled: false)
         XCTAssertEqual(controller.currentPhase, .approaching)
 
         // Move Cookie to destination point
         let arrivalPos = controller.destinationPoint!
+        simulatedTime = simulatedTime.addingTimeInterval(0.1)
         controller.tick(dt: 0.1, cookiePosition: arrivalPos, characterSize: CGSize(width: 80, height: 80), frequency: .frequent, verticalClimbingEnabled: false)
         XCTAssertEqual(controller.currentPhase, .walkingTopEdge)
 
         // Advance walk across top edge
         let initialProgress = controller.edgeProgress
+        simulatedTime = simulatedTime.addingTimeInterval(2.0)
         controller.tick(dt: 2.0, cookiePosition: arrivalPos, characterSize: CGSize(width: 80, height: 80), frequency: .frequent, verticalClimbingEnabled: false)
         XCTAssertGreaterThan(controller.edgeProgress, initialProgress)
 
-        // Force progress to reach corner
-        controller.tick(dt: 10.0, cookiePosition: arrivalPos, characterSize: CGSize(width: 80, height: 80), frequency: .frequent, verticalClimbingEnabled: false)
+        // Walk to corner
+        simulatedTime = simulatedTime.addingTimeInterval(5.0)
+        controller.tick(dt: 5.0, cookiePosition: arrivalPos, characterSize: CGSize(width: 80, height: 80), frequency: .frequent, verticalClimbingEnabled: false)
         XCTAssertEqual(controller.currentPhase, .cornerTransition)
     }
 
@@ -342,18 +347,35 @@ final class WindowInteractionTests: XCTestCase {
                 self.makeRawWindowDict(id: 801, ownerPID: 8001, ownerName: "Safari", layer: 0, x: 200, y: 100, width: 800, height: 600)
             ]
         }
+        var simulatedTime = Date()
+        provider.now = { simulatedTime }
         provider.refreshWindows(force: true)
 
         let controller = WindowInteractionController(provider: provider)
-        controller.startExploration(fromPosition: NSPoint(x: 950, y: 994), frequency: .frequent)
+        controller.now = { simulatedTime }
 
-        // Advance to corner transition on right edge
-        controller.tick(dt: 1.0, cookiePosition: NSPoint(x: 950, y: 994), characterSize: CGSize(width: 80, height: 80), frequency: .frequent, verticalClimbingEnabled: true)
-        controller.tick(dt: 1.0, cookiePosition: NSPoint(x: 950, y: 994), characterSize: CGSize(width: 80, height: 80), frequency: .frequent, verticalClimbingEnabled: true)
-        controller.tick(dt: 10.0, cookiePosition: NSPoint(x: 980, y: 994), characterSize: CGSize(width: 80, height: 80), frequency: .frequent, verticalClimbingEnabled: true)
+        // Start Cookie near top-left access point (220, 994)
+        controller.startExploration(fromPosition: NSPoint(x: 250, y: 994), frequency: .frequent)
 
-        // Wait past corner duration with verticalClimbingEnabled = true
-        controller.tick(dt: 2.0, cookiePosition: NSPoint(x: 980, y: 994), characterSize: CGSize(width: 80, height: 80), frequency: .frequent, verticalClimbingEnabled: true)
+        // 1. Anticipating -> approaching
+        simulatedTime = simulatedTime.addingTimeInterval(0.7)
+        controller.tick(dt: 0.7, cookiePosition: NSPoint(x: 250, y: 994), characterSize: CGSize(width: 80, height: 80), frequency: .frequent, verticalClimbingEnabled: true)
+        XCTAssertEqual(controller.currentPhase, .approaching)
+
+        // 2. Approaching -> walkingTopEdge
+        simulatedTime = simulatedTime.addingTimeInterval(0.1)
+        controller.tick(dt: 0.1, cookiePosition: controller.destinationPoint!, characterSize: CGSize(width: 80, height: 80), frequency: .frequent, verticalClimbingEnabled: true)
+        XCTAssertEqual(controller.currentPhase, .walkingTopEdge)
+
+        // 3. Walk to the right corner (edgeProgress -> 1.0)
+        simulatedTime = simulatedTime.addingTimeInterval(7.0)
+        controller.tick(dt: 7.0, cookiePosition: controller.destinationPoint!, characterSize: CGSize(width: 80, height: 80), frequency: .frequent, verticalClimbingEnabled: true)
+        XCTAssertEqual(controller.currentPhase, .cornerTransition)
+        XCTAssertGreaterThanOrEqual(controller.edgeProgress, 0.9)
+
+        // 4. Corner transition with vertical climbing enabled -> transitions to climbingVerticalEdge
+        simulatedTime = simulatedTime.addingTimeInterval(1.6)
+        controller.tick(dt: 1.6, cookiePosition: controller.destinationPoint!, characterSize: CGSize(width: 80, height: 80), frequency: .frequent, verticalClimbingEnabled: true)
         XCTAssertEqual(controller.currentPhase, .climbingVerticalEdge)
         XCTAssertEqual(controller.activeEdgePath?.edgeType, .rightVertical)
     }
@@ -370,16 +392,21 @@ final class WindowInteractionTests: XCTestCase {
                 self.makeRawWindowDict(id: 901, ownerPID: 9001, ownerName: "Safari", layer: 0, x: 200, y: currentWindowY, width: 800, height: 600)
             ]
         }
+        var simulatedTime = Date()
+        provider.now = { simulatedTime }
         provider.refreshWindows(force: true)
 
         let controller = WindowInteractionController(provider: provider)
-        var simulatedTime = Date()
         controller.now = { simulatedTime }
 
-        controller.startExploration(fromPosition: NSPoint(x: 250, y: 300), frequency: .frequent)
+        controller.startExploration(fromPosition: NSPoint(x: 250, y: 994), frequency: .frequent)
 
-        // Transition into walking top edge
-        controller.tick(dt: 1.0, cookiePosition: NSPoint(x: 250, y: 300), characterSize: CGSize(width: 80, height: 80), frequency: .frequent, verticalClimbingEnabled: false)
+        // Anticipate -> approaching
+        simulatedTime = simulatedTime.addingTimeInterval(0.7)
+        controller.tick(dt: 0.7, cookiePosition: NSPoint(x: 250, y: 994), characterSize: CGSize(width: 80, height: 80), frequency: .frequent, verticalClimbingEnabled: false)
+
+        // Arrive -> walkingTopEdge
+        simulatedTime = simulatedTime.addingTimeInterval(0.1)
         controller.tick(dt: 0.1, cookiePosition: controller.destinationPoint!, characterSize: CGSize(width: 80, height: 80), frequency: .frequent, verticalClimbingEnabled: false)
         XCTAssertEqual(controller.currentPhase, .walkingTopEdge)
 
@@ -387,7 +414,7 @@ final class WindowInteractionTests: XCTestCase {
 
         // User dragged the Safari window downwards in Quartz (y: 100 -> 250)
         currentWindowY = 250
-        simulatedTime = simulatedTime.addingTimeInterval(0.6) // Trigger reconciliation
+        simulatedTime = simulatedTime.addingTimeInterval(0.6) // Trigger reconciliation (> 0.5s)
         controller.tick(dt: 0.1, cookiePosition: controller.destinationPoint!, characterSize: CGSize(width: 80, height: 80), frequency: .frequent, verticalClimbingEnabled: false)
 
         let updatedDestY = controller.destinationPoint!.y
@@ -408,15 +435,23 @@ final class WindowInteractionTests: XCTestCase {
                 return []
             }
         }
+        var simulatedTime = Date()
+        provider.now = { simulatedTime }
         provider.refreshWindows(force: true)
 
         let controller = WindowInteractionController(provider: provider)
-        var simulatedTime = Date()
         controller.now = { simulatedTime }
 
-        controller.startExploration(fromPosition: NSPoint(x: 250, y: 300), frequency: .frequent)
-        controller.tick(dt: 1.0, cookiePosition: NSPoint(x: 250, y: 300), characterSize: CGSize(width: 80, height: 80), frequency: .frequent, verticalClimbingEnabled: false)
+        controller.startExploration(fromPosition: NSPoint(x: 250, y: 994), frequency: .frequent)
+
+        // Anticipating -> approaching
+        simulatedTime = simulatedTime.addingTimeInterval(0.7)
+        controller.tick(dt: 0.7, cookiePosition: NSPoint(x: 250, y: 994), characterSize: CGSize(width: 80, height: 80), frequency: .frequent, verticalClimbingEnabled: false)
+
+        // Approaching -> walkingTopEdge
+        simulatedTime = simulatedTime.addingTimeInterval(0.1)
         controller.tick(dt: 0.1, cookiePosition: controller.destinationPoint!, characterSize: CGSize(width: 80, height: 80), frequency: .frequent, verticalClimbingEnabled: false)
+        XCTAssertEqual(controller.currentPhase, .walkingTopEdge)
 
         // Window closes!
         windowPresent = false
@@ -438,18 +473,21 @@ final class WindowInteractionTests: XCTestCase {
         provider.windowListProvider = {
             [self.makeRawWindowDict(id: 1001, ownerPID: 1001, ownerName: "Finder", layer: 0, x: 200, y: 100, width: 800, height: 600)]
         }
+        var simulatedTime = Date()
+        provider.now = { simulatedTime }
         provider.refreshWindows(force: true)
 
         let controller = WindowInteractionController(provider: provider)
+        controller.now = { simulatedTime }
         let engine = CookieBehaviorEngine(
             store: store,
             windowProvider: provider,
             windowController: controller
         )
+        engine.now = { simulatedTime }
         engine.start()
 
-        // Start exploration
-        controller.startExploration(fromPosition: NSPoint(x: 250, y: 300), frequency: .frequent)
+        controller.startExploration(fromPosition: NSPoint(x: 250, y: 994), frequency: .frequent)
         XCTAssertTrue(controller.isExploringWindow)
 
         // User grabs Cookie
@@ -466,17 +504,21 @@ final class WindowInteractionTests: XCTestCase {
         provider.windowListProvider = {
             [self.makeRawWindowDict(id: 1002, ownerPID: 1002, ownerName: "Finder", layer: 0, x: 200, y: 100, width: 800, height: 600)]
         }
+        var simulatedTime = Date()
+        provider.now = { simulatedTime }
         provider.refreshWindows(force: true)
 
         let controller = WindowInteractionController(provider: provider)
+        controller.now = { simulatedTime }
         let engine = CookieBehaviorEngine(
             store: store,
             windowProvider: provider,
             windowController: controller
         )
+        engine.now = { simulatedTime }
         engine.start()
 
-        controller.startExploration(fromPosition: NSPoint(x: 250, y: 300), frequency: .frequent)
+        controller.startExploration(fromPosition: NSPoint(x: 250, y: 994), frequency: .frequent)
         XCTAssertTrue(controller.isExploringWindow)
 
         // Trigger user emote
@@ -494,17 +536,21 @@ final class WindowInteractionTests: XCTestCase {
         provider.windowListProvider = {
             [self.makeRawWindowDict(id: 1003, ownerPID: 1003, ownerName: "Finder", layer: 0, x: 200, y: 100, width: 800, height: 600)]
         }
+        var simulatedTime = Date()
+        provider.now = { simulatedTime }
         provider.refreshWindows(force: true)
 
         let controller = WindowInteractionController(provider: provider)
+        controller.now = { simulatedTime }
         let engine = CookieBehaviorEngine(
             store: store,
             windowProvider: provider,
             windowController: controller
         )
+        engine.now = { simulatedTime }
         engine.start()
 
-        controller.startExploration(fromPosition: NSPoint(x: 250, y: 300), frequency: .frequent)
+        controller.startExploration(fromPosition: NSPoint(x: 250, y: 994), frequency: .frequent)
         XCTAssertTrue(controller.isExploringWindow)
 
         engine.handleFeed(food: .fish)

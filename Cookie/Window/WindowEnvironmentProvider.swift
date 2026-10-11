@@ -140,7 +140,7 @@ final class WindowEnvironmentProvider: ObservableObject {
                 layer: layer,
                 bounds: appKitBounds,
                 isOccluded: isOccluded,
-                lastObserved: now
+                lastObserved: currentTime
             )
 
             filteredWindows.append(window)

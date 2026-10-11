@@ -40,7 +40,11 @@ final class WindowInteractionController: ObservableObject {
     // MARK: - Dependencies & Seams
 
     let provider: WindowEnvironmentProvider
-    var now: () -> Date = { Date() }
+    var now: () -> Date = { Date() } {
+        didSet {
+            provider.now = now
+        }
+    }
 
     private let log = Logger(subsystem: "com.cookie.mac", category: "WindowInteraction")
 
@@ -117,7 +121,7 @@ final class WindowInteractionController: ObservableObject {
     ) {
         provider.refreshWindows(force: true)
 
-        let candidate = targetWindow ?? provider.findClosestCandidate(to: cookiePosition, maxDistance: 500)
+        let candidate = targetWindow ?? provider.findClosestCandidate(to: cookiePosition, maxDistance: 650)
         guard let win = candidate else {
             log.debug("No suitable window found within exploration reach")
             return
