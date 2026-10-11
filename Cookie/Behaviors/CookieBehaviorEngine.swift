@@ -78,8 +78,10 @@ final class CookieBehaviorEngine: ObservableObject {
         return CGPoint(x: x, y: y)
     }
 
-    // MARK: - Cursor Interaction & Locomotion Controllers
+    // MARK: - Cursor, Dock & Locomotion Controllers
     let cursorController: CursorInteractionController
+    let dockDetector: DockEnvironmentDetector
+    let dockController: DockInteractionController
     let movementInterpolator: MovementInterpolator
     private var lastKnownPosition: NSPoint = .zero
     private var lastCursorPosition: NSPoint?
@@ -146,10 +148,19 @@ final class CookieBehaviorEngine: ObservableObject {
         var timeUntilNextPause: TimeInterval = 3
     }
 
-    init(store: CookieStore, cursorController: CursorInteractionController? = nil) {
+    init(
+        store: CookieStore,
+        cursorController: CursorInteractionController? = nil,
+        dockDetector: DockEnvironmentDetector? = nil,
+        dockController: DockInteractionController? = nil
+    ) {
         self.store = store
-        let controller = cursorController ?? CursorInteractionController()
-        self.cursorController = controller
+        let cController = cursorController ?? CursorInteractionController()
+        self.cursorController = cController
+        let dDetector = dockDetector ?? DockEnvironmentDetector()
+        self.dockDetector = dDetector
+        let dController = dockController ?? DockInteractionController(detector: dDetector)
+        self.dockController = dController
         let intensity = store.profile.settings.followingIntensity
         self.movementInterpolator = MovementInterpolator(
             maxSpeed: intensity.maxSpeed,
