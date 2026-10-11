@@ -221,7 +221,7 @@ final class WindowInteractionController: ObservableObject {
         currentPhase = .preparingJump
         phaseElapsed = 0
         phaseDuration = Double.random(in: 0.40...0.65)
-        playfulReaction = .curious
+        playfulReaction = .shy
         updateLookAngle(from: proposal.startPoint, toward: proposal.targetSurface.landingPoint)
         log.info("Preparing jump to \(proposal.targetSurface.ownerName, privacy: .public) [style: \(proposal.style.rawValue, privacy: .public), dist: \(Int(proposal.totalEuclideanDistance), privacy: .public)pt]")
     }
