@@ -19,6 +19,7 @@ final class UpdateManager: NSObject, ObservableObject, SPUUpdaterDelegate, SPUUs
     private var sparkleUpdater: SPUUpdater?
     private var userDriverReply: ((SPUUserUpdateChoice) -> Void)?
     private var userDriverAcknowledgement: (() -> Void)?
+    private var isUserInitiatedCheck = false
 
     // Fallback/Direct download task
     private var downloadTask: URLSessionDownloadTask?
@@ -80,6 +81,7 @@ final class UpdateManager: NSObject, ObservableObject, SPUUpdaterDelegate, SPUUs
     func checkForUpdates(userInitiated: Bool) {
         guard !state.isCheckingOrBusy else { return }
 
+        self.isUserInitiatedCheck = userInitiated
         state = .checking
 
         // Attempt Sparkle's native check if configured
@@ -158,6 +160,17 @@ final class UpdateManager: NSObject, ObservableObject, SPUUpdaterDelegate, SPUUs
         )
 
         if isNewer {
+            if !userInitiated {
+                if let skipped = UserDefaults.standard.string(forKey: "CookieSkippedVersion"), skipped == latest.version {
+                    state = .idle
+                    return
+                }
+                if let postponed = UserDefaults.standard.object(forKey: "CookiePostponedDate") as? Date,
+                   Date().timeIntervalSince(postponed) < 86400 {
+                    state = .idle
+                    return
+                }
+            }
             state = .updateAvailable(info: latest)
             isShowingUpdatePrompt = true
         } else {
@@ -187,6 +200,7 @@ final class UpdateManager: NSObject, ObservableObject, SPUUpdaterDelegate, SPUUs
             userDriverReply = nil
             reply(.dismiss)
         }
+        UserDefaults.standard.set(Date(), forKey: "CookiePostponedDate")
         isShowingUpdatePrompt = false
         state = .idle
     }
@@ -282,6 +296,7 @@ final class UpdateManager: NSObject, ObservableObject, SPUUpdaterDelegate, SPUUs
 
     nonisolated func showUserInitiatedUpdateCheck(cancellation: @escaping () -> Void) {
         Task { @MainActor in
+            self.isUserInitiatedCheck = true
             self.state = .checking
         }
     }
@@ -301,6 +316,23 @@ final class UpdateManager: NSObject, ObservableObject, SPUUpdaterDelegate, SPUUs
                 isCritical: appcastItem.isCriticalUpdate,
                 publishedDate: appcastItem.date
             )
+
+            if !state.userInitiated {
+                if let skipped = UserDefaults.standard.string(forKey: "CookieSkippedVersion"), skipped == info.version {
+                    reply(.dismiss)
+                    self.userDriverReply = nil
+                    self.state = .idle
+                    return
+                }
+                if let postponed = UserDefaults.standard.object(forKey: "CookiePostponedDate") as? Date,
+                   Date().timeIntervalSince(postponed) < 86400 {
+                    reply(.dismiss)
+                    self.userDriverReply = nil
+                    self.state = .idle
+                    return
+                }
+            }
+
             self.state = .updateAvailable(info: info)
             self.isShowingUpdatePrompt = true
         }
@@ -314,7 +346,13 @@ final class UpdateManager: NSObject, ObservableObject, SPUUpdaterDelegate, SPUUs
         Task { @MainActor in
             self.userDriverAcknowledgement = acknowledgement
             self.state = .upToDate(lastChecked: Date())
-            self.isShowingUpdatePrompt = true
+            if self.isUserInitiatedCheck {
+                self.isShowingUpdatePrompt = true
+            } else {
+                acknowledgement()
+                self.userDriverAcknowledgement = nil
+                self.state = .idle
+            }
         }
     }
 
@@ -322,7 +360,13 @@ final class UpdateManager: NSObject, ObservableObject, SPUUpdaterDelegate, SPUUs
         Task { @MainActor in
             self.userDriverAcknowledgement = acknowledgement
             self.state = .error(title: "Update Error", message: error.localizedDescription)
-            self.isShowingUpdatePrompt = true
+            if self.isUserInitiatedCheck {
+                self.isShowingUpdatePrompt = true
+            } else {
+                acknowledgement()
+                self.userDriverAcknowledgement = nil
+                self.state = .idle
+            }
         }
     }
 
