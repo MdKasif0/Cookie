@@ -43,8 +43,8 @@ targets:
         CFBundleDisplayName: Cookie
         CFBundleIconFile: AppIcon
         CFBundleIconName: AppIcon
-        CFBundleShortVersionString: "1.0.0"
-        CFBundleVersion: "1"
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
         NSHumanReadableCopyright: "© 2026 Md Kasif Uddin. All rights reserved."
         LSApplicationCategoryType: public.app-category.entertainment
         NSHighResolutionCapable: true
