@@ -281,7 +281,9 @@ final class CookieBehaviorEngine: ObservableObject {
             }
             return // autonomous state changes do not interrupt active emote
         case .walking, .running, .followingCursor:
-            advanceLocomotion(dt: dt, currentPosition: currentPosition)
+            if !windowController.isExploringWindow && !dockController.isExploringDock {
+                advanceLocomotion(dt: dt, currentPosition: currentPosition)
+            }
         default:
             locomotionVelocity = 0
             locomotionVelocity2D = .zero
@@ -400,6 +402,79 @@ final class CookieBehaviorEngine: ObservableObject {
         ], duration: 1.0)
     }
 
+    // MARK: - Window Exploration Handling (Phase 3)
+
+    private func handleWindowExploration(dt: TimeInterval, currentPosition: NSPoint) {
+        guard windowController.isExploringWindow else { return }
+
+        // High priority states abort window exploration immediately
+        switch state {
+        case .beingDragged, .emoting, .eating, .drinking, .inBox:
+            windowController.cancelExploration()
+            return
+        default:
+            break
+        }
+
+        if worldItem != nil || isPressed {
+            windowController.cancelExploration()
+            return
+        }
+
+        // Apply any playful reaction triggered during window play
+        if let reactionKind = windowController.playfulReaction {
+            windowController.clearPlayfulReaction()
+            self.reaction = reactionKind
+        }
+
+        switch windowController.currentPhase {
+        case .idle:
+            break
+
+        case .anticipating:
+            locomotionVelocity = 0
+            locomotionVelocity2D = .zero
+            if state != .curious {
+                enter(.curious, duration: 1.2)
+            }
+            if let targetPt = windowController.destinationPoint {
+                setFacing(targetPt.x >= currentPosition.x ? .right : .left)
+            }
+
+        case .approaching, .walkingTopEdge, .climbingVerticalEdge, .departing:
+            guard let dest = windowController.destinationPoint else { return }
+            let clampedDest = clampPoint(dest)
+            if state != .walking && state != .running {
+                enter(.walking, duration: 10.0)
+            }
+            movementInterpolator.maxSpeed = (windowController.currentPhase == .climbingVerticalEdge) ? 85 : 125
+            movementInterpolator.setTarget2D(clampedDest)
+            let (_, vel2D) = movementInterpolator.update2D(dt: dt)
+            locomotionVelocity2D = vel2D
+            locomotionVelocity = vel2D.dx
+            if abs(vel2D.dx) > 3 {
+                setFacing(vel2D.dx > 0 ? .right : .left)
+            }
+
+        case .cornerTransition:
+            locomotionVelocity = 0
+            locomotionVelocity2D = .zero
+            if state != .curious && state != .investigating {
+                enter(.curious, duration: 1.4)
+            }
+            if let targetPt = windowController.destinationPoint {
+                setFacing(targetPt.x >= currentPosition.x ? .right : .left)
+            }
+
+        case .pausing:
+            locomotionVelocity = 0
+            locomotionVelocity2D = .zero
+            if state != .sitting && state != .curious {
+                enter(.sitting, duration: 2.0)
+            }
+        }
+    }
+
     // MARK: - Dock Exploration Handling (Phase 2)
 
     private func handleDockExploration(dt: TimeInterval, currentPosition: NSPoint) {
@@ -475,6 +550,7 @@ final class CookieBehaviorEngine: ObservableObject {
         guard isRunning else { return }
         isPressed = true
         dockController.cancelExploration()
+        windowController.cancelExploration()
         cursorController.resetInteractionState()
         movementInterpolator.stop()
         if state.isLocomotion {
@@ -639,6 +715,7 @@ final class CookieBehaviorEngine: ObservableObject {
         endPress()
         cancelActiveEmote()
         dockController.cancelExploration()
+        windowController.cancelExploration()
         cursorController.resetInteractionState()
         movementInterpolator.stop()
         sequenceQueue = []
@@ -691,6 +768,7 @@ final class CookieBehaviorEngine: ObservableObject {
         guard isRunning, state != .beingDragged else { return }
         clearSession()
         dockController.cancelExploration()
+        windowController.cancelExploration()
         sequenceQueue = []
         let chosenFood = food ?? FoodKind.allCases.randomElement() ?? .fish
         let offset: CGFloat = facing == .right ? 110 : -110
@@ -715,6 +793,7 @@ final class CookieBehaviorEngine: ObservableObject {
         guard isRunning, state != .beingDragged else { return }
         clearSession()
         dockController.cancelExploration()
+        windowController.cancelExploration()
         sequenceQueue = []
         let offset: CGFloat = facing == .right ? 120 : -120
         let targetX = clampX(lastKnownX + offset)
@@ -802,6 +881,7 @@ final class CookieBehaviorEngine: ObservableObject {
         sessionTargetX = nil
         sequenceQueue.removeAll()
         dockController.cancelExploration()
+        windowController.cancelExploration()
 
         activeEmote = emote
         emotePlaybackPhase = .starting
@@ -940,6 +1020,25 @@ final class CookieBehaviorEngine: ObservableObject {
         return true
     }
 
+    private func maybeTriggerWindowExploration(date: Date) -> Bool {
+        guard store.profile.settings.windowInteraction,
+              state != .beingDragged,
+              worldItem == nil,
+              !isPressed,
+              date >= sulksUntil else { return false }
+
+        if windowController.shouldTriggerAutonomousExploration(
+            cookiePosition: lastKnownPosition,
+            frequency: store.profile.settings.windowFrequency,
+            settingsEnabled: store.profile.settings.windowInteraction,
+            isInterrupted: isPressed || worldItem != nil
+        ) {
+            windowController.startExploration(fromPosition: lastKnownPosition, frequency: store.profile.settings.windowFrequency)
+            return true
+        }
+        return false
+    }
+
     private func maybeTriggerDockExploration(date: Date) -> Bool {
         guard store.profile.settings.dockInteraction,
               store.profile.settings.autonomousDockExploration,
@@ -961,7 +1060,7 @@ final class CookieBehaviorEngine: ObservableObject {
     }
 
     func handleEdgeReached(_ edge: CookieEdge) {
-        guard isRunning, state.isLocomotion, !dockController.isExploringDock else { return }
+        guard isRunning, state.isLocomotion, !windowController.isExploringWindow, !dockController.isExploringDock else { return }
         log.info("Reached the \(edge == .left ? "left" : "right", privacy: .public) edge")
         edgeCooldownUntil = now().addingTimeInterval(Double.random(in: 25...50))
         let roll = Double.random(in: 0...1)
@@ -1067,6 +1166,7 @@ final class CookieBehaviorEngine: ObservableObject {
         let date = now()
         if maybeTriggerSpecialEvent(date: date) { return }
         if maybeTriggerAutonomousToy(date: date) { return }
+        if maybeTriggerWindowExploration(date: date) { return }
         if maybeTriggerDockExploration(date: date) { return }
 
         let weights = behaviorWeights()

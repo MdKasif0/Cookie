@@ -166,10 +166,10 @@ final class CookieScene: SKScene {
                 }
                 .store(in: &cancellables)
 
-            Publishers.CombineLatest(engine.cursorController.$lookAngle, engine.dockController.$dockLookAngle)
+            Publishers.CombineLatest3(engine.cursorController.$lookAngle, engine.windowController.$windowLookAngle, engine.dockController.$dockLookAngle)
                 .receive(on: DispatchQueue.main)
-                .sink { [weak self] cursorAngle, dockAngle in
-                    let effectiveAngle = cursorAngle ?? dockAngle
+                .sink { [weak self] cursorAngle, windowAngle, dockAngle in
+                    let effectiveAngle = cursorAngle ?? windowAngle ?? dockAngle
                     self?.character.setCursorLookAngle(effectiveAngle)
                 }
                 .store(in: &cancellables)
