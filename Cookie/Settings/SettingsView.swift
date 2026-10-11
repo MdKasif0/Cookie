@@ -262,7 +262,7 @@ struct BehaviorSettingsTab: View {
                 Toggle("Enable autonomous Dock exploration", isOn: $store.profile.settings.autonomousDockExploration)
                     .disabled(!store.profile.settings.dockInteraction)
                     .accessibilityHint("Allows Cookie to occasionally and naturally stroll toward the Dock on her own")
-                Picker("Exploration frequency", selection: $store.profile.settings.dockExplorationFrequency) {
+                Picker("Dock exploration frequency", selection: $store.profile.settings.dockExplorationFrequency) {
                     ForEach(DockExplorationFrequency.allCases) { freq in
                         Text(freq.displayName).tag(freq.rawValue)
                     }
@@ -271,8 +271,24 @@ struct BehaviorSettingsTab: View {
                 .accessibilityLabel("Dock Exploration Frequency")
                 .accessibilityHint("Controls how often Cookie wanders to the Dock")
 
+                Divider()
+
+                Toggle("Enable window edge exploration", isOn: $store.profile.settings.windowInteraction)
+                    .accessibilityHint("Allows Cookie to recognize and explore visible application window edges")
+                Toggle("Enable vertical edge climbing", isOn: $store.profile.settings.windowVerticalClimbing)
+                    .disabled(!store.profile.settings.windowInteraction)
+                    .accessibilityHint("Allows Cookie to climb down vertical window borders")
+                Picker("Window exploration frequency", selection: $store.profile.settings.windowExplorationFrequency) {
+                    ForEach(WindowExplorationFrequency.allCases) { freq in
+                        Text(freq.displayName).tag(freq.rawValue)
+                    }
+                }
+                .disabled(!store.profile.settings.windowInteraction)
+                .accessibilityLabel("Window Exploration Frequency")
+                .accessibilityHint("Controls how often Cookie approaches and explores application window perimeters")
+
                 Button("Reset Desktop Exploration to Defaults") {
-                    store.profile.settings.resetDockSettings()
+                    store.profile.settings.resetDesktopExplorationSettings()
                 }
                 .buttonStyle(.plain)
                 .foregroundStyle(Color.accentColor)
@@ -280,7 +296,7 @@ struct BehaviorSettingsTab: View {
             } header: {
                 Text("Desktop Exploration")
             } footer: {
-                Text("Cookie detects the macOS Dock orientation and safe edges, occasionally approaching to curiously look at application icons. Dock clicks are never intercepted.")
+                Text("Cookie detects visible window edges and the macOS Dock, approaching them naturally to stroll along safe top borders. Windows belonging to other applications are never controlled or altered.")
             }
             Section {
                 Picker("Sleep behavior", selection: $store.profile.settings.sleepBehavior) {

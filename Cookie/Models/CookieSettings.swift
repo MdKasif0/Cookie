@@ -31,8 +31,9 @@ struct CookieSettings: Codable, Equatable {
     var cursorFollowingEnabled: Bool = true
     var cursorDodgingEnabled: Bool = true
     var cursorFollowingIntensity: String = CursorFollowingIntensity.balanced.rawValue
-    /// Reserved for the upcoming window-interaction milestone.
-    var windowInteraction: Bool = false
+    var windowInteraction: Bool = true
+    var windowVerticalClimbing: Bool = false
+    var windowExplorationFrequency: String = WindowExplorationFrequency.occasional.rawValue
     /// "normal", "longer", or "none".
     var sleepBehavior: String = SleepBehavior.normal.rawValue
     /// Whether Cookie occasionally explores toys on her own (always optional).
@@ -52,7 +53,7 @@ struct CookieSettings: Codable, Equatable {
         case launchAtLogin, showOnStartup, rememberPosition
         case cookieSize, animationIntensity, reducedMotionMode
         case soundEnabled, masterVolume, meowVolume, interactionSounds, purringSounds
-        case activityLevel, randomInteractions, cursorInteraction, cursorFollowingEnabled, cursorDodgingEnabled, cursorFollowingIntensity, windowInteraction, sleepBehavior
+        case activityLevel, randomInteractions, cursorInteraction, cursorFollowingEnabled, cursorDodgingEnabled, cursorFollowingIntensity, windowInteraction, windowVerticalClimbing, windowExplorationFrequency, sleepBehavior
         case autonomousToys, dockInteraction, autonomousDockExploration, dockExplorationFrequency, automaticallyCheckForUpdates
     }
 
@@ -75,7 +76,9 @@ struct CookieSettings: Codable, Equatable {
         cursorFollowingEnabled = try container.decodeIfPresent(Bool.self, forKey: .cursorFollowingEnabled) ?? true
         cursorDodgingEnabled = try container.decodeIfPresent(Bool.self, forKey: .cursorDodgingEnabled) ?? true
         cursorFollowingIntensity = try container.decodeIfPresent(String.self, forKey: .cursorFollowingIntensity) ?? CursorFollowingIntensity.balanced.rawValue
-        windowInteraction = try container.decodeIfPresent(Bool.self, forKey: .windowInteraction) ?? false
+        windowInteraction = try container.decodeIfPresent(Bool.self, forKey: .windowInteraction) ?? true
+        windowVerticalClimbing = try container.decodeIfPresent(Bool.self, forKey: .windowVerticalClimbing) ?? false
+        windowExplorationFrequency = try container.decodeIfPresent(String.self, forKey: .windowExplorationFrequency) ?? WindowExplorationFrequency.occasional.rawValue
         sleepBehavior = try container.decodeIfPresent(String.self, forKey: .sleepBehavior) ?? SleepBehavior.normal.rawValue
         autonomousToys = try container.decodeIfPresent(Bool.self, forKey: .autonomousToys) ?? true
         dockInteraction = try container.decodeIfPresent(Bool.self, forKey: .dockInteraction) ?? true
@@ -104,6 +107,10 @@ struct CookieSettings: Codable, Equatable {
         DockExplorationFrequency(rawValue: dockExplorationFrequency) ?? .occasional
     }
 
+    var windowFrequency: WindowExplorationFrequency {
+        WindowExplorationFrequency(rawValue: windowExplorationFrequency) ?? .occasional
+    }
+
     mutating func resetCursorInteractionSettings() {
         cursorInteraction = true
         cursorFollowingEnabled = true
@@ -115,6 +122,17 @@ struct CookieSettings: Codable, Equatable {
         dockInteraction = true
         autonomousDockExploration = true
         dockExplorationFrequency = DockExplorationFrequency.occasional.rawValue
+    }
+
+    mutating func resetWindowSettings() {
+        windowInteraction = true
+        windowVerticalClimbing = false
+        windowExplorationFrequency = WindowExplorationFrequency.occasional.rawValue
+    }
+
+    mutating func resetDesktopExplorationSettings() {
+        resetDockSettings()
+        resetWindowSettings()
     }
 }
 

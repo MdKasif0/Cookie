@@ -54,6 +54,7 @@ final class CookieBehaviorEngine: ObservableObject {
         didSet {
             cursorController.now = now
             dockController.now = now
+            windowController.now = now
         }
     }
     var visibleXRange: () -> ClosedRange<Double>? = {
@@ -78,10 +79,12 @@ final class CookieBehaviorEngine: ObservableObject {
         return CGPoint(x: x, y: y)
     }
 
-    // MARK: - Cursor, Dock & Locomotion Controllers
+    // MARK: - Cursor, Dock, Window & Locomotion Controllers
     let cursorController: CursorInteractionController
     let dockDetector: DockEnvironmentDetector
     let dockController: DockInteractionController
+    let windowProvider: WindowEnvironmentProvider
+    let windowController: WindowInteractionController
     let movementInterpolator: MovementInterpolator
     private var lastKnownPosition: NSPoint = .zero
     private var lastCursorPosition: NSPoint?
@@ -152,7 +155,9 @@ final class CookieBehaviorEngine: ObservableObject {
         store: CookieStore,
         cursorController: CursorInteractionController? = nil,
         dockDetector: DockEnvironmentDetector? = nil,
-        dockController: DockInteractionController? = nil
+        dockController: DockInteractionController? = nil,
+        windowProvider: WindowEnvironmentProvider? = nil,
+        windowController: WindowInteractionController? = nil
     ) {
         self.store = store
         let cController = cursorController ?? CursorInteractionController()
@@ -161,6 +166,10 @@ final class CookieBehaviorEngine: ObservableObject {
         self.dockDetector = dDetector
         let dController = dockController ?? DockInteractionController(detector: dDetector)
         self.dockController = dController
+        let wProvider = windowProvider ?? WindowEnvironmentProvider()
+        self.windowProvider = wProvider
+        let wController = windowController ?? WindowInteractionController(provider: wProvider)
+        self.windowController = wController
         let intensity = store.profile.settings.followingIntensity
         self.movementInterpolator = MovementInterpolator(
             maxSpeed: intensity.maxSpeed,
@@ -215,8 +224,23 @@ final class CookieBehaviorEngine: ObservableObject {
             isInterrupted: isInterrupted
         )
 
-        // 2. Update intelligent macOS Dock interaction controller (Phase 2)
-        if store.profile.settings.dockInteraction, !isInterrupted {
+        // 2. Update intelligent Window interaction controller (Phase 3)
+        if store.profile.settings.windowInteraction, !isInterrupted {
+            let charSize = CookieScreenGeometry.basePanelSize(for: store.profile.settings.cookieSize)
+            windowController.tick(
+                dt: dt,
+                cookiePosition: currentPosition,
+                characterSize: charSize,
+                frequency: store.profile.settings.windowFrequency,
+                verticalClimbingEnabled: store.profile.settings.windowVerticalClimbing
+            )
+            handleWindowExploration(dt: dt, currentPosition: currentPosition)
+        } else if isInterrupted || !store.profile.settings.windowInteraction {
+            windowController.cancelExploration()
+        }
+
+        // 3. Update intelligent macOS Dock interaction controller (Phase 2)
+        if store.profile.settings.dockInteraction, !isInterrupted, !windowController.isExploringWindow {
             let charSize = CookieScreenGeometry.basePanelSize(for: store.profile.settings.cookieSize)
             dockController.tick(
                 dt: dt,
@@ -235,11 +259,11 @@ final class CookieBehaviorEngine: ObservableObject {
             }
 
             handleDockExploration(dt: dt, currentPosition: currentPosition)
-        } else if isInterrupted || !store.profile.settings.dockInteraction {
+        } else if isInterrupted || !store.profile.settings.dockInteraction || windowController.isExploringWindow {
             dockController.cancelExploration()
         }
 
-        // 3. Process reactions and following triggers if not interrupted
+        // 4. Process reactions and following triggers if not interrupted
         if !isInterrupted {
             handleCursorReactions(dt: dt)
         }
