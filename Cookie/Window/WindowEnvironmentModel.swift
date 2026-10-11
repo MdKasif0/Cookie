@@ -158,6 +158,23 @@ struct WindowNavEdge: Identifiable, Equatable {
     let toNodeId: String
     let edgeType: WindowEdgeType
     let path: WindowEdgePath
+    let isJump: Bool
+
+    init(
+        id: String,
+        fromNodeId: String,
+        toNodeId: String,
+        edgeType: WindowEdgeType,
+        path: WindowEdgePath,
+        isJump: Bool = false
+    ) {
+        self.id = id
+        self.fromNodeId = fromNodeId
+        self.toNodeId = toNodeId
+        self.edgeType = edgeType
+        self.path = path
+        self.isJump = isJump
+    }
 }
 
 /// Lightweight navigation graph representing accessible window perimeters and desktop transitions.
@@ -182,7 +199,7 @@ struct WindowNavGraph: Equatable {
     }
 }
 
-/// State machine tracking Cookie's active window exploration phases.
+/// State machine tracking Cookie's active window exploration and jumping phases.
 enum WindowExplorationPhase: String, Equatable {
     /// Not exploring any window.
     case idle
@@ -198,6 +215,12 @@ enum WindowExplorationPhase: String, Equatable {
     case climbingVerticalEdge
     /// Brief observation pause on the edge or corner.
     case pausing
+    /// Preparing to launch a jump: crouch anticipation, orientation alignment, target re-verification.
+    case preparingJump
+    /// Airborne along a parabolic jump trajectory.
+    case jumping
+    /// Touchdown landing absorption and surface stabilization.
+    case landing
     /// Concluding exploration and safely returning to desktop ground.
     case departing
 }
