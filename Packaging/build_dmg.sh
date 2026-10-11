@@ -34,6 +34,9 @@ cp "${SCRIPT_DIR}/dmg_background.png" "${STAGING_DIR}/.background/dmg_background
 if [[ -f "${SCRIPT_DIR}/dmg_background@2x.png" ]]; then
     cp "${SCRIPT_DIR}/dmg_background@2x.png" "${STAGING_DIR}/.background/dmg_background@2x.png"
 fi
+if [[ -f "${SCRIPT_DIR}/dmg_background.tiff" ]]; then
+    cp "${SCRIPT_DIR}/dmg_background.tiff" "${STAGING_DIR}/.background/dmg_background.tiff"
+fi
 
 echo "==> 4. Creating temporary read-write disk image..."
 hdiutil create -srcfolder "${STAGING_DIR}" \
@@ -70,11 +73,15 @@ tell application "Finder"
         set arrangement of theViewOptions to not arranged
         
         try
-            set background picture of theViewOptions to file ".background:dmg_background.png"
+            set background picture of theViewOptions to file ".background:dmg_background.tiff"
+        on error
+            try
+                set background picture of theViewOptions to file ".background:dmg_background.png"
+            end try
         end try
         
-        set position of item "${APP_NAME}.app" of container window to {160, 230}
-        set position of item "Applications" of container window to {480, 230}
+        set position of item "${APP_NAME}.app" of container window to {180, 210}
+        set position of item "Applications" of container window to {475, 210}
         
         close
         open
