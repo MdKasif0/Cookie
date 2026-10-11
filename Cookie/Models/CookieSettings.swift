@@ -82,6 +82,9 @@ struct CookieSettings: Codable, Equatable {
         windowInteraction = try container.decodeIfPresent(Bool.self, forKey: .windowInteraction) ?? true
         windowVerticalClimbing = try container.decodeIfPresent(Bool.self, forKey: .windowVerticalClimbing) ?? false
         windowExplorationFrequency = try container.decodeIfPresent(String.self, forKey: .windowExplorationFrequency) ?? WindowExplorationFrequency.occasional.rawValue
+        windowJumpingEnabled = try container.decodeIfPresent(Bool.self, forKey: .windowJumpingEnabled) ?? true
+        jumpFrequency = try container.decodeIfPresent(String.self, forKey: .jumpFrequency) ?? JumpFrequency.balanced.rawValue
+        jumpStyle = try container.decodeIfPresent(String.self, forKey: .jumpStyle) ?? JumpStyle.gentle.rawValue
         sleepBehavior = try container.decodeIfPresent(String.self, forKey: .sleepBehavior) ?? SleepBehavior.normal.rawValue
         autonomousToys = try container.decodeIfPresent(Bool.self, forKey: .autonomousToys) ?? true
         dockInteraction = try container.decodeIfPresent(Bool.self, forKey: .dockInteraction) ?? true
@@ -114,6 +117,14 @@ struct CookieSettings: Codable, Equatable {
         WindowExplorationFrequency(rawValue: windowExplorationFrequency) ?? .occasional
     }
 
+    var jumpFrequencySetting: JumpFrequency {
+        JumpFrequency(rawValue: jumpFrequency) ?? .balanced
+    }
+
+    var jumpStyleSetting: JumpStyle {
+        JumpStyle(rawValue: jumpStyle) ?? .gentle
+    }
+
     mutating func resetCursorInteractionSettings() {
         cursorInteraction = true
         cursorFollowingEnabled = true
@@ -133,9 +144,16 @@ struct CookieSettings: Codable, Equatable {
         windowExplorationFrequency = WindowExplorationFrequency.occasional.rawValue
     }
 
+    mutating func resetJumpSettings() {
+        windowJumpingEnabled = true
+        jumpFrequency = JumpFrequency.balanced.rawValue
+        jumpStyle = JumpStyle.gentle.rawValue
+    }
+
     mutating func resetDesktopExplorationSettings() {
         resetDockSettings()
         resetWindowSettings()
+        resetJumpSettings()
     }
 }
 
