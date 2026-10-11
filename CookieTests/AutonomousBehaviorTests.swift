@@ -381,7 +381,7 @@ final class AutonomousBehaviorTests: XCTestCase {
         XCTAssertEqual(engine.state, .idle)
 
         // 3. Emotes are not interrupted by scheduler
-        let emote = Emote(id: .wave, name: "Wave", animationName: "wave", duration: 2.0, cooldown: 10)
+        let emote = Emote.wave
         XCTAssertTrue(engine.triggerEmote(emote))
         XCTAssertEqual(engine.state, .emoting)
 

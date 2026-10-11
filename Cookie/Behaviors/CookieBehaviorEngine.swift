@@ -949,7 +949,6 @@ final class CookieBehaviorEngine: ObservableObject {
         guard state != .beingDragged && !isPressed else { return false }
         guard activeEmote == nil else { return false }
         guard cooldownRemaining(for: emote.id) <= 0 else { return false }
-        guard behaviorMemory.canPlayEmote(id: emote.id.rawValue) else { return false }
         return true
     }
 
