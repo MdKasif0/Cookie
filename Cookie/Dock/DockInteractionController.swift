@@ -200,7 +200,7 @@ final class DockInteractionController: ObservableObject {
         // Begin with a brief curious anticipation glance
         currentPhase = .anticipating
         phaseElapsed = 0
-        phaseDuration = Double.random(in: 0.35...0.65)
+        phaseDuration = Double.random(in: 0.35...0.55)
         playfulReaction = .shy
         updateLookAngle(from: cookiePosition, toward: target?.screenPoint ?? targetPoint, environment: env)
 

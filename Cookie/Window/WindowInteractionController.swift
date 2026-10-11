@@ -469,7 +469,7 @@ final class WindowInteractionController: ObservableObject {
 
                 currentPhase = .landing
                 phaseElapsed = 0
-                phaseDuration = Double.random(in: 0.28...0.45)
+                phaseDuration = Double.random(in: 0.28...0.38)
                 playfulReaction = .dropped
 
                 jumpPlanner.recordJumpCompleted(to: proposal.targetSurface.windowId)

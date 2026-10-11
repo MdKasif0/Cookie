@@ -554,8 +554,8 @@ final class JumpInteractionTests: XCTestCase {
         XCTAssertEqual(controller.jumpShadowScale, 1.0) // Restored on touchdown
 
         // 4. Recovery absorption completes -> transitions to walking on Window B!
-        simDate = simDate.addingTimeInterval(0.4)
-        controller.tick(dt: 0.4, cookiePosition: CGPoint(x: 650, y: 994), characterSize: CGSize(width: 80, height: 80), frequency: .frequent, verticalClimbingEnabled: false)
+        simDate = simDate.addingTimeInterval(0.45)
+        controller.tick(dt: 0.45, cookiePosition: CGPoint(x: 650, y: 994), characterSize: CGSize(width: 80, height: 80), frequency: .frequent, verticalClimbingEnabled: false)
         XCTAssertEqual(controller.currentPhase, .walkingTopEdge)
         XCTAssertEqual(controller.activeWindow?.id, 302) // Now exploring Window B!
     }

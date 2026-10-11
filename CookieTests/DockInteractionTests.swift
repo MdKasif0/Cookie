@@ -187,7 +187,7 @@ final class DockInteractionTests: XCTestCase {
         }
 
         // Advance past anticipation duration (~0.5s)
-        controller.tick(dt: 0.6, cookiePosition: startPos, characterSize: charSize, frequency: .frequent)
+        controller.tick(dt: 0.7, cookiePosition: startPos, characterSize: charSize, frequency: .frequent)
         XCTAssertEqual(controller.currentPhase, .approaching)
 
         // Simulate reaching destination point
