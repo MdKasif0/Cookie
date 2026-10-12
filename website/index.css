@@ -2342,97 +2342,12 @@ img {
 }
 
 /* ==========================================================================
-   Responsive Adaptations
-   ========================================================================== */
-@media (max-width: 860px) {
-  .story-grid, .story-grid.reverse {
-    grid-template-columns: 1fr;
-    gap: 40px;
-    direction: ltr;
-  }
-  
-  .mock-window {
-    width: 90%;
-  }
-
-  .treat-items-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .variations-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .mac-window-body {
-    grid-template-columns: 1fr;
-  }
-
-  .mac-window-sidebar {
-    flex-direction: row;
-    flex-wrap: wrap;
-    border-right: none;
-    border-bottom: 1px solid var(--border-subtle);
-  }
-
-  .mac-window-content {
-    grid-template-columns: 1fr;
-    padding: 20px 16px;
-  }
-
-  .nav-menu {
-    display: none;
-  }
-
-  .mobile-nav-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .download-hero-card {
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 30px 24px;
-    gap: 24px;
-  }
-
-  .download-cta-wrap {
-    width: 100%;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-  }
-
-  .btn-download-hero,
-  .btn-github-hero {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .compatibility-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-    margin-bottom: 0;
-  }
-}
-
-@media (max-width: 600px) {
-  .compatibility-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .download-app-identity {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
-  }
-/* ==========================================================================
    Privacy Modal Sheet (Native <dialog>)
    ========================================================================== */
 .privacy-modal {
   border: none;
   background: transparent;
-  padding: 24px;
+  padding: 16px;
   margin: auto;
   max-width: 540px;
   width: calc(100% - 32px);
@@ -2450,7 +2365,7 @@ img {
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   box-shadow: 0 24px 64px rgba(45, 32, 20, 0.22);
-  padding: 32px;
+  padding: clamp(22px, 5vw, 32px);
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -2483,7 +2398,7 @@ img {
   line-height: 1;
   color: var(--neutral-gray);
   cursor: pointer;
-  padding: 4px 8px;
+  padding: 6px 10px;
   border-radius: var(--radius-sm);
   transition: color 0.15s ease, background-color 0.15s ease;
 }
@@ -2495,7 +2410,7 @@ img {
 
 .privacy-modal-title {
   font-family: var(--font-serif);
-  font-size: 1.5rem;
+  font-size: clamp(1.28rem, 4vw, 1.5rem);
   font-weight: 600;
   letter-spacing: -0.02em;
   color: var(--charcoal-deep);
@@ -2503,7 +2418,7 @@ img {
 }
 
 .privacy-modal-body {
-  font-size: 0.94rem;
+  font-size: clamp(0.88rem, 2.5vw, 0.94rem);
   line-height: 1.6;
   color: var(--soft-brown);
   display: flex;
@@ -2546,6 +2461,535 @@ img {
   transform: translateY(-1px);
 }
 
+/* ==========================================================================
+   Comprehensive Mobile & Tablet Responsive Architecture
+   ========================================================================== */
+
+/* Tablet & Smaller Screens (<= 960px) */
+@media (max-width: 960px) {
+  .footer-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 36px;
+  }
+}
+
+/* Tablet Portrait & Large Phones (<= 860px) */
+@media (max-width: 860px) {
+  .nav-menu {
+    display: none;
+  }
+
+  .mobile-nav-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Story Vignettes */
+  .story-chapter {
+    padding: clamp(64px, 8vh, 90px) 0;
+  }
+
+  .story-grid,
+  .story-grid.reverse {
+    grid-template-columns: 1fr;
+    gap: 36px;
+    direction: ltr;
+  }
+
+  .story-text-column {
+    max-width: 100%;
+  }
+
+  .mock-window {
+    width: 100%;
+  }
+
+  /* Customizer Window */
+  .mac-window-body {
+    grid-template-columns: 1fr;
+  }
+
+  .mac-window-sidebar {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 8px 10px;
+    gap: 6px;
+    border-right: none;
+    border-bottom: 1px solid var(--border-subtle);
+    scrollbar-width: none;
+  }
+
+  .mac-window-sidebar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .sidebar-header {
+    display: none;
+  }
+
+  .mac-sidebar-item {
+    width: auto;
+    flex-shrink: 0;
+    padding: 7px 12px;
+    font-size: 0.82rem;
+    white-space: nowrap;
+  }
+
+  .mac-window-content {
+    grid-template-columns: 1fr;
+    padding: clamp(16px, 3vw, 24px) clamp(14px, 2.5vw, 20px);
+    gap: 20px;
+  }
+
+  /* Variations Gallery */
+  .variations-grid {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    gap: 12px;
+    padding: 4px 4px 14px;
+    scrollbar-width: none;
+  }
+
+  .variations-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .variation-card {
+    flex: 0 0 clamp(135px, 36vw, 160px);
+    scroll-snap-align: start;
+    padding: 14px 10px 12px;
+  }
+
+  /* Download Section */
+  .download-section {
+    padding: clamp(64px, 8vh, 90px) 0 clamp(72px, 9vh, 100px);
+  }
+
+  .download-hero-card {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: clamp(24px, 4vw, 32px) clamp(18px, 3.5vw, 28px);
+    gap: 22px;
+  }
+
+  .download-cta-wrap {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .btn-download-hero,
+  .btn-github-hero {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .compatibility-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    margin-bottom: 0;
+  }
+}
+
+/* Standard Mobile Devices (<= 600px) */
+@media (max-width: 600px) {
+  /* Site Header & Mobile Drawer */
+  .nav-wrapper {
+    height: 56px;
+  }
+
+  .mobile-nav-drawer {
+    top: 56px;
+    max-height: calc(100dvh - 56px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 18px 20px 28px;
+  }
+
+  /* Hero Adjustments */
+  .hero-section {
+    padding: 28px 16px 0;
+    min-height: calc(100dvh - 56px);
+  }
+
+  .hero-eyebrow {
+    margin-bottom: 16px;
+    font-size: 0.78rem;
+    padding: 4px 12px;
+  }
+
+  .hero-headline {
+    margin-bottom: 12px;
+  }
+
+  .hero-supporting {
+    margin-bottom: 22px;
+    line-height: 1.45;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    width: 100%;
+    max-width: 320px;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .hero-btn-primary,
+  .hero-btn-secondary {
+    width: 100%;
+    justify-content: center;
+    padding: 13px 20px;
+  }
+
+  .hero-stage {
+    width: min(260px, 75vw);
+    height: min(240px, 70vw);
+  }
+
+  .cookie-actor-wrap {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Story Chapter Vignettes */
+  .story-chapter {
+    padding: 56px 0;
+  }
+
+  /* Vignette 1: Desktop Scene */
+  .desktop-scene-wrap {
+    padding: 20px 14px 26px;
+  }
+
+  .mock-editor-content {
+    padding: 14px 12px;
+    font-size: 0.76rem;
+    line-height: 1.6;
+  }
+
+  .scene-cookie-companion {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    width: clamp(90px, 26vw, 120px);
+    height: clamp(90px, 26vw, 120px);
+  }
+
+  /* Vignette 2: Curious Cat */
+  .curious-stage {
+    padding: 30px 14px;
+    min-height: 270px;
+  }
+
+  .curious-cat-container {
+    width: clamp(140px, 42vw, 190px);
+    height: clamp(140px, 42vw, 190px);
+  }
+
+  /* Vignette 3: Sleepy Scene */
+  .sleepy-scene-wrap {
+    padding: 28px 12px 24px;
+    min-height: 260px;
+    gap: clamp(8px, 2.5vw, 16px);
+  }
+
+  .sleepy-box-wrap {
+    width: clamp(96px, 32vw, 135px);
+  }
+
+  .sleepy-cat-wrap {
+    width: clamp(115px, 42vw, 165px);
+  }
+
+  .box-cat-peeker {
+    width: clamp(70px, 22vw, 95px);
+    height: clamp(70px, 22vw, 95px);
+    bottom: 56px;
+    left: 20px;
+  }
+
+  /* Vignette 4: Playground Sandbox */
+  .playground-sandbox {
+    height: clamp(260px, 55vw, 320px);
+  }
+
+  .draggable-cookie-actor {
+    width: clamp(95px, 26vw, 125px);
+    height: clamp(95px, 26vw, 125px);
+  }
+
+  /* Vignette 5: Treats & Care */
+  .treats-showcase-box {
+    padding: 20px 14px;
+  }
+
+  .treat-items-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .treat-button {
+    padding: 12px 6px;
+    font-size: 0.8rem;
+    min-height: 48px;
+  }
+
+  .treat-button .emoji {
+    font-size: 1.35rem;
+  }
+
+  .treat-response-card {
+    padding: 14px;
+    gap: 12px;
+  }
+
+  .treat-response-card .cat-avatar {
+    width: 44px;
+    height: 44px;
+  }
+
+  .treat-speech {
+    font-size: 0.88rem;
+    line-height: 1.45;
+  }
+
+  /* Customization Section */
+  .customization-section {
+    padding: 56px 0 64px;
+  }
+
+  .customization-header {
+    margin-bottom: 36px;
+  }
+
+  .variations-gallery {
+    margin-bottom: 40px;
+  }
+
+  /* Mac App Window Mockup */
+  .mac-app-window {
+    border-radius: var(--radius-md);
+  }
+
+  .mac-window-titlebar {
+    padding: 10px 12px;
+  }
+
+  .mac-window-status {
+    display: none;
+  }
+
+  .mac-window-title {
+    font-size: 0.78rem;
+  }
+
+  .mac-preview-card {
+    padding: 16px 12px 14px;
+  }
+
+  .preview-stage-frame {
+    width: clamp(120px, 34vw, 150px);
+    height: clamp(120px, 34vw, 150px);
+    margin-bottom: 8px;
+  }
+
+  .preview-name {
+    font-size: 1.05rem;
+  }
+
+  .preview-summary {
+    font-size: 0.8rem;
+    min-height: auto;
+  }
+
+  /* Customizer Panes */
+  .mac-panes-wrap {
+    min-height: auto;
+  }
+
+  .mac-pane {
+    gap: 18px;
+  }
+
+  .swatch-grid {
+    gap: 10px;
+  }
+
+  .swatch-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .mac-segmented-control {
+    display: flex;
+    width: 100%;
+  }
+
+  .segment-btn {
+    flex: 1;
+    text-align: center;
+    padding: 6px 4px;
+    font-size: clamp(0.72rem, 2.4vw, 0.82rem);
+  }
+
+  .pill-options {
+    gap: 7px;
+  }
+
+  .mini-pill {
+    padding: 6px 11px;
+    font-size: 0.78rem;
+  }
+
+  .accessory-cards-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+
+  .accessory-card {
+    padding: 10px 4px;
+  }
+
+  .accessory-card .acc-title {
+    font-size: 0.76rem;
+  }
+
+  .accessory-card .acc-sub {
+    font-size: 0.68rem;
+  }
+
+  .personality-row {
+    padding: 9px 12px;
+    gap: 10px;
+  }
+
+  .personality-name {
+    font-size: 0.84rem;
+  }
+
+  .personality-desc {
+    font-size: 0.74rem;
+  }
+
+  .mac-input-wrap {
+    max-width: 100%;
+  }
+
+  .name-chip {
+    padding: 5px 10px;
+    font-size: 0.8rem;
+  }
+
+  /* Download Section */
+  .download-app-identity {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .download-icon {
+    width: 58px;
+    height: 58px;
+    border-radius: 14px;
+  }
+
+  .download-app-title {
+    font-size: 1.35rem;
+  }
+
+  .download-app-specs-inline {
+    font-size: 0.76rem;
+    gap: 4px;
+  }
+
+  .compatibility-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .compat-card {
+    padding: 18px 16px;
+  }
+
+  .compat-icon-wrap {
+    margin-bottom: 12px;
+  }
+
+  .compat-desc {
+    margin-bottom: 14px;
+  }
+
+  /* Footer */
+  .site-footer {
+    padding: 52px 0 32px;
+  }
+
+  .footer-inner {
+    gap: 40px;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .footer-bottom-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+/* Compact Mobile Screens (<= 380px) */
+@media (max-width: 380px) {
+  .hero-eyebrow {
+    font-size: 0.74rem;
+  }
+
+  .hero-actions {
+    max-width: 100%;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    font-size: 0.92rem;
+    padding: 12px 16px;
+  }
+
+  .accessory-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .treat-items-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+
+  .treat-button {
+    padding: 10px 4px;
+    font-size: 0.76rem;
+  }
+
+  .footer-bottom-actions {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+
+/* Motion Accessibility */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
