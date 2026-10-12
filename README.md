@@ -30,20 +30,17 @@ Built with native **SpriteKit** and **SwiftUI**, Cookie is whisper-quiet on syst
 
 ## ✨ Key Features
 
-| Capability | Detail |
+| Feature | Highlight |
 | :--- | :--- |
-| **🐾 Living Desktop Companion** | Runs as a borderless, non-activating floating panel across all macOS Spaces without stealing application focus. |
-| **🪟 Intelligent Window & Surface Jumping** | Physics-backed parabolic leap trajectories (`JumpPlanner`) with real-time window detection, safe top-edge corridors, and pre-launch window movement drift cancellation. |
-| **🧭 macOS Dock Traversal & Exploration** | Detects Dock geometry, orientation (Bottom, Left, Right), and running app tiles; Cookie walks along the Dock and transitions smoothly to the desktop. |
-| **🧠 Context-Aware Ambient Engine** | Non-invasive application context detector (`ApplicationContextDetector`) that tunes curiosity, energy, and nap frequency based on active workflows (coding, reading, creative apps). |
-| **💾 Behavior Memory & Affection System** | Lightweight in-memory and persistent tracker (`BehaviorMemory`) recording visited surfaces, favorite petting zones, emote history, and friendship milestones. |
-| **🧶 Desktop World Items & Toys** | Spawn interactive vector toys (Yarn Ball, Feather, Toy Mouse, Fish Toy, Tennis Ball, Cardboard Box) and treats (Fish, Milk, Chicken, Cookie) with cozy box-sitting mechanics. |
-| **🎯 Pixel-Perfect Alpha Hit Testing** | Clicks on transparent pixels pass straight through to background apps. Cookie never blocks your clicks or buttons. |
-| **🫳 Direct Tactile Interactions** | Anatomically zone-aware petting (nose, ears, belly, feet, tail), picking up and carrying, physics drops with cushion sound, and double-click play. |
-| **🎨 Bespoke Customization Studio (⌘K)** | 10 warm fur palettes, custom coats (Solid, Tuxedo, Siamese, Tabby), eye styles, body scaling, and layered vector accessories. |
-| **🎵 Synthesized Sound System** | Pitch-bent cat vocalizations (mrrps, purrs, chirps, squeaks, snores) with dedicated master, voice, and sfx volume buses. |
-| **🔄 In-App Sparkle 2.6+ Updates** | Secure cryptographic updates with EdDSA digital signatures and a cozy custom SwiftUI update prompt (`UpdatePromptView`). |
-| **🔒 100% Local & Private** | Zero analytics, zero cloud dependencies, zero telemetry, and human-readable JSON persistence in `Application Support`. |
+| **🐾 Desktop Companion** | Borderless floating panel that lives across all macOS Spaces without stealing focus. |
+| **🪟 Window & Dock Jumping** | Traverses window edges and the macOS Dock with parabolic physics leaps. |
+| **🧠 Context Awareness** | Automatically adapts energy and curiosity to your active workflow (IDEs, browsers). |
+| **🫳 Tactile Interactions** | Zone-aware petting, physics dragging, and transparent click-through hit testing. |
+| **🧶 Toys & Treats** | Interactive desktop items (yarn, mouse, cardboard box) and snack rewards. |
+| **🎨 Character Studio (⌘K)** | 10 fur palettes, coats, eye styles, body scaling, and layered accessories. |
+| **🎵 Synthesized Audio** | Procedural purrs, chirps, and meows with independent volume buses. |
+| **🔒 100% Private & Offline** | Zero analytics, zero cloud dependencies, and local JSON storage. |
+| **🔄 Seamless Updates** | Secure in-app updates via Sparkle with cryptographic EdDSA verification. |
 
 ---
 
