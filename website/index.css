@@ -231,12 +231,12 @@ img {
   top: 64px;
   left: 0;
   right: 0;
-  background-color: rgba(251, 249, 245, 0.88);
-  backdrop-filter: blur(20px) saturate(160%);
-  -webkit-backdrop-filter: blur(20px) saturate(160%);
-  border-bottom: 1px solid rgba(139, 125, 112, 0.18);
+  background-color: rgba(251, 249, 245, 0.98);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border-bottom: 1px solid rgba(139, 125, 112, 0.22);
   padding: 20px 24px 28px;
-  box-shadow: var(--shadow-window);
+  box-shadow: 0 16px 36px rgba(28, 27, 25, 0.12);
   z-index: 99;
 }
 
