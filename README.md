@@ -22,7 +22,7 @@
 
 ## 📖 Overview
 
-**Cookie** is a lightweight, offline desktop companion for macOS built natively with **SwiftUI** and **SpriteKit**. She roams your screen, leaps between open windows and the Dock, follows your cursor, and naps quietly beside your work—whisper-quiet on hardware (~0% idle CPU), zero telemetry, and completely non-intrusive.
+**Cookie** is a lightweight, offline desktop companion for macOS built with **SwiftUI** and **SpriteKit**. She roams your screen, leaps across window edges and the Dock, follows your cursor, and naps quietly beside your work—whisper-quiet on hardware (~0% idle CPU) and completely private.
 
 ---
 
@@ -109,8 +109,6 @@ graph TD
 
 ### Behavior State Machine
 
-Cookie's behavior is driven by `CookieBehaviorEngine` and `BehaviorScheduler`. Rather than acting like a restless toy, Cookie behaves like a real companion with weighted probabilities, natural durations, and anti-annoyance cooldowns:
-
 ```mermaid
 stateDiagram-v2
     [*] --> Idle
@@ -151,131 +149,72 @@ stateDiagram-v2
 
 ---
 
-## 🪟 Intelligent Window & Surface Jumping
+## 🪟 Window & Dock Jumping
 
-Cookie is equipped with a physics-backed jump engine (`JumpPlanner`) capable of traversing macOS application windows and the Dock:
+Cookie traverses application windows and the macOS Dock using physics-backed parabolic leaps (`JumpPlanner`):
 
-* **Parabolic Trajectory Math**: Calculates realistic launch velocities, flight duration, peak altitude, and landing angles.
-* **Tuned Physical Reach**:
-  * Maximum horizontal leap: **340 pt**
-  * Maximum vertical upward leap: **175 pt**
-  * Maximum downward drop: **260 pt**
-  * Minimum landing width required: **75 pt**
-* **Safe Landing Corridors**: Automatically clamps landing coordinates within the safe top-edge boundaries of target windows so Cookie never lands awkwardly off the edge.
-* **Pre-Launch Drift Cancellation**: If the user moves or resizes the destination window while Cookie is crouching to jump, the system immediately cancels the jump and gracefully returns to a ground stroll.
-* **Anti-Ping-Pong Cooldowns**: Prevents repetitive bouncing between the same pair of windows (45-second surface cooldown).
-
----
-
-## 🧭 macOS Dock Traversal
-
-The `DockEnvironmentDetector` and `DockInteractionController` integrate Cookie with your macOS setup:
-
-* **Geometry & Orientation Awareness**: Detects whether the Dock is pinned to the **Bottom**, **Left**, or **Right** of the screen across single and multi-monitor setups.
-* **Dock Autohide Support**: Respects autohidden Dock states and dynamically recalculates usable desktop bounds.
-* **Dock Exploration**: Cookie can step onto the Dock, observe running application icons, glance at notifications, and safely jump back down to the desktop floor.
+* **Trajectory Physics**: Tuned reach (340 pt horizontal, 175 pt vertical up, 260 pt drop) with realistic arc velocities.
+* **Corridor Safety**: Automatically clamps landing points within window top edges and cancels leaps if the target window moves mid-crouch.
+* **Dock Traversal**: Detects Dock orientation (Bottom, Left, Right) and autohide state across single and multi-display setups.
 
 ---
 
 ## 🧠 Context-Aware Ambient Engine
 
-Cookie observes her environment without invading privacy. The `ApplicationContextDetector` classifies the active application category solely from bundle identifiers and localized app names:
+Cookie observes your workflow to modulate her activity without invading privacy (`ApplicationContextDetector`):
 
-* **Code Editors & IDEs** (`Xcode`, `VS Code`, `Cursor`, `Sublime`, `Zed`): Cookie adopts a calm, whisper-quiet demeanor, sleeping or quietly sitting beside your editor.
-* **Web Browsers** (`Safari`, `Chrome`, `Firefox`, `Arc`, `Orion`): Cookie shows gentle curiosity, occasionally glancing at cursor movements.
-* **Creative Tools** (`Figma`, `Photoshop`, `Blender`, `Logic Pro`): Cookie watches your canvas from a polite distance.
-* **Communication & Other**: Cookie takes casual strolls and stretches.
-
-> [!NOTE]
-> Cookie never accesses window content, document titles, keystrokes, or screen pixels. Context detection uses public macOS `NSWorkspace` notifications exclusively.
+* **Focused Work (IDEs / Text Editors)**: Adopts a calm demeanor, sleeping or quietly sitting beside your editor.
+* **Casual Use (Browsers / Creative Apps)**: Shows gentle curiosity, following cursor movement from a polite distance.
+* **100% Private**: Uses public `NSWorkspace` app notifications exclusively—never reads keystrokes, window titles, or screen pixels.
 
 ---
 
 ## 🧶 Desktop World Items & Toys
 
-Cookie can interact with desktop world items placed via the status menu:
+Spawn interactive items via the status menu for immediate play and feeding:
 
-### Toys
-* 🧶 **Yarn Ball**: Batting and rolling across the desk.
-* 🪶 **Feather**: Playful swatting and pouncing.
-* 🐭 **Toy Mouse**: Curious stalking and chasing bursts.
-* 🐟 **Fish Toy**: Hugging and kicking with back paws.
-* 🎾 **Tennis Ball**: Bouncing nudges.
-* 📦 **Cardboard Box**: Cookie hops inside, peeks over the edge, and curls up inside the box!
-
-### Treats & Feeding
-* 🐟 **Fresh Fish**: Contented munching with happy ear twitches.
-* 🥛 **Bowl of Milk**: Gentle licking and drinking sounds.
-* 🍗 **Chicken**: Delighted purring and joyful bounce.
-* 🍪 **Cookie**: Her namesake snack, triggering a special celebration emote!
+* **Toys**: Yarn Ball, Feather, Toy Mouse, Fish Toy, Tennis Ball, and a **Cardboard Box** she can hop inside and peek out of.
+* **Treats**: Fish, Milk, Chicken, and Cookies that trigger contented purrs, ear twitches, and celebratory emotes.
 
 ---
 
 ## 🎮 Direct Interactions
 
-Cookie's artwork is mapped into normalized anatomical zones (`CookieZone`):
+Cookie reacts to tactile cursor actions across anatomical touch zones:
 
-| Zone / Action | Interaction | Reaction & Effect |
+| Action | Input | Reaction |
 | :--- | :--- | :--- |
-| **Nose** | Single click | Surprised sneeze or tiny curious meow. |
-| **Head & Ears** | Single click / stroke | Delighted purr, closed-eye grin, and affection gain. |
-| **Belly & Body** | Click / rub | Soft meow, happy glance, or contented purr. |
-| **Feet** | Single click | Playful hop and quick paw lift. |
-| **Tail** | Single click | Gentle startle reaction with twitch. |
-| **Pick Up** | Click & Drag | Carried pose; stroking mid-air counts as comforting petting. |
-| **Drop** | Release cursor | Smooth physics drop with cushioned landing sound. |
-| **Double Click** | Quick double tap | Short playful burst or enthusiastic jump. |
-| **Toys & Food** | Menu Bar selection | Spawns vector item next to Cookie for immediate interaction. |
-| **Over-Petting** | Exceeding tolerance | Annoyed look away ("hmph") and a brief sulk avoiding cursor play. |
+| **Pet & Scratch** | Click nose, head, belly, feet, or tail | Purrs, grins, sneezes, or playful paw hops. |
+| **Pick Up & Drop** | Click & drag / release | Carried pose; drops with cushioned landing audio. |
+| **Play Burst** | Double-click | Quick playful hop or energetic jump. |
+| **Over-Petting** | Rapid clicks past tolerance | Mild protest ("hmph") and brief sulk before returning to normal. |
 
 ---
 
 ## 🎨 Personalities & Customization
 
-### The Six Personalities
-
-* **😴 Sleepy**: Spends extra time curled up in deep sleep. Ideal for quiet focus sessions.
-* **🧶 Playful**: Loves bouncing, double-click games, and inspecting screen elements.
-* **💖 Affectionate**: High pet tolerance, frequent purring, and quick affection growth.
-* **⚡ Energetic**: Fast strides, active strolls across your workspace, and lively curiosity.
-* **👀 Curious**: Follows your cursor closely, tracking movements with gentle head tilts.
-* **😼 Grumpy**: Lower pet tolerance, independent behavior, and dry, comical reactions.
-
-### Customization Studio (⌘K)
-
-Accessible directly from the menu bar or settings:
-* **Fur Colors**: 10 hand-curated warm swatches (Warm White, Cream, Peach, Ginger, Caramel, Cinnamon, Mocha, Slate, Charcoal, Velvet Black). *Strictly no cold blues or harsh purples.*
-* **Patterns**: Solid, Tuxedo, Siamese Points, and Tabby stripes.
-* **Eye Styles**: Round, Sleepy, and Sparkle with customized iris glints.
-* **Accessories**: Vector-anchored Collars, Bows, Party Hats, Glasses, Scarves, Bandanas, and Crowns.
-* **Body Scale**: Classic, Chubby, and Petite options with live panel re-centering.
+* **6 Personalities**: Sleepy, Playful, Affectionate, Energetic, Curious, and Grumpy—each with unique pet tolerance and cadence.
+* **Studio (⌘K)**: 10 warm fur palettes, 4 coats (Solid, Tuxedo, Siamese, Tabby), 3 eye styles, body scaling, and layered vector accessories (collars, bows, glasses, hats).
 
 ---
 
-## ⚙️ Native Settings & Menu Bar
+## ⚙️ Native Settings (⌘,)
 
-Cookie features a comprehensive, native seven-tab preference pane (⌘,):
-
-1. **General**: Startup behavior, launch at login (`SMAppService`), desktop visibility, and multi-display coordinate recall.
-2. **Appearance**: Dynamic scale slider, animation frame rate (30 / 60 FPS), and macOS Reduced Motion compliance.
-3. **Sound**: Master volume, dedicated meow slider, interaction sound toggles, and ambient purring controls.
-4. **Behavior**: Activity cadence (Calm / Balanced / Lively), autonomous behavior toggle & pause, cursor following/dodging intensity, window exploration & jumping toggles, dock exploration toggles, and autonomous toys.
-5. **Stats**: Behavior memory metrics (total pets, favorite petting zones, jumps executed, naps enjoyed, affection level, and companionship duration).
-6. **Privacy**: Statement of complete local data residency, offline operation guarantee, and zero analytics.
-7. **About**: Version 1.1.0 metadata, Sparkle in-app update checks, release notes, open-source acknowledgments, and repository links.
+Seven native preference tabs:
+* **General**: Login item (`SMAppService`), desktop visibility, and multi-display coordinate recall.
+* **Appearance**: Scale slider, 30/60 FPS toggle, and macOS Reduced Motion support.
+* **Sound**: Master, meow, and interaction volume controls with ambient purring toggles.
+* **Behavior**: Cadence (Calm / Balanced / Lively), window jumping, dock exploration, and cursor interactions.
+* **Stats**: Lifetime pets, favorite petting spots, jumps completed, and friendship progress.
+* **Privacy & About**: Local data residency confirmation, Sparkle update checks, and version info.
 
 ---
 
-## 🔄 Secure In-App Updates
+## 🔄 In-App Updates
 
-Cookie features an integrated, privacy-focused updater powered by **Sparkle 2.6+**:
-
-* **Cryptographic Security**: Every update binary is verified using **EdDSA (ed25519)** digital signatures before execution.
-* **Cozy Custom Dialog (`UpdatePromptView`)**: Beautiful native SwiftUI prompt with Cookie artwork, release highlights, and seamless action buttons:
-  * **Install & Relaunch**: Automatically downloads and upgrades Cookie in place.
-  * **Remind Me Later**: Snoozes the prompt without nagging.
-  * **Skip This Version**: Bypasses the release until the next version is published.
-* **Appcast Feed**: Published transparently via GitHub Releases at `website/appcast.xml`.
+Integrated with **Sparkle 2.6+**:
+* **Cryptographic Security**: Every release binary is validated with EdDSA (ed25519) digital signatures.
+* **Cozy Dialog (`UpdatePromptView`)**: Native SwiftUI prompt with release highlights, install & relaunch, and snooze/skip options.
 
 ---
 
@@ -284,84 +223,52 @@ Cookie features an integrated, privacy-focused updater powered by **Sparkle 2.6+
 ```
 Cookie/
 ├── Cookie/
-│   ├── Animation/       # SpriteAnimationController, texture slicers, frame caches, procedural overlays
-│   ├── App/             # Entry point, AppDelegate, WindowManager composition
-│   ├── Assets/          # Asset catalogs, AppIcon.appiconset, CookieArt, Sound assets
-│   ├── Audio/           # AudioManager, sound synthesis engine, volume buses
+│   ├── Animation/       # SpriteAnimationController, texture slicers, frame caches
+│   ├── App/             # Entry point, AppDelegate, WindowManager
+│   ├── Assets/          # Asset catalogs, AppIcon, CookieArt
+│   ├── Audio/           # AudioManager, sound synthesis engine
 │   ├── Behaviors/       # CookieBehaviorEngine, BehaviorScheduler, BehaviorMemory
-│   ├── Context/         # ApplicationContextDetector, workflow categorization
-│   ├── Cookie/          # CompanionPanelController, NSPanel, CookieScene (SpriteKit)
-│   ├── Cursor/          # Cursor proximity tracking, glance & curiosity mechanics
-│   ├── Customization/   # Appearance catalogs, vector accessories, pattern generators
+│   ├── Context/         # ApplicationContextDetector & workflow classification
+│   ├── Cookie/          # CompanionPanelController, NSPanel, CookieScene
 │   ├── Dock/            # DockEnvironmentDetector, DockInteractionController
-│   ├── MenuBar/         # Status item controller, companion menu (feeding, toys, actions)
-│   ├── Models/          # CookieProfile, CookieSettings, Personality, Activity, WorldItems
-│   ├── Persistence/     # CookieStore (JSON manager with atomic writes & backup safeguards)
-│   ├── Resources/       # Info.plist, AppIcon.icns, Sprites, Sounds
-│   ├── Settings/        # Native SwiftUI 7-tab preference panels (General, Behavior, Stats, etc.)
-│   ├── Updates/         # UpdateManager (Sparkle 2.6+), AppcastParser, UpdatePromptView
-│   ├── ViewModels/      # SwiftUI observable view models
-│   ├── Views/           # Welcome onboarding, character studio preview, update prompt view
-│   └── Window/          # JumpPlanner, WindowInteractionController, WindowEnvironmentProvider
-├── Packaging/           # Production DMG packaging script, HiDPI background artwork, volume icon
-├── scripts/             # Asset generators, sound synthesizer, icon builders, update signing
-├── website/             # Showcase product website, downloads portal, and appcast feed
-├── DISTRIBUTION.md      # Code signing, notarization, and DMG build guide
-└── project.yml          # Declarative XcodeGen configuration
+│   ├── MenuBar/         # Status item controller, companion menu
+│   ├── Models/          # CookieProfile, CookieSettings, WorldItems
+│   ├── Persistence/     # CookieStore (local JSON persistence)
+│   ├── Settings/        # Native SwiftUI 7-tab preference panels
+│   ├── Updates/         # UpdateManager (Sparkle 2.6+), UpdatePromptView
+│   └── Window/          # JumpPlanner, WindowInteractionController
+├── Packaging/           # Production DMG packaging script, HiDPI artwork, volume icon
+├── scripts/             # Asset generators, sound synthesizer, update signing
+└── website/             # Product showcase site and appcast feed
 ```
 
 ---
 
 ## 🚀 Building & Developing
 
-### Requirements
-* **macOS 14.0 Sonoma** or later
-* **Xcode 15.0+** with Command Line Tools
-* **[XcodeGen](https://github.com/yonaskolb/XcodeGen)** (`brew install xcodegen`)
-
-### Quick Start
+**Requirements**: macOS 14.0+, Xcode 15.0+, and [XcodeGen](https://github.com/yonaskolb/XcodeGen) (`brew install xcodegen`).
 
 ```bash
-# 1. Clone repository
-git clone https://github.com/MdKasif0/Cookie.git
-cd Cookie
-
-# 2. Generate Xcode project from project.yml
+# 1. Generate Xcode project & build
 xcodegen generate
-
-# 3. Open in Xcode or build via CLI
-open Cookie.xcodeproj
-
-# Or build directly with Xcode command line tools:
 xcodebuild -scheme Cookie -configuration Release -derivedDataPath .build/DerivedData build
-```
 
-### Packaging Production DMG
-
-To package the signed, styled production disk image:
-
-```bash
+# 2. Package production DMG
 ./Packaging/build_dmg.sh
 ```
 
-The script builds a fresh Release bundle, sets the custom `.VolumeIcon.icns`, configures the Finder presentation with Retina background artwork (`dmg_background.tiff`), aligns icons symmetrically, and outputs `dist/Cookie-1.1.0.dmg`.
-
 ---
 
-## 📦 Distribution & Packaging
+## 📦 Distribution
 
-* **Marketing Version**: `1.1.0` (Build `2`)
-* **Binary Format**: Universal 2 (`arm64` Apple Silicon + `x86_64` Intel)
-* **Installer Format**: Self-contained ~23 MB disk image (`Cookie-1.1.0.dmg`, UDZO)
-* **Volume Styling**: Custom icon (`AppIcon.icns`) and HiDPI multi-page TIFF artwork
-* **Local Data Path**: `~/Library/Application Support/Cookie/cookie-store.json`
+* **Binary**: Universal 2 (`arm64` + `x86_64`)
+* **DMG**: Self-contained ~23 MB image (`Cookie-1.1.0.dmg`, UDZO) with custom HiDPI artwork and `.VolumeIcon.icns`.
+* **Data Path**: `~/Library/Application Support/Cookie/cookie-store.json`
 
-For complete details on Hardened Runtime, Apple Developer ID signing, and notarization workflows, see [DISTRIBUTION.md](DISTRIBUTION.md).
+For signing and notarization workflows, see [DISTRIBUTION.md](DISTRIBUTION.md).
 
 ---
 
 ## 📄 License
 
-Cookie is free and open-source software distributed under the **[MIT License](LICENSE)**.
-
-Crafted with care by [Md Kasif Uddin](https://github.com/MdKasif0).
+Free and open-source software under the [MIT License](LICENSE). Crafted with care by [Md Kasif Uddin](https://github.com/MdKasif0).
