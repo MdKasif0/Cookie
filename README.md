@@ -22,9 +22,7 @@
 
 ## 📖 Overview
 
-**Cookie** is an authentic, lightweight indie desktop companion designed specifically for macOS. She wanders gracefully across your display, traverses open application windows with physics-backed leaps, explores the macOS Dock, follows your cursor with curious glances, naps beside your active projects, and purrs when pet.
-
-Built with native **SpriteKit** and **SwiftUI**, Cookie is whisper-quiet on system hardware (~0% idle CPU during sleep) and never interrupts your workflow. She understands your working context, remembers your favorite interactions over time, and stays 100% private and offline on your machine.
+**Cookie** is a lightweight, offline desktop companion for macOS built natively with **SwiftUI** and **SpriteKit**. She roams your screen, leaps between open windows and the Dock, follows your cursor, and naps quietly beside your work—whisper-quiet on hardware (~0% idle CPU), zero telemetry, and completely non-intrusive.
 
 ---
 
