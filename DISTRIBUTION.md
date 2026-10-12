@@ -10,10 +10,10 @@ This document describes the distribution architecture, Apple Developer ID signin
 | :--- | :--- |
 | **Application Name** | Cookie |
 | **Bundle Identifier** | `com.cookie.mac` |
-| **Marketing Version** | `1.0.0` |
+| **Marketing Version** | `1.1.0` |
 | **Minimum System Version** | macOS 14.0 (Sonoma) or later |
 | **Architecture** | Universal 2 (Apple Silicon `arm64` + Intel `x86_64`) |
-| **Distribution Format** | Compressed Apple Disk Image (`Cookie-1.0.0.dmg`, UDZO) |
+| **Distribution Format** | Compressed Apple Disk Image (`Cookie-1.1.0.dmg`, UDZO) |
 | **Current Build Signature** | Ad-hoc signed (`-`) with Hardened Runtime compatibility |
 
 ---
@@ -90,7 +90,7 @@ Sign the resulting `.dmg` with the Developer ID Application certificate:
 ```bash
 codesign --timestamp \
   --sign "Developer ID Application: Your Name (TEAM_ID)" \
-  dist/Cookie-1.0.0.dmg
+  dist/Cookie-1.1.0.dmg
 ```
 
 ---
@@ -114,7 +114,7 @@ xcrun notarytool store-credentials "CookieNotary" \
 Submit the disk image to the Apple Notary Service and wait for the verdict:
 
 ```bash
-xcrun notarytool submit dist/Cookie-1.0.0.dmg \
+xcrun notarytool submit dist/Cookie-1.1.0.dmg \
   --keychain-profile "CookieNotary" \
   --wait
 ```
@@ -124,10 +124,10 @@ Once notarization succeeds, staple the cryptographic ticket directly to the disk
 
 ```bash
 # Staple the DMG
-xcrun stapler staple dist/Cookie-1.0.0.dmg
+xcrun stapler staple dist/Cookie-1.1.0.dmg
 
 # Verify the staple
-spctl -a -t open --context context:primary-signature -v dist/Cookie-1.0.0.dmg
+spctl -a -t open --context context:primary-signature -v dist/Cookie-1.1.0.dmg
 ```
 
 ---
