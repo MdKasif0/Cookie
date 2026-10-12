@@ -91,7 +91,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ------------------------------------------------------------------------
-  // 3. Chapter 2: "Sometimes curious." (Cursor Tracking Stage)
+  // 3. Chapter 2: "Sometimes curious." (Cursor & Touch Tracking Stage)
   // ------------------------------------------------------------------------
   const curiousStage = document.getElementById("curiousStage");
   const curiousCat = document.getElementById("curiousCat");
@@ -102,10 +102,10 @@ document.addEventListener("DOMContentLoaded", () => {
   if (curiousStage && curiousCat) {
     let isClose = false;
 
-    curiousStage.addEventListener("mousemove", (e) => {
+    const handleCuriousMove = (clientX, clientY) => {
       const rect = curiousStage.getBoundingClientRect();
-      const mouseX = e.clientX - rect.left;
-      const mouseY = e.clientY - rect.top;
+      const mouseX = clientX - rect.left;
+      const mouseY = clientY - rect.top;
 
       // Position the target indicator ring
       if (curiousPointer) {
@@ -142,14 +142,36 @@ document.addEventListener("DOMContentLoaded", () => {
         if (curiousCatImg) curiousCatImg.src = "assets/hero-cookie-open.png";
         if (curiousCatWebp) curiousCatWebp.srcset = "assets/hero-cookie-open.webp";
       }
-    });
+    };
 
-    curiousStage.addEventListener("mouseleave", () => {
+    const resetCurious = () => {
       curiousCat.style.transform = "translate(0, 0) rotate(0deg)";
       isClose = false;
       if (curiousCatImg) curiousCatImg.src = "assets/hero-cookie-open.png";
       if (curiousCatWebp) curiousCatWebp.srcset = "assets/hero-cookie-open.webp";
+    };
+
+    curiousStage.addEventListener("mousemove", (e) => {
+      handleCuriousMove(e.clientX, e.clientY);
     });
+
+    curiousStage.addEventListener("mouseleave", resetCurious);
+
+    // Mobile touch tracking support
+    curiousStage.addEventListener("touchstart", (e) => {
+      if (e.touches && e.touches.length > 0) {
+        handleCuriousMove(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, { passive: true });
+
+    curiousStage.addEventListener("touchmove", (e) => {
+      if (e.touches && e.touches.length > 0) {
+        handleCuriousMove(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, { passive: true });
+
+    curiousStage.addEventListener("touchend", resetCurious);
+    curiousStage.addEventListener("touchcancel", resetCurious);
   }
 
   // ------------------------------------------------------------------------
@@ -191,6 +213,8 @@ document.addEventListener("DOMContentLoaded", () => {
     let isDragging = false;
     let startX = 0;
     let startY = 0;
+    let lastX = 0;
+    let lastY = 0;
     let initialLeft = 140;
     let initialTop = 120;
     let dragDistance = 0;
@@ -205,6 +229,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       startX = e.clientX;
       startY = e.clientY;
+      lastX = e.clientX;
+      lastY = e.clientY;
       initialLeft = draggableCookie.offsetLeft;
       initialTop = draggableCookie.offsetTop;
 
@@ -220,7 +246,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const dx = e.clientX - startX;
       const dy = e.clientY - startY;
-      dragDistance += Math.hypot(e.movementX, e.movementY);
+      const stepX = e.clientX - lastX;
+      const stepY = e.clientY - lastY;
+      lastX = e.clientX;
+      lastY = e.clientY;
+      dragDistance += Math.hypot(stepX, stepY);
 
       const sandboxRect = dragSandbox.getBoundingClientRect();
       const cookieWidth = draggableCookie.offsetWidth;
@@ -674,6 +704,11 @@ document.addEventListener("DOMContentLoaded", () => {
       mobileNavMenu.classList.toggle("active", isOpen);
       mobileNavToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
       mobileNavMenu.setAttribute("aria-hidden", isOpen ? "false" : "true");
+      if (isOpen) {
+        document.body.style.overflow = "hidden";
+      } else {
+        document.body.style.overflow = "";
+      }
     };
 
     mobileNavToggle.addEventListener("click", () => {
