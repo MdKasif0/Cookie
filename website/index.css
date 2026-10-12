@@ -80,7 +80,7 @@ body {
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 a {
@@ -129,7 +129,7 @@ img {
   width: 100%;
   max-width: var(--max-w-content);
   margin: 0 auto;
-  padding: 0 32px;
+  padding-inline: clamp(16px, 4vw, 32px);
 }
 
 /* ==========================================================================
@@ -306,14 +306,15 @@ img {
   background-position: center bottom;
   background-size: cover;
   min-height: calc(100vh - 64px);
+  min-height: calc(100dvh - 64px);
   max-height: 960px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  padding: clamp(48px, 6vh, 66px) 24px 0;
+  padding: clamp(32px, 5vh, 66px) clamp(16px, 3vw, 24px) 0;
   text-align: center;
-  overflow: hidden;
+  overflow: clip;
 }
 
 .hero-container {
@@ -459,14 +460,17 @@ img {
 
 /* Quiet Version Metadata */
 .hero-release-tag {
-  font-size: 0.82rem;
+  font-size: clamp(0.74rem, 2.4vw, 0.82rem);
   color: #8b7d70;
   letter-spacing: 0.01em;
-  margin-bottom: clamp(18px, 3vh, 32px);
+  margin-bottom: clamp(16px, 2.8vh, 32px);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px 8px;
+  flex-wrap: wrap;
+  padding-inline: 12px;
+  line-height: 1.4;
 }
 
 .hero-release-tag .meta-dot {
@@ -479,8 +483,8 @@ img {
    ========================================================================== */
 .hero-stage {
   position: relative;
-  width: 290px;
-  height: 270px;
+  width: min(290px, 80vw);
+  height: min(270px, 75vw);
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -490,8 +494,8 @@ img {
 
 .cookie-actor-wrap {
   position: relative;
-  width: 270px;
-  height: 270px;
+  width: min(270px, 75vw);
+  height: min(270px, 75vw);
   cursor: pointer;
   user-select: none;
   transform-origin: 50% 90%;
@@ -1977,36 +1981,6 @@ img {
   border-color: var(--border-strong);
   background-color: var(--surface);
   transform: translateY(-1px);
-}
-
-/* Footer Responsiveness */
-@media (max-width: 960px) {
-  .footer-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 36px;
-  }
-}
-
-@media (max-width: 580px) {
-  .site-footer {
-    padding: 60px 0 36px;
-  }
-
-  .footer-grid {
-    grid-template-columns: 1fr;
-    gap: 32px;
-  }
-
-  .footer-bottom {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 14px;
-  }
-
-  .footer-bottom-actions {
-    width: 100%;
-    justify-content: space-between;
-  }
 }
 
 /* Box Peeker Easter Egg */
