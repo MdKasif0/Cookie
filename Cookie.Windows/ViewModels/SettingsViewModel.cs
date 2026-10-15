@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using Cookie.Windows.Core.Audio;
@@ -36,7 +37,25 @@ public class SettingsViewModel : INotifyPropertyChanged
 
         ResetPersonalityCommand = new RelayCommand(() =>
         {
+            _profile.Personality = CookiePersonality.Playful;
             _profile.Settings.ResetPersonalityAndActivitySettings();
+            SaveAndNotify();
+            OnPropertyChanged(string.Empty);
+        });
+
+        ResetAppearanceCommand = new RelayCommand(() =>
+        {
+            _profile.Appearance = new CookieAppearanceConfig();
+            SaveAndNotify();
+            OnPropertyChanged(string.Empty);
+        });
+
+        RemoveAllAccessoriesCommand = new RelayCommand(() =>
+        {
+            foreach (var acc in _profile.Appearance.Accessories)
+            {
+                acc.IsEnabled = false;
+            }
             SaveAndNotify();
             OnPropertyChanged(string.Empty);
         });
@@ -58,10 +77,15 @@ public class SettingsViewModel : INotifyPropertyChanged
 
     public ICommand TestSoundCommand { get; }
     public ICommand ResetPersonalityCommand { get; }
+    public ICommand ResetAppearanceCommand { get; }
+    public ICommand RemoveAllAccessoriesCommand { get; }
     public ICommand ResetCursorCommand { get; }
     public ICommand ResetExplorationCommand { get; }
 
-    // General
+    public CookieProfile Profile => _profile;
+    public CookieAppearanceConfig Appearance => _profile.Appearance;
+
+    // General & Name
     public string CharacterName
     {
         get => _profile.DisplayName;
@@ -71,6 +95,7 @@ public class SettingsViewModel : INotifyPropertyChanged
             {
                 _profile.DisplayName = value;
                 SaveAndNotify();
+                OnPropertyChanged();
             }
         }
     }
@@ -78,28 +103,28 @@ public class SettingsViewModel : INotifyPropertyChanged
     public bool LaunchAtLogin
     {
         get => _profile.Settings.LaunchAtLogin;
-        set { if (_profile.Settings.LaunchAtLogin != value) { _profile.Settings.LaunchAtLogin = value; SaveAndNotify(); } }
+        set { if (_profile.Settings.LaunchAtLogin != value) { _profile.Settings.LaunchAtLogin = value; SaveAndNotify(); OnPropertyChanged(); } }
     }
 
     public bool ShowOnStartup
     {
         get => _profile.Settings.ShowOnStartup;
-        set { if (_profile.Settings.ShowOnStartup != value) { _profile.Settings.ShowOnStartup = value; SaveAndNotify(); } }
+        set { if (_profile.Settings.ShowOnStartup != value) { _profile.Settings.ShowOnStartup = value; SaveAndNotify(); OnPropertyChanged(); } }
     }
 
     public bool RememberPosition
     {
         get => _profile.Settings.RememberPosition;
-        set { if (_profile.Settings.RememberPosition != value) { _profile.Settings.RememberPosition = value; SaveAndNotify(); } }
+        set { if (_profile.Settings.RememberPosition != value) { _profile.Settings.RememberPosition = value; SaveAndNotify(); OnPropertyChanged(); } }
     }
 
     public bool AutomaticallyCheckForUpdates
     {
         get => _profile.Settings.AutomaticallyCheckForUpdates;
-        set { if (_profile.Settings.AutomaticallyCheckForUpdates != value) { _profile.Settings.AutomaticallyCheckForUpdates = value; SaveAndNotify(); } }
+        set { if (_profile.Settings.AutomaticallyCheckForUpdates != value) { _profile.Settings.AutomaticallyCheckForUpdates = value; SaveAndNotify(); OnPropertyChanged(); } }
     }
 
-    // Appearance
+    // Appearance: Size & Animation
     public double CookieSize
     {
         get => _profile.Settings.CookieSize;
@@ -110,6 +135,7 @@ public class SettingsViewModel : INotifyPropertyChanged
             {
                 _profile.Settings.CookieSize = clamped;
                 SaveAndNotify();
+                OnPropertyChanged();
                 OnPropertyChanged(nameof(CookieSizePercent));
             }
         }
@@ -127,6 +153,7 @@ public class SettingsViewModel : INotifyPropertyChanged
             {
                 _profile.Settings.AnimationIntensity = clamped;
                 SaveAndNotify();
+                OnPropertyChanged();
                 OnPropertyChanged(nameof(AnimationIntensityPercent));
             }
         }
@@ -134,6 +161,7 @@ public class SettingsViewModel : INotifyPropertyChanged
 
     public string AnimationIntensityPercent => $"{(int)Math.Round(AnimationIntensity * 100)}%";
 
+    // Appearance: Fur, Eyes, Ears, Tail, Body
     public FurColor SelectedFurColor
     {
         get => _profile.Appearance.FurColor;
@@ -143,11 +171,26 @@ public class SettingsViewModel : INotifyPropertyChanged
             {
                 _profile.Appearance.FurColor = value;
                 SaveAndNotify();
+                OnPropertyChanged();
             }
         }
     }
-
     public IReadOnlyList<FurColor> AvailableFurColors => Enum.GetValues<FurColor>();
+
+    public FurPattern SelectedFurPattern
+    {
+        get => _profile.Appearance.Pattern;
+        set
+        {
+            if (_profile.Appearance.Pattern != value)
+            {
+                _profile.Appearance.Pattern = value;
+                SaveAndNotify();
+                OnPropertyChanged();
+            }
+        }
+    }
+    public IReadOnlyList<FurPattern> AvailableFurPatterns => Enum.GetValues<FurPattern>();
 
     public EyeColor SelectedEyeColor
     {
@@ -158,11 +201,136 @@ public class SettingsViewModel : INotifyPropertyChanged
             {
                 _profile.Appearance.EyeColor = value;
                 SaveAndNotify();
+                OnPropertyChanged();
             }
         }
     }
-
     public IReadOnlyList<EyeColor> AvailableEyeColors => Enum.GetValues<EyeColor>();
+
+    public EyeStyle SelectedEyeStyle
+    {
+        get => _profile.Appearance.EyeStyle;
+        set
+        {
+            if (_profile.Appearance.EyeStyle != value)
+            {
+                _profile.Appearance.EyeStyle = value;
+                SaveAndNotify();
+                OnPropertyChanged();
+            }
+        }
+    }
+    public IReadOnlyList<EyeStyle> AvailableEyeStyles => Enum.GetValues<EyeStyle>();
+
+    public EarVariation SelectedEarVariation
+    {
+        get => _profile.Appearance.EarVariation;
+        set
+        {
+            if (_profile.Appearance.EarVariation != value)
+            {
+                _profile.Appearance.EarVariation = value;
+                SaveAndNotify();
+                OnPropertyChanged();
+            }
+        }
+    }
+    public IReadOnlyList<EarVariation> AvailableEarVariations => Enum.GetValues<EarVariation>();
+
+    public TailVariation SelectedTailVariation
+    {
+        get => _profile.Appearance.TailVariation;
+        set
+        {
+            if (_profile.Appearance.TailVariation != value)
+            {
+                _profile.Appearance.TailVariation = value;
+                SaveAndNotify();
+                OnPropertyChanged();
+            }
+        }
+    }
+    public IReadOnlyList<TailVariation> AvailableTailVariations => Enum.GetValues<TailVariation>();
+
+    public BodyVariation SelectedBodyVariation
+    {
+        get => _profile.Appearance.BodyVariation;
+        set
+        {
+            if (_profile.Appearance.BodyVariation != value)
+            {
+                _profile.Appearance.BodyVariation = value;
+                SaveAndNotify();
+                OnPropertyChanged();
+            }
+        }
+    }
+    public IReadOnlyList<BodyVariation> AvailableBodyVariations => Enum.GetValues<BodyVariation>();
+
+    // Accessories
+    public bool AccessoryCollar
+    {
+        get => _profile.Appearance.Accessory(AccessoryKind.Collar).IsEnabled;
+        set { SetAccessory(AccessoryKind.Collar, value); OnPropertyChanged(); }
+    }
+
+    public bool AccessoryBow
+    {
+        get => _profile.Appearance.Accessory(AccessoryKind.Bow).IsEnabled;
+        set { SetAccessory(AccessoryKind.Bow, value); OnPropertyChanged(); }
+    }
+
+    public bool AccessoryHat
+    {
+        get => _profile.Appearance.Accessory(AccessoryKind.Hat).IsEnabled;
+        set { SetAccessory(AccessoryKind.Hat, value); OnPropertyChanged(); }
+    }
+
+    public bool AccessoryGlasses
+    {
+        get => _profile.Appearance.Accessory(AccessoryKind.Glasses).IsEnabled;
+        set { SetAccessory(AccessoryKind.Glasses, value); OnPropertyChanged(); }
+    }
+
+    public bool AccessoryScarf
+    {
+        get => _profile.Appearance.Accessory(AccessoryKind.Scarf).IsEnabled;
+        set { SetAccessory(AccessoryKind.Scarf, value); OnPropertyChanged(); }
+    }
+
+    public bool AccessoryCrown
+    {
+        get => _profile.Appearance.Accessory(AccessoryKind.Crown).IsEnabled;
+        set { SetAccessory(AccessoryKind.Crown, value); OnPropertyChanged(); }
+    }
+
+    public bool AccessoryBandana
+    {
+        get => _profile.Appearance.Accessory(AccessoryKind.Bandana).IsEnabled;
+        set { SetAccessory(AccessoryKind.Bandana, value); OnPropertyChanged(); }
+    }
+
+    public bool AccessoryPumpkin
+    {
+        get => _profile.Appearance.Accessory(AccessoryKind.Pumpkin).IsEnabled;
+        set { SetAccessory(AccessoryKind.Pumpkin, value); OnPropertyChanged(); }
+    }
+
+    public bool AccessorySantaHat
+    {
+        get => _profile.Appearance.Accessory(AccessoryKind.SantaHat).IsEnabled;
+        set { SetAccessory(AccessoryKind.SantaHat, value); OnPropertyChanged(); }
+    }
+
+    private void SetAccessory(AccessoryKind kind, bool enabled)
+    {
+        var acc = _profile.Appearance.Accessory(kind);
+        if (acc.IsEnabled != enabled)
+        {
+            acc.IsEnabled = enabled;
+            SaveAndNotify();
+        }
+    }
 
     public ReducedMotionMode SelectedReducedMotion
     {
@@ -173,13 +341,35 @@ public class SettingsViewModel : INotifyPropertyChanged
             {
                 _profile.Settings.ReducedMotion = value;
                 SaveAndNotify();
+                OnPropertyChanged();
             }
         }
     }
-
     public IReadOnlyList<ReducedMotionMode> AvailableReducedMotionModes => Enum.GetValues<ReducedMotionMode>();
 
     // Personality
+    public CookiePersonality SelectedPersonality
+    {
+        get => _profile.Personality;
+        set
+        {
+            if (_profile.Personality != value)
+            {
+                _profile.Personality = value;
+                SaveAndNotify();
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(PersonalitySummary));
+                OnPropertyChanged(nameof(PersonalityWalkSpeed));
+                OnPropertyChanged(nameof(PersonalityPetTolerance));
+            }
+        }
+    }
+    public IReadOnlyList<CookiePersonality> AvailablePersonalities => Enum.GetValues<CookiePersonality>();
+
+    public string PersonalitySummary => _profile.Personality.GetSummary();
+    public string PersonalityWalkSpeed => $"{_profile.Personality.GetWalkSpeed()} pt/s";
+    public string PersonalityPetTolerance => $"{_profile.Personality.GetPetTolerance()} strokes/min";
+
     public ActivityLevel SelectedActivity
     {
         get => _profile.Settings.Activity;
@@ -189,28 +379,28 @@ public class SettingsViewModel : INotifyPropertyChanged
             {
                 _profile.Settings.Activity = value;
                 SaveAndNotify();
+                OnPropertyChanged();
             }
         }
     }
-
     public IReadOnlyList<ActivityLevel> AvailableActivities => Enum.GetValues<ActivityLevel>();
 
     public bool AutonomousBehaviorEnabled
     {
         get => _profile.Settings.AutonomousBehaviorEnabled;
-        set { if (_profile.Settings.AutonomousBehaviorEnabled != value) { _profile.Settings.AutonomousBehaviorEnabled = value; SaveAndNotify(); } }
+        set { if (_profile.Settings.AutonomousBehaviorEnabled != value) { _profile.Settings.AutonomousBehaviorEnabled = value; SaveAndNotify(); OnPropertyChanged(); } }
     }
 
     public bool PauseAutonomousBehavior
     {
         get => _profile.Settings.PauseAutonomousBehavior;
-        set { if (_profile.Settings.PauseAutonomousBehavior != value) { _profile.Settings.PauseAutonomousBehavior = value; SaveAndNotify(); } }
+        set { if (_profile.Settings.PauseAutonomousBehavior != value) { _profile.Settings.PauseAutonomousBehavior = value; SaveAndNotify(); OnPropertyChanged(); } }
     }
 
     public bool RandomInteractions
     {
         get => _profile.Settings.RandomInteractions;
-        set { if (_profile.Settings.RandomInteractions != value) { _profile.Settings.RandomInteractions = value; SaveAndNotify(); } }
+        set { if (_profile.Settings.RandomInteractions != value) { _profile.Settings.RandomInteractions = value; SaveAndNotify(); OnPropertyChanged(); } }
     }
 
     public SleepBehavior SelectedSleepBehavior
@@ -222,29 +412,29 @@ public class SettingsViewModel : INotifyPropertyChanged
             {
                 _profile.Settings.Sleep = value;
                 SaveAndNotify();
+                OnPropertyChanged();
             }
         }
     }
-
     public IReadOnlyList<SleepBehavior> AvailableSleepBehaviors => Enum.GetValues<SleepBehavior>();
 
     // Cursor
     public bool CursorInteraction
     {
         get => _profile.Settings.CursorInteraction;
-        set { if (_profile.Settings.CursorInteraction != value) { _profile.Settings.CursorInteraction = value; SaveAndNotify(); } }
+        set { if (_profile.Settings.CursorInteraction != value) { _profile.Settings.CursorInteraction = value; SaveAndNotify(); OnPropertyChanged(); } }
     }
 
     public bool CursorFollowingEnabled
     {
         get => _profile.Settings.CursorFollowingEnabled;
-        set { if (_profile.Settings.CursorFollowingEnabled != value) { _profile.Settings.CursorFollowingEnabled = value; SaveAndNotify(); } }
+        set { if (_profile.Settings.CursorFollowingEnabled != value) { _profile.Settings.CursorFollowingEnabled = value; SaveAndNotify(); OnPropertyChanged(); } }
     }
 
     public bool CursorDodgingEnabled
     {
         get => _profile.Settings.CursorDodgingEnabled;
-        set { if (_profile.Settings.CursorDodgingEnabled != value) { _profile.Settings.CursorDodgingEnabled = value; SaveAndNotify(); } }
+        set { if (_profile.Settings.CursorDodgingEnabled != value) { _profile.Settings.CursorDodgingEnabled = value; SaveAndNotify(); OnPropertyChanged(); } }
     }
 
     public CursorFollowingIntensity SelectedFollowingIntensity
@@ -256,42 +446,42 @@ public class SettingsViewModel : INotifyPropertyChanged
             {
                 _profile.Settings.FollowingIntensity = value;
                 SaveAndNotify();
+                OnPropertyChanged();
             }
         }
     }
-
     public IReadOnlyList<CursorFollowingIntensity> AvailableFollowingIntensities => Enum.GetValues<CursorFollowingIntensity>();
 
     // Desktop Exploration
     public bool DockInteraction
     {
         get => _profile.Settings.DockInteraction;
-        set { if (_profile.Settings.DockInteraction != value) { _profile.Settings.DockInteraction = value; SaveAndNotify(); } }
+        set { if (_profile.Settings.DockInteraction != value) { _profile.Settings.DockInteraction = value; SaveAndNotify(); OnPropertyChanged(); } }
     }
 
     public bool AutonomousDockExploration
     {
         get => _profile.Settings.AutonomousDockExploration;
-        set { if (_profile.Settings.AutonomousDockExploration != value) { _profile.Settings.AutonomousDockExploration = value; SaveAndNotify(); } }
+        set { if (_profile.Settings.AutonomousDockExploration != value) { _profile.Settings.AutonomousDockExploration = value; SaveAndNotify(); OnPropertyChanged(); } }
     }
 
     public bool WindowInteraction
     {
         get => _profile.Settings.WindowInteraction;
-        set { if (_profile.Settings.WindowInteraction != value) { _profile.Settings.WindowInteraction = value; SaveAndNotify(); } }
+        set { if (_profile.Settings.WindowInteraction != value) { _profile.Settings.WindowInteraction = value; SaveAndNotify(); OnPropertyChanged(); } }
     }
 
     public bool WindowJumpingEnabled
     {
         get => _profile.Settings.WindowJumpingEnabled;
-        set { if (_profile.Settings.WindowJumpingEnabled != value) { _profile.Settings.WindowJumpingEnabled = value; SaveAndNotify(); } }
+        set { if (_profile.Settings.WindowJumpingEnabled != value) { _profile.Settings.WindowJumpingEnabled = value; SaveAndNotify(); OnPropertyChanged(); } }
     }
 
     // Sound
     public bool SoundEnabled
     {
         get => _profile.Settings.SoundEnabled;
-        set { if (_profile.Settings.SoundEnabled != value) { _profile.Settings.SoundEnabled = value; SaveAndNotify(); } }
+        set { if (_profile.Settings.SoundEnabled != value) { _profile.Settings.SoundEnabled = value; SaveAndNotify(); OnPropertyChanged(); } }
     }
 
     public double MasterVolume
@@ -304,11 +494,11 @@ public class SettingsViewModel : INotifyPropertyChanged
             {
                 _profile.Settings.MasterVolume = clamped;
                 SaveAndNotify();
+                OnPropertyChanged();
                 OnPropertyChanged(nameof(MasterVolumePercent));
             }
         }
     }
-
     public string MasterVolumePercent => $"{(int)Math.Round(MasterVolume * 100)}%";
 
     public double MeowVolume
@@ -321,23 +511,23 @@ public class SettingsViewModel : INotifyPropertyChanged
             {
                 _profile.Settings.MeowVolume = clamped;
                 SaveAndNotify();
+                OnPropertyChanged();
                 OnPropertyChanged(nameof(MeowVolumePercent));
             }
         }
     }
-
     public string MeowVolumePercent => $"{(int)Math.Round(MeowVolume * 100)}%";
 
     public bool InteractionSounds
     {
         get => _profile.Settings.InteractionSounds;
-        set { if (_profile.Settings.InteractionSounds != value) { _profile.Settings.InteractionSounds = value; SaveAndNotify(); } }
+        set { if (_profile.Settings.InteractionSounds != value) { _profile.Settings.InteractionSounds = value; SaveAndNotify(); OnPropertyChanged(); } }
     }
 
     public bool PurringSounds
     {
         get => _profile.Settings.PurringSounds;
-        set { if (_profile.Settings.PurringSounds != value) { _profile.Settings.PurringSounds = value; SaveAndNotify(); } }
+        set { if (_profile.Settings.PurringSounds != value) { _profile.Settings.PurringSounds = value; SaveAndNotify(); OnPropertyChanged(); } }
     }
 
     public string AppVersion => "1.1.0";

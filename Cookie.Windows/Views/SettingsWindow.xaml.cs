@@ -9,6 +9,8 @@ namespace Cookie.Windows.Views;
 
 public partial class SettingsWindow : Window
 {
+    private readonly CookieProfile _profile;
+
     public SettingsWindow(
         CookieProfile profile,
         SettingsManager settingsManager,
@@ -16,6 +18,20 @@ public partial class SettingsWindow : Window
         Action? onSettingsChanged = null)
     {
         InitializeComponent();
-        DataContext = new SettingsViewModel(profile, settingsManager, audioManager, onSettingsChanged);
+        _profile = profile;
+
+        var vm = new SettingsViewModel(profile, settingsManager, audioManager, () =>
+        {
+            UpdateLivePreview();
+            onSettingsChanged?.Invoke();
+        });
+
+        DataContext = vm;
+        Loaded += (s, e) => UpdateLivePreview();
+    }
+
+    private void UpdateLivePreview()
+    {
+        PreviewCanvas?.UpdateAppearance(_profile.Appearance);
     }
 }
