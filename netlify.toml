@@ -44,6 +44,12 @@
 # Convenient redirects
 [[redirects]]
   from = "/download/windows"
+  to = "/downloads/Cookie-Setup.exe"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/download/windows-portable"
   to = "/downloads/Cookie-Windows-1.1.0-win-x64-Portable.zip"
   status = 302
   force = true
