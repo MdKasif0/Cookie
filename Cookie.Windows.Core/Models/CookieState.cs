@@ -24,14 +24,20 @@ public enum CookieState
     Investigating,
     Tired,
     InBox,
-    Emoting
+    Emoting,
+    ExploringTaskbar,
+    ExploringWindow,
+    Climbing,
+    Jumping
 }
 
 public static class CookieStateExtensions
 {
     public static bool IsLocomotion(this CookieState state)
     {
-        return state is CookieState.Walking or CookieState.Running or CookieState.FollowingCursor;
+        return state is CookieState.Walking or CookieState.Running or CookieState.FollowingCursor
+            or CookieState.ExploringWindow or CookieState.ExploringTaskbar or CookieState.Climbing
+            or CookieState.Jumping;
     }
 }
 

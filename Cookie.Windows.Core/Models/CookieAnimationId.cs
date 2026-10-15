@@ -69,7 +69,8 @@ public enum CookieAnimationId
     HappyEmote,
     Love,
     SleepyEmote,
-    PlayfulEmote
+    PlayfulEmote,
+    Climb
 }
 
 public static class CookieAnimationExtensions
@@ -113,6 +114,7 @@ public static class CookieAnimationExtensions
             CookieAnimationId.Love => new(CookieAnimationCategory.Emotes, "love", CookieAnimationPriority.Emote, false, 4),
             CookieAnimationId.SleepyEmote => new(CookieAnimationCategory.Emotes, "sleepy", CookieAnimationPriority.Emote, false, 4),
             CookieAnimationId.PlayfulEmote => new(CookieAnimationCategory.Emotes, "playful", CookieAnimationPriority.Emote, false, 5),
+            CookieAnimationId.Climb => new(CookieAnimationCategory.Special, "climb", CookieAnimationPriority.Walk, true, 4),
             _ => new(CookieAnimationCategory.Idle, "idle", CookieAnimationPriority.Idle, true, 4)
         };
     }

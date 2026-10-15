@@ -131,6 +131,11 @@ public static class CookiePoseCatalog
             new CookiePose(squash: 1.1, bodyY: 12, pawLift: 4, eyeStyle: CookieEyeStyle.Happy),
             new CookiePose(squash: 1.02)
         },
+        ["climb"] = new[]
+        {
+            new CookiePose(squash: 1.08, headY: -4, pawLift: 6, tailAngle: -10, earStyle: CookieEarStyle.Perked, eyeStyle: CookieEyeStyle.Open),
+            new CookiePose(squash: 1.06, headY: -2, pawLift: 3, tailAngle: -8, earStyle: CookieEarStyle.Perked, eyeStyle: CookieEyeStyle.Wide)
+        },
         ["fall"] = new[]
         {
             new CookiePose(squash: 1.05, tailAngle: 25, pawLift: -4, earStyle: CookieEarStyle.Back, eyeStyle: CookieEyeStyle.Wide),
