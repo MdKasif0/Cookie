@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading;
 using System.Windows;
 using Cookie.Windows.Audio;
+using Cookie.Windows.Context;
 using Cookie.Windows.Core.Animation;
 using Cookie.Windows.Core.Audio;
 using Cookie.Windows.Core.Behaviors;
@@ -21,6 +22,7 @@ public partial class App : Application
     private SettingsManager? _settingsManager;
     private CookieProfile? _profile;
     private CompanionWindow? _companionWindow;
+    private WindowsApplicationContextDetector? _contextDetector;
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -52,12 +54,14 @@ public partial class App : Application
         var audioManager = new WindowsAudioManager();
         var screenService = new ScreenGeometryService(new WindowsScreenGeometryProvider());
         var envProvider = new WindowsDesktopEnvironmentProvider();
+        _contextDetector = new WindowsApplicationContextDetector();
         var animationController = new CookieAnimationController();
         var behaviorController = new CookieBehaviorController(
             animationController,
             screenService,
             audioManager,
-            environmentProvider: envProvider);
+            environmentProvider: envProvider,
+            contextDetector: _contextDetector);
 
         _companionWindow = new CompanionWindow(
             animationController,

@@ -103,6 +103,8 @@ public partial class CompanionWindow : Window
         var source = HwndSource.FromHwnd(hWnd);
         source?.AddHook(WndProc);
 
+        NativeMethods.WTSRegisterSessionNotification(hWnd, NativeMethods.NOTIFY_FOR_THIS_SESSION);
+
         _audioManager.Play(SoundEffect.Welcome);
     }
 
@@ -114,7 +116,25 @@ public partial class CompanionWindow : Window
             {
                 winEnv.InvalidateCache();
             }
+            _behaviorController.HandleDisplayConfigurationChanged();
             Dispatcher.InvokeAsync(RecoverPositionToVisibleScreen);
+        }
+        else if (msg == NativeMethods.WM_WTSSESSION_CHANGE)
+        {
+            int reason = wParam.ToInt32();
+            if (reason == NativeMethods.WTS_SESSION_LOCK)
+            {
+                _behaviorController.PauseForSessionLock();
+            }
+            else if (reason == NativeMethods.WTS_SESSION_UNLOCK)
+            {
+                _behaviorController.ResumeFromSessionLock();
+                if (_behaviorController.EnvironmentProvider is WindowsDesktopEnvironmentProvider winEnv)
+                {
+                    winEnv.InvalidateCache();
+                }
+                Dispatcher.InvokeAsync(RecoverPositionToVisibleScreen);
+            }
         }
         return IntPtr.Zero;
     }
@@ -339,6 +359,16 @@ public partial class CompanionWindow : Window
     protected override void OnClosed(EventArgs e)
     {
         _gameLoopTimer.Stop();
+        try
+        {
+            var helper = new WindowInteropHelper(this);
+            if (helper.Handle != IntPtr.Zero)
+            {
+                NativeMethods.WTSUnRegisterSessionNotification(helper.Handle);
+            }
+        }
+        catch { }
+
         if (_activeEmotePicker != null && _activeEmotePicker.IsLoaded)
         {
             _activeEmotePicker.Close();
