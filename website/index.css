@@ -2089,12 +2089,19 @@ img {
   box-shadow: var(--shadow-window);
   padding: 32px 36px;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 32px;
+  flex-direction: column;
+  gap: 20px;
   margin-bottom: 48px;
   position: relative;
   overflow: hidden;
+}
+
+.download-hero-main-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  width: 100%;
 }
 
 .download-hero-card::before {
@@ -2591,10 +2598,14 @@ img {
   }
 
   .download-hero-card {
-    flex-direction: column;
-    align-items: flex-start;
     padding: clamp(24px, 4vw, 32px) clamp(18px, 3.5vw, 28px);
     gap: 22px;
+  }
+
+  .download-hero-main-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
   }
 
   .download-cta-wrap {
