@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Cookie.Windows.Core</RootNamespace>
+    <AssemblyName>Cookie.Windows.Core</AssemblyName>
+    <Product>Cookie</Product>
+    <Version>1.1.0</Version>
+    <Copyright>© 2026 Md Kasif Uddin. All rights reserved.</Copyright>
+  </PropertyGroup>
+
+</Project>

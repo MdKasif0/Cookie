@@ -1,0 +1,21 @@
+using System;
+using System.Windows;
+using Cookie.Windows.Audio;
+using Cookie.Windows.Models;
+using Cookie.Windows.Persistence;
+using Cookie.Windows.ViewModels;
+
+namespace Cookie.Windows.Views;
+
+public partial class SettingsWindow : Window
+{
+    public SettingsWindow(
+        CookieProfile profile,
+        SettingsManager settingsManager,
+        WindowsAudioManager audioManager,
+        Action? onSettingsChanged = null)
+    {
+        InitializeComponent();
+        DataContext = new SettingsViewModel(profile, settingsManager, audioManager, onSettingsChanged);
+    }
+}
