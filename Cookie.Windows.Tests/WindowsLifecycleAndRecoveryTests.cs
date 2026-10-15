@@ -136,8 +136,8 @@ public class WindowsLifecycleAndRecoveryTests
         controller.BeginDrag();
 
         Assert.Equal(CookieState.BeingDragged, controller.State);
-        Assert.False(controller.WindowController.IsActive);
-        Assert.False(controller.TaskbarController.IsActive);
+        Assert.False(controller.WindowController.IsExploringWindow);
+        Assert.False(controller.TaskbarController.IsExploringTaskbar);
     }
 
     [Fact]
