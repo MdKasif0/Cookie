@@ -133,4 +133,10 @@ public static class NativeMethods
 
     [DllImport("winmm.dll", EntryPoint = "mciSendStringA", CharSet = CharSet.Ansi, SetLastError = true)]
     public static extern int mciSendString(string lpstrCommand, StringBuilder? lpstrReturnString, int uReturnLength, IntPtr hwndCallback);
+
+    [DllImport("wtsapi32.dll", SetLastError = true)]
+    public static extern bool WTSRegisterSessionNotification(IntPtr hWnd, int dwFlags);
+
+    [DllImport("wtsapi32.dll", SetLastError = true)]
+    public static extern bool WTSUnRegisterSessionNotification(IntPtr hWnd);
 }
