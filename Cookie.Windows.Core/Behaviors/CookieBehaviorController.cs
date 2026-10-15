@@ -5,6 +5,7 @@ using Cookie.Windows.Core.Audio;
 using Cookie.Windows.Core.Cursor;
 using Cookie.Windows.Core.Desktop;
 using Cookie.Windows.Core.Models;
+using Cookie.Windows.Core.Windows;
 
 namespace Cookie.Windows.Core.Behaviors;
 
@@ -13,11 +14,14 @@ namespace Cookie.Windows.Core.Behaviors;
 /// Enforces priority hierarchy:
 /// 1. Active dragging (BeingDragged)
 /// 2. Explicit user-triggered emote (Emoting)
-/// 3. Active direct interaction (Reacting from drop/pet)
-/// 4. Desktop / window exploration
-/// 5. Cursor following (FollowingCursor)
-/// 6. Autonomous activity (Walking, stretching, grooming, etc.)
-/// 7. Idle
+/// 3. Active direct interaction (Reacting from drop/pet/dodge)
+/// 4. Safety drop / Invalidation recovery
+/// 5. Active jump (Jumping)
+/// 6. Window exploration (ExploringWindow, Climbing)
+/// 7. Taskbar exploration (ExploringTaskbar)
+/// 8. Cursor following (FollowingCursor)
+/// 9. Autonomous activity (Walking, stretching, grooming, etc.)
+/// 10. Idle
 /// </summary>
 public class CookieBehaviorController
 {
@@ -28,6 +32,9 @@ public class CookieBehaviorController
 
     public CursorInteractionController CursorController { get; }
     public MovementInterpolator MovementInterpolator { get; }
+    public IDesktopEnvironmentProvider EnvironmentProvider { get; }
+    public TaskbarInteractionController TaskbarController { get; }
+    public WindowInteractionController WindowController { get; }
 
     private CookieState _state = CookieState.Idle;
     private CookieDirection _facing = CookieDirection.Right;
@@ -88,7 +95,13 @@ public class CookieBehaviorController
     public Func<DateTime> Now
     {
         get => CursorController.Now;
-        set => CursorController.Now = value;
+        set
+        {
+            CursorController.Now = value;
+            TaskbarController.Now = value;
+            WindowController.Now = value;
+            WindowController.JumpPlanner.Now = value;
+        }
     }
 
     public CookieBehaviorController(
@@ -96,7 +109,10 @@ public class CookieBehaviorController
         ScreenGeometryService screenService,
         AudioManagerBase audioManager,
         CursorInteractionController? cursorController = null,
-        MovementInterpolator? movementInterpolator = null)
+        MovementInterpolator? movementInterpolator = null,
+        IDesktopEnvironmentProvider? environmentProvider = null,
+        TaskbarInteractionController? taskbarController = null,
+        WindowInteractionController? windowController = null)
     {
         _animationController = animationController;
         _screenService = screenService;
@@ -108,6 +124,10 @@ public class CookieBehaviorController
             acceleration: 340.0,
             deceleration: 480.0,
             arrivalThreshold: 5.0);
+
+        EnvironmentProvider = environmentProvider ?? new DefaultDesktopEnvironmentProvider();
+        TaskbarController = taskbarController ?? new TaskbarInteractionController();
+        WindowController = windowController ?? new WindowInteractionController();
 
         var primaryArea = _screenService.GetPrimaryWorkArea();
         _currentPosition = DesktopCoordinateSpace.CalculateDefaultSpawn(primaryArea, _companionSize);
@@ -176,10 +196,12 @@ public class CookieBehaviorController
             Settings,
             isInterrupted);
 
+        var env = EnvironmentProvider.GetDesktopEnvironment(_currentPosition);
+
         switch (_state)
         {
             case CookieState.BeingDragged:
-                // Dragging has ultimate control; autonomous locomotion is halted
+                // Dragging has ultimate priority; autonomous movement is completely halted
                 break;
 
             case CookieState.Emoting:
@@ -187,8 +209,20 @@ public class CookieBehaviorController
                 break;
 
             case CookieState.Reacting:
-                // Direct reaction or dodge playing
                 UpdateReacting(deltaTimeSeconds);
+                break;
+
+            case CookieState.Jumping:
+                UpdateJumping(deltaTimeSeconds, env);
+                break;
+
+            case CookieState.Climbing:
+            case CookieState.ExploringWindow:
+                UpdateWindowExploration(deltaTimeSeconds, env);
+                break;
+
+            case CookieState.ExploringTaskbar:
+                UpdateTaskbarExploration(deltaTimeSeconds, env, cursorPos);
                 break;
 
             case CookieState.FollowingCursor:
@@ -201,7 +235,7 @@ public class CookieBehaviorController
 
             case CookieState.Idle:
             default:
-                UpdateIdle(deltaTimeSeconds, catCenter, cursorPos);
+                UpdateIdle(deltaTimeSeconds, catCenter, cursorPos, env);
                 break;
         }
 
@@ -211,7 +245,6 @@ public class CookieBehaviorController
             if (CursorController.LookAngle.HasValue)
             {
                 double angle = CursorController.LookAngle.Value;
-                // Clamp and map subtle head glance
                 double gazeOffset = Math.Clamp(angle * 12.0, -3.5, 3.5);
                 double tiltOffset = Math.Clamp(-angle * 18.0, -4.0, 4.0);
                 _animationController.SetLookAt(gazeOffset, tiltOffset);
@@ -223,7 +256,128 @@ public class CookieBehaviorController
         }
     }
 
-    private void UpdateIdle(double deltaTimeSeconds, CorePoint catCenter, CorePoint? cursorPos)
+    private void UpdateJumping(double deltaTimeSeconds, DesktopEnvironment env)
+    {
+        var newPos = WindowController.Update(deltaTimeSeconds, _currentPosition, _companionSize, env, Settings);
+        if (newPos.HasValue)
+        {
+            _currentPosition = newPos.Value;
+            OnPositionChanged?.Invoke(_currentPosition);
+
+            if (WindowController.ActiveJumpTrajectory != null)
+            {
+                var vel = WindowController.ActiveJumpTrajectory.VelocityAt(WindowController.JumpProgress);
+                var dir = vel.Vx >= 0 ? CookieDirection.Right : CookieDirection.Left;
+                SetFacing(dir);
+
+                // If ascending in the air (Vy < 0 in Windows screen coords), show jump pose; if descending (Vy > 0), show fall pose
+                if (vel.Vy < -20.0)
+                {
+                    _animationController.PlayAnimation(CookieAnimationId.Jump);
+                }
+                else if (vel.Vy > 20.0)
+                {
+                    _animationController.PlayAnimation(CookieAnimationId.Fall);
+                }
+            }
+        }
+
+        if (WindowController.CurrentPhase == WindowExplorationPhase.Landing)
+        {
+            if (WindowController.ActiveWindow != null)
+            {
+                TransitionToState(CookieState.ExploringWindow);
+                _animationController.PlayAnimation(CookieAnimationId.Idle);
+            }
+            else
+            {
+                TransitionToState(CookieState.Reacting);
+                _audioManager.Play(SoundEffect.Drop);
+                _animationController.PlayAnimation(CookieAnimationId.Dropped);
+            }
+        }
+        else if (WindowController.CurrentPhase == WindowExplorationPhase.Idle)
+        {
+            TransitionToState(CookieState.Idle);
+            _animationController.PlayAnimation(CookieAnimationId.Idle);
+        }
+    }
+
+    private void UpdateWindowExploration(double deltaTimeSeconds, DesktopEnvironment env)
+    {
+        var newPos = WindowController.Update(deltaTimeSeconds, _currentPosition, _companionSize, env, Settings);
+        if (newPos.HasValue)
+        {
+            _currentPosition = newPos.Value;
+            OnPositionChanged?.Invoke(_currentPosition);
+        }
+
+        if (WindowController.CurrentPhase == WindowExplorationPhase.Jumping)
+        {
+            TransitionToState(CookieState.Jumping);
+            _audioManager.Play(SoundEffect.Surprise);
+            _animationController.PlayAnimation(CookieAnimationId.Jump);
+        }
+        else if (WindowController.CurrentPhase == WindowExplorationPhase.ClimbingVerticalEdge)
+        {
+            TransitionToState(CookieState.Climbing);
+            _animationController.PlayAnimation(CookieAnimationId.Climb);
+        }
+        else if (WindowController.CurrentPhase == WindowExplorationPhase.WalkingTopEdge)
+        {
+            TransitionToState(CookieState.ExploringWindow);
+            var dir = WindowController.PathDirection >= 0 ? CookieDirection.Right : CookieDirection.Left;
+            SetFacing(dir);
+            _animationController.PlayAnimation(dir == CookieDirection.Right ? CookieAnimationId.WalkRight : CookieAnimationId.WalkLeft);
+        }
+        else if (WindowController.CurrentPhase == WindowExplorationPhase.PreparingJump)
+        {
+            _animationController.PlayAnimation(CookieAnimationId.Sit);
+        }
+        else if (WindowController.CurrentPhase == WindowExplorationPhase.Idle)
+        {
+            TransitionToState(CookieState.Idle);
+            _animationController.PlayAnimation(CookieAnimationId.Idle);
+        }
+    }
+
+    private void UpdateTaskbarExploration(double deltaTimeSeconds, DesktopEnvironment env, CorePoint? cursorPos)
+    {
+        var targetPos = TaskbarController.Update(deltaTimeSeconds, _currentPosition, _companionSize, env, cursorPos);
+        if (targetPos.HasValue)
+        {
+            double dx = targetPos.Value.X - _currentPosition.X;
+            double step = BaseWalkSpeed * deltaTimeSeconds;
+
+            if (Math.Abs(dx) <= step)
+            {
+                _currentPosition = targetPos.Value;
+                _animationController.PlayAnimation(CookieAnimationId.Idle);
+            }
+            else
+            {
+                double dir = Math.Sign(dx);
+                _currentPosition = new CorePoint(_currentPosition.X + dir * step, _currentPosition.Y);
+                SetFacing(dir > 0 ? CookieDirection.Right : CookieDirection.Left);
+                _animationController.PlayAnimation(dir > 0 ? CookieAnimationId.WalkRight : CookieAnimationId.WalkLeft);
+            }
+            OnPositionChanged?.Invoke(_currentPosition);
+        }
+
+        if (TaskbarController.TaskbarLookAngle.HasValue)
+        {
+            double angle = TaskbarController.TaskbarLookAngle.Value;
+            _animationController.SetLookAt(angle * 12.0, -angle * 18.0);
+        }
+
+        if (TaskbarController.CurrentPhase == TaskbarSessionPhase.Idle)
+        {
+            TransitionToState(CookieState.Idle);
+            _animationController.PlayAnimation(CookieAnimationId.Idle);
+        }
+    }
+
+    private void UpdateIdle(double deltaTimeSeconds, CorePoint catCenter, CorePoint? cursorPos, DesktopEnvironment env)
     {
         // 1. Process active cursor reactions
         if (CursorInteractionEnabled && CursorController.IsCursorNear)
@@ -287,6 +441,50 @@ public class CookieBehaviorController
             return;
         }
 
+        // 3. Autonomous Window Exploration Check
+        if (Settings.WindowInteraction &&
+            WindowController.ShouldTriggerAutonomousExploration(
+                _currentPosition,
+                Settings.WindowExplorationFrequency,
+                Settings.WindowInteraction,
+                isInterrupted: false))
+        {
+            if (WindowController.StartExploration(
+                _currentPosition,
+                env.Windows,
+                Settings.WindowExplorationFrequency,
+                Settings.WindowVerticalClimbing))
+            {
+                TransitionToState(CookieState.ExploringWindow);
+                var dir = WindowController.PathDirection >= 0 ? CookieDirection.Right : CookieDirection.Left;
+                SetFacing(dir);
+                _animationController.PlayAnimation(dir == CookieDirection.Right ? CookieAnimationId.WalkRight : CookieAnimationId.WalkLeft);
+                return;
+            }
+        }
+
+        // 4. Autonomous Taskbar Exploration Check
+        if (Settings.DockInteraction &&
+            Settings.AutonomousDockExploration &&
+            TaskbarController.ShouldTriggerAutonomousExploration(
+                _currentPosition,
+                Settings.DockExplorationFrequency,
+                Settings.DockInteraction,
+                isInterrupted: false))
+        {
+            TaskbarController.StartExploration(
+                _currentPosition,
+                _companionSize,
+                env,
+                env.Windows,
+                Settings.DockExplorationFrequency);
+
+            TransitionToState(CookieState.ExploringTaskbar);
+            _animationController.PlayAnimation(CookieAnimationId.Curious);
+            return;
+        }
+
+        // 5. Autonomous Ground Behaviors
         _stateTimer += deltaTimeSeconds;
         if (_stateTimer >= _nextBehaviorTime)
         {
@@ -309,7 +507,6 @@ public class CookieBehaviorController
 
     private void UpdateFollowingCursor(double deltaTimeSeconds, CorePoint catCenter)
     {
-        // If cursor moves rapidly, pause following — curious cat pauses and watches rather than chasing
         if (CursorController.CursorMotionState == CursorMotionState.Rapid)
         {
             MovementInterpolator.Stop2D();
@@ -318,7 +515,6 @@ public class CookieBehaviorController
             return;
         }
 
-        // If cursor departed or close contact reached, end following
         if (CursorController.CurrentZone is CursorProximityZone.Departure or CursorProximityZone.CloseContact ||
             !CursorController.FollowTarget.HasValue)
         {
@@ -328,7 +524,6 @@ public class CookieBehaviorController
             return;
         }
 
-        // Update target smoothly
         var safeTarget = ClampToScreen(CursorController.FollowTarget.Value);
         MovementInterpolator.SetTarget2D(safeTarget);
 
@@ -483,6 +678,10 @@ public class CookieBehaviorController
         _dodgeTarget = null;
         MovementInterpolator.Stop2D();
 
+        // Dragging immediately cancels active window exploration, jumping, or taskbar visits
+        WindowController.CancelExploration();
+        TaskbarController.CancelExploration();
+
         TransitionToState(CookieState.BeingDragged);
         _animationController.PlayAnimation(CookieAnimationId.PickedUp);
     }
@@ -512,6 +711,9 @@ public class CookieBehaviorController
         _dodgeTarget = null;
         MovementInterpolator.Stop2D();
 
+        WindowController.CancelExploration();
+        TaskbarController.CancelExploration();
+
         TransitionToState(CookieState.Reacting);
         _audioManager.Play(SoundEffect.Purr);
         _animationController.PlayAnimation(CookieAnimationId.Pet);
@@ -524,6 +726,9 @@ public class CookieBehaviorController
         _walkTarget = null;
         _dodgeTarget = null;
         MovementInterpolator.Stop2D();
+
+        WindowController.CancelExploration();
+        TaskbarController.CancelExploration();
 
         var date = Now();
         _emoteCooldowns[emote.Id] = date.AddSeconds(emote.CooldownSeconds);

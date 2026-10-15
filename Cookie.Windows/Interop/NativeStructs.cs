@@ -46,3 +46,14 @@ public struct MONITORINFOEX
     [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
     public string szDevice;
 }
+
+[StructLayout(LayoutKind.Sequential)]
+public struct APPBARDATA
+{
+    public int cbSize;
+    public IntPtr hWnd;
+    public uint uCallbackMessage;
+    public uint uEdge;
+    public RECT rc;
+    public IntPtr lParam;
+}
