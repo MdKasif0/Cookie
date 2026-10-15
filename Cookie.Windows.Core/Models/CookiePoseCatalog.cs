@@ -133,8 +133,8 @@ public static class CookiePoseCatalog
         },
         ["climb"] = new[]
         {
-            new CookiePose(squash: 1.08, headY: -4, pawLift: 6, tailAngle: -10, earStyle: CookieEarStyle.Perked, eyeStyle: CookieEyeStyle.Open),
-            new CookiePose(squash: 1.06, headY: -2, pawLift: 3, tailAngle: -8, earStyle: CookieEarStyle.Perked, eyeStyle: CookieEyeStyle.Wide)
+            new CookiePose(squash: 1.08, headY: -4, pawLift: 6, tailAngle: -10, earStyle: CookieEarStyle.Normal, eyeStyle: CookieEyeStyle.Open),
+            new CookiePose(squash: 1.06, headY: -2, pawLift: 3, tailAngle: -8, earStyle: CookieEarStyle.Normal, eyeStyle: CookieEyeStyle.Wide)
         },
         ["fall"] = new[]
         {
