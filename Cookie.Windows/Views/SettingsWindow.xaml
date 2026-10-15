@@ -319,7 +319,7 @@
                         <GroupBox Header="Intensity">
                             <StackPanel>
                                 <ComboBox ItemsSource="{Binding AvailableFollowingIntensities}" SelectedItem="{Binding SelectedFollowingIntensity}" 
-                                           IsEnabled="{Binding CursorInteraction}" Margin="0,4"/>
+                                           IsEnabled="{Binding CursorInteraction}" Margin="0,4" AutomationProperties.Name="Following Intensity"/>
                                 <TextBlock Text="Sets how closely and quickly Cookie glances toward or steps near the cursor." 
                                            Foreground="{StaticResource TextMuted}" FontSize="11" Margin="0,4,0,0"/>
                             </StackPanel>
@@ -344,7 +344,7 @@
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Text="Exploration Frequency:" VerticalAlignment="Center"/>
-                                    <ComboBox Grid.Column="1" ItemsSource="{Binding AvailableDockExplorationFrequencies}" SelectedItem="{Binding SelectedDockExplorationFrequency}"/>
+                                    <ComboBox Grid.Column="1" ItemsSource="{Binding AvailableDockExplorationFrequencies}" SelectedItem="{Binding SelectedDockExplorationFrequency}" AutomationProperties.Name="Taskbar Exploration Frequency"/>
                                 </Grid>
                             </StackPanel>
                         </GroupBox>
@@ -359,7 +359,7 @@
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Text="Exploration Frequency:" VerticalAlignment="Center"/>
-                                    <ComboBox Grid.Column="1" ItemsSource="{Binding AvailableWindowExplorationFrequencies}" SelectedItem="{Binding SelectedWindowExplorationFrequency}"/>
+                                    <ComboBox Grid.Column="1" ItemsSource="{Binding AvailableWindowExplorationFrequencies}" SelectedItem="{Binding SelectedWindowExplorationFrequency}" AutomationProperties.Name="Window Exploration Frequency"/>
                                 </Grid>
                             </StackPanel>
                         </GroupBox>
@@ -378,10 +378,10 @@
                                     </Grid.ColumnDefinitions>
 
                                     <TextBlock Text="Jump Frequency:" VerticalAlignment="Center" Margin="0,4"/>
-                                    <ComboBox Grid.Column="1" ItemsSource="{Binding AvailableJumpFrequencies}" SelectedItem="{Binding SelectedJumpFrequency}" Margin="0,4"/>
+                                    <ComboBox Grid.Column="1" ItemsSource="{Binding AvailableJumpFrequencies}" SelectedItem="{Binding SelectedJumpFrequency}" Margin="0,4" AutomationProperties.Name="Jump Frequency"/>
 
                                     <TextBlock Grid.Row="1" Text="Jump Style:" VerticalAlignment="Center" Margin="0,4"/>
-                                    <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding AvailableJumpStyles}" SelectedItem="{Binding SelectedJumpStyle}" Margin="0,4"/>
+                                    <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding AvailableJumpStyles}" SelectedItem="{Binding SelectedJumpStyle}" Margin="0,4" AutomationProperties.Name="Jump Style"/>
                                 </Grid>
                             </StackPanel>
                         </GroupBox>
@@ -405,7 +405,7 @@
                                         <ColumnDefinition Width="48"/>
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Text="Master Volume:" VerticalAlignment="Center"/>
-                                    <Slider Grid.Column="1" Minimum="0.0" Maximum="1.0" Value="{Binding MasterVolume}" IsEnabled="{Binding SoundEnabled}"/>
+                                    <Slider Grid.Column="1" Minimum="0.0" Maximum="1.0" Value="{Binding MasterVolume}" IsEnabled="{Binding SoundEnabled}" AutomationProperties.Name="Master Volume"/>
                                     <TextBlock Grid.Column="2" Text="{Binding MasterVolumePercent}" VerticalAlignment="Center" TextAlignment="Right" FontWeight="SemiBold"/>
                                 </Grid>
                             </StackPanel>
@@ -420,7 +420,7 @@
                                         <ColumnDefinition Width="48"/>
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Text="Meow Volume:" VerticalAlignment="Center"/>
-                                    <Slider Grid.Column="1" Minimum="0.0" Maximum="1.0" Value="{Binding MeowVolume}" IsEnabled="{Binding SoundEnabled}"/>
+                                    <Slider Grid.Column="1" Minimum="0.0" Maximum="1.0" Value="{Binding MeowVolume}" IsEnabled="{Binding SoundEnabled}" AutomationProperties.Name="Meow Volume"/>
                                     <TextBlock Grid.Column="2" Text="{Binding MeowVolumePercent}" VerticalAlignment="Center" TextAlignment="Right" FontWeight="SemiBold"/>
                                 </Grid>
                                 <CheckBox Content="Play interaction sounds (chirp, toy, boop)" IsChecked="{Binding InteractionSounds}" IsEnabled="{Binding SoundEnabled}"/>
