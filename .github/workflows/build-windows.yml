@@ -77,14 +77,10 @@ jobs:
           $installerHash = (Get-FileHash -Algorithm SHA256 dist/windows/installer/Cookie-Setup.exe).Hash.ToLower()
           $zipHash = (Get-FileHash -Algorithm SHA256 dist/windows/Cookie-Windows-1.1.0-win-x64-Portable.zip).Hash.ToLower()
           $exeHash = (Get-FileHash -Algorithm SHA256 dist/windows/win-x64/Cookie.exe).Hash.ToLower()
-          
-          $checksums = @"
-$installerHash  dist/windows/installer/Cookie-Setup.exe
-$zipHash  dist/windows/Cookie-Windows-1.1.0-win-x64-Portable.zip
-$exeHash  dist/windows/win-x64/Cookie.exe
-"@
-          Set-Content -Path dist/windows/SHA256SUMS.txt -Value $checksums
-          Write-Host $checksums
+          "$installerHash  dist/windows/installer/Cookie-Setup.exe" | Out-File -FilePath dist/windows/SHA256SUMS.txt -Encoding utf8
+          "$zipHash  dist/windows/Cookie-Windows-1.1.0-win-x64-Portable.zip" | Out-File -FilePath dist/windows/SHA256SUMS.txt -Append -Encoding utf8
+          "$exeHash  dist/windows/win-x64/Cookie.exe" | Out-File -FilePath dist/windows/SHA256SUMS.txt -Append -Encoding utf8
+          Get-Content dist/windows/SHA256SUMS.txt
 
       - name: Upload Installer Artifact
         uses: actions/upload-artifact@v4
