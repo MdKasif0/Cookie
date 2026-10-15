@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json.Serialization;
 
 namespace Cookie.Windows.Core.Models;
@@ -25,6 +28,22 @@ public enum EyeColor
     Honey,
     Moss,
     Rust
+}
+
+public static class EyeColorExtensions
+{
+    public static CookieColor GetRenderColor(this EyeColor color)
+    {
+        return color switch
+        {
+            EyeColor.Charcoal => CookieColor.FromRgb(59, 51, 46),
+            EyeColor.WarmBrown => CookieColor.FromRgb(92, 61, 36),
+            EyeColor.Honey => CookieColor.FromRgb(168, 112, 46),
+            EyeColor.Moss => CookieColor.FromRgb(107, 117, 71),
+            EyeColor.Rust => CookieColor.FromRgb(158, 82, 51),
+            _ => CookieColor.FromRgb(59, 51, 46)
+        };
+    }
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
@@ -66,6 +85,56 @@ public enum TailVariation
     Normal,
     Fluffy,
     Curly
+}
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum AccessoryKind
+{
+    Collar,
+    Bow,
+    Hat,
+    Glasses,
+    Scarf,
+    Crown,
+    Bandana,
+    Pumpkin,
+    SantaHat
+}
+
+public static class AccessoryKindExtensions
+{
+    public static string GetDisplayName(this AccessoryKind kind)
+    {
+        return kind switch
+        {
+            AccessoryKind.Collar => "Collar",
+            AccessoryKind.Bow => "Bow",
+            AccessoryKind.Hat => "Party Hat",
+            AccessoryKind.Glasses => "Glasses",
+            AccessoryKind.Scarf => "Winter Scarf",
+            AccessoryKind.Crown => "Crown",
+            AccessoryKind.Bandana => "Bandana",
+            AccessoryKind.Pumpkin => "Pumpkin",
+            AccessoryKind.SantaHat => "Santa Hat",
+            _ => kind.ToString()
+        };
+    }
+}
+
+public class AccessoryConfig
+{
+    public AccessoryKind Kind { get; set; }
+    public bool IsEnabled { get; set; } = false;
+    public double Scale { get; set; } = 1.0;
+    public double OffsetY { get; set; } = 0.0;
+
+    public AccessoryConfig() { }
+
+    public AccessoryConfig(AccessoryKind kind, bool isEnabled = false)
+    {
+        Kind = kind;
+        IsEnabled = isEnabled;
+    }
 }
 
 public class CharacterPalette
@@ -165,10 +234,46 @@ public class CookieAppearanceConfig
 {
     public FurColor FurColor { get; set; } = FurColor.Cream;
     public FurPattern Pattern { get; set; } = FurPattern.None;
+
+    [JsonIgnore]
+    public FurPattern FurPattern
+    {
+        get => Pattern;
+        set => Pattern = value;
+    }
+
     public EyeColor EyeColor { get; set; } = EyeColor.Charcoal;
     public EyeStyle EyeStyle { get; set; } = EyeStyle.Round;
     public BodyVariation BodyVariation { get; set; } = BodyVariation.Classic;
     public EarVariation EarVariation { get; set; } = EarVariation.Normal;
     public TailVariation TailVariation { get; set; } = TailVariation.Normal;
     public string? SelectedAccessoryId { get; set; } = null;
+
+    public List<AccessoryConfig> Accessories { get; set; } = Enum.GetValues<AccessoryKind>()
+        .Select(k => new AccessoryConfig(k))
+        .ToList();
+
+    public AccessoryConfig Accessory(AccessoryKind kind)
+    {
+        var existing = Accessories.FirstOrDefault(a => a.Kind == kind);
+        if (existing == null)
+        {
+            existing = new AccessoryConfig(kind);
+            Accessories.Add(existing);
+        }
+        return existing;
+    }
+
+    public void SetAccessory(AccessoryConfig config)
+    {
+        int index = Accessories.FindIndex(a => a.Kind == config.Kind);
+        if (index >= 0)
+        {
+            Accessories[index] = config;
+        }
+        else
+        {
+            Accessories.Add(config);
+        }
+    }
 }
