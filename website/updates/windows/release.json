@@ -1,0 +1,9 @@
+{
+  "version": "1.1.0",
+  "releaseNotes": "Cookie for Windows 1.1.0 Official Release\n\n- Full feature parity with macOS companion\n- Transparent desktop companion with pixel-perfect character rendering\n- Cursor interactions, pet reactions, and 5 expressive emotes\n- Window climbing, jumping, and dynamic taskbar exploration\n- Active application awareness and autonomous behaviors\n- Native notification area system tray integration\n- Single-instance protection and graceful activation\n- Local settings persistence with corrupt recovery\n- Privacy-first design: 100% offline local companion",
+  "downloadUrl": "https://getcookie.app/updates/windows/CookieSetup-1.1.0.exe",
+  "sha256Hash": "474777092e9f4303a5255c518650537f7a5dc20c855560e84e728a0b7db41f0a",
+  "releaseDate": "2026-10-15T11:32:48Z",
+  "packageSizeBytes": 77247713,
+  "minimumOsVersion": "10.0.19041"
+}
