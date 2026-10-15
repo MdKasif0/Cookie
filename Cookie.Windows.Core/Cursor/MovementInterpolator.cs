@@ -145,8 +145,9 @@ public class MovementInterpolator
 
         double delta = TargetPosition - CurrentPosition;
         double distance = Math.Abs(delta);
+        double speed = Math.Abs(CurrentVelocity);
 
-        if (distance <= ArrivalThreshold && Math.Abs(CurrentVelocity) <= (Acceleration * dt * 1.5))
+        if (distance <= ArrivalThreshold && (speed <= (Acceleration * dt * 2.0) || speed <= (ArrivalThreshold / dt)))
         {
             CurrentPosition = TargetPosition;
             CurrentVelocity = 0.0;
@@ -199,7 +200,7 @@ public class MovementInterpolator
 
         double currentSpeed = Math.Sqrt(CurrentVelocity2D.X * CurrentVelocity2D.X + CurrentVelocity2D.Y * CurrentVelocity2D.Y);
 
-        if (distance <= ArrivalThreshold && currentSpeed <= (Acceleration * dt * 1.5))
+        if (distance <= ArrivalThreshold && (currentSpeed <= (Acceleration * dt * 2.0) || currentSpeed <= (ArrivalThreshold / dt)))
         {
             CurrentPosition2D = TargetPosition2D;
             CurrentVelocity2D = new CorePoint(0, 0);
