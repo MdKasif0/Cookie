@@ -1,0 +1,10 @@
+{
+  "id": "love",
+  "name": "Love",
+  "description": "Cookie sends you some love.",
+  "fps": 5,
+  "loop": false,
+  "duration": 2.0,
+  "sound": "cookie-purr",
+  "cooldown": 2.0
+}

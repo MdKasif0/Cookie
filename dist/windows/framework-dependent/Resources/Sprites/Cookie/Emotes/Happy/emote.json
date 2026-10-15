@@ -1,0 +1,10 @@
+{
+  "id": "happy",
+  "name": "Happy",
+  "description": "Cookie is feeling happy.",
+  "fps": 6,
+  "loop": false,
+  "duration": 1.8,
+  "sound": "cookie-happy",
+  "cooldown": 1.8
+}

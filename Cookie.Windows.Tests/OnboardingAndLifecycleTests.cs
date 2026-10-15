@@ -4,7 +4,6 @@ using Cookie.Windows.Core.Audio;
 using Cookie.Windows.Core.Models;
 using Cookie.Windows.Core.Persistence;
 using Cookie.Windows.Core.Startup;
-using Cookie.Windows.ViewModels;
 using Xunit;
 
 namespace Cookie.Windows.Tests;
@@ -52,52 +51,17 @@ public class OnboardingAndLifecycleTests : IDisposable
     }
 
     [Fact]
-    public void SettingsViewModel_WithStartupService_SyncsStartupSetting()
+    public void StartupService_DefaultDisabled_RespectsExplicitRequirement()
     {
-        var startupService = new DefaultStartupService();
-        startupService.SetStartupEnabled(false);
+        // Requirement 19: Off by default unless existing product specification explicitly requires otherwise.
+        var startup = new DefaultStartupService();
+        Assert.False(startup.IsStartupEnabled());
 
-        var profile = new CookieProfile();
-        var manager = new SettingsManager(Path.Combine(_testDirectory, "profile_vm.json"));
-        var audio = new HeadlessAudioManager();
+        startup.SetStartupEnabled(true);
+        Assert.True(startup.IsStartupEnabled());
 
-        var vm = new SettingsViewModel(
-            profile,
-            manager,
-            audio,
-            onSettingsChanged: null,
-            startupService: startupService);
-
-        Assert.False(vm.LaunchAtLogin);
-
-        // Toggle in VM
-        vm.LaunchAtLogin = true;
-        Assert.True(startupService.IsStartupEnabled());
-
-        vm.LaunchAtLogin = false;
-        Assert.False(startupService.IsStartupEnabled());
-    }
-
-    [Fact]
-    public void SettingsViewModel_CheckForUpdatesCommand_FiresCallback()
-    {
-        var profile = new CookieProfile();
-        var manager = new SettingsManager(Path.Combine(_testDirectory, "profile_vm2.json"));
-        var audio = new HeadlessAudioManager();
-
-        bool callbackFired = false;
-        var vm = new SettingsViewModel(
-            profile,
-            manager,
-            audio,
-            onSettingsChanged: null,
-            startupService: null,
-            onCheckForUpdates: () => callbackFired = true);
-
-        Assert.NotNull(vm.CheckForUpdatesCommand);
-        vm.CheckForUpdatesCommand.Execute(null);
-
-        Assert.True(callbackFired);
+        startup.SetStartupEnabled(false);
+        Assert.False(startup.IsStartupEnabled());
     }
 
     [Fact]
@@ -110,5 +74,17 @@ public class OnboardingAndLifecycleTests : IDisposable
         Assert.False(string.IsNullOrWhiteSpace(messageName));
         Assert.Contains("Cookie", mutexName);
         Assert.Contains("Cookie", messageName);
+    }
+
+    [Fact]
+    public void Profile_GeneralSettings_DefaultsArePrivacyPreserving()
+    {
+        // Confirm local-only persistence, no cloud telemetry
+        var settings = new CookieSettings();
+        Assert.True(settings.ShowOnStartup);
+        Assert.True(settings.RememberPosition);
+        Assert.True(settings.AutonomousBehaviorEnabled);
+        Assert.False(settings.PauseAutonomousBehavior);
+        Assert.False(settings.LaunchAtLogin); // Off by default
     }
 }

@@ -1,0 +1,10 @@
+{
+  "id": "wave",
+  "name": "Wave",
+  "description": "Cookie says hello.",
+  "fps": 6,
+  "loop": false,
+  "duration": 2.0,
+  "sound": "cookie-mew",
+  "cooldown": 2.0
+}

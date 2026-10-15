@@ -139,29 +139,49 @@ public class UpdateService : IUpdateService, IDisposable
 
         try
         {
-            using var response = await _httpClient.GetAsync(manifest.DownloadUrl, HttpCompletionOption.ResponseHeadersRead, ct).ConfigureAwait(false);
-            response.EnsureSuccessStatusCode();
+            Stream contentStream;
+            long totalBytes;
+            HttpResponseMessage? response = null;
 
-            long totalBytes = response.Content.Headers.ContentLength ?? manifest.PackageSizeBytes;
-
-            await using (var contentStream = await response.Content.ReadAsStreamAsync(ct).ConfigureAwait(false))
-            await using (var fileStream = new FileStream(tempFilePath, FileMode.Create, FileAccess.Write, FileShare.None, 8192, true))
+            if (Uri.TryCreate(manifest.DownloadUrl, UriKind.Absolute, out var uri) && uri.IsFile)
             {
-                byte[] buffer = new byte[8192];
-                long totalRead = 0;
-                int read;
+                var fileInfo = new FileInfo(uri.LocalPath);
+                totalBytes = fileInfo.Length;
+                contentStream = File.OpenRead(uri.LocalPath);
+            }
+            else
+            {
+                response = await _httpClient.GetAsync(manifest.DownloadUrl, HttpCompletionOption.ResponseHeadersRead, ct).ConfigureAwait(false);
+                response.EnsureSuccessStatusCode();
+                totalBytes = response.Content.Headers.ContentLength ?? manifest.PackageSizeBytes;
+                contentStream = await response.Content.ReadAsStreamAsync(ct).ConfigureAwait(false);
+            }
 
-                while ((read = await contentStream.ReadAsync(buffer, 0, buffer.Length, ct).ConfigureAwait(false)) > 0)
+            try
+            {
+                await using (contentStream)
+                await using (var fileStream = new FileStream(tempFilePath, FileMode.Create, FileAccess.Write, FileShare.None, 8192, true))
                 {
-                    await fileStream.WriteAsync(buffer, 0, read, ct).ConfigureAwait(false);
-                    totalRead += read;
+                    byte[] buffer = new byte[8192];
+                    long totalRead = 0;
+                    int read;
 
-                    if (totalBytes > 0 && progress != null)
+                    while ((read = await contentStream.ReadAsync(buffer, 0, buffer.Length, ct).ConfigureAwait(false)) > 0)
                     {
-                        double p = (double)totalRead / totalBytes;
-                        progress.Report(Math.Min(1.0, Math.Max(0.0, p)));
+                        await fileStream.WriteAsync(buffer, 0, read, ct).ConfigureAwait(false);
+                        totalRead += read;
+
+                        if (totalBytes > 0 && progress != null)
+                        {
+                            double p = (double)totalRead / totalBytes;
+                            progress.Report(Math.Min(1.0, Math.Max(0.0, p)));
+                        }
                     }
                 }
+            }
+            finally
+            {
+                response?.Dispose();
             }
 
             // Verify integrity before promoting file

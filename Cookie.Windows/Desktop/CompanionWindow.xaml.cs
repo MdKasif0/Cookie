@@ -14,7 +14,6 @@ using Cookie.Windows.Core.Persistence;
 using Cookie.Windows.Core.Startup;
 using Cookie.Windows.Core.Updates;
 using Cookie.Windows.Interop;
-using Cookie.Windows.Startup;
 using Cookie.Windows.Views;
 
 namespace Cookie.Windows.Desktop;
