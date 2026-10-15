@@ -93,7 +93,7 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Display Name:" VerticalAlignment="Center"/>
-                                <TextBox Grid.Column="1" Text="{Binding CharacterName, UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBox Grid.Column="1" Text="{Binding CharacterName, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Display Name"/>
                             </Grid>
                         </GroupBox>
 
@@ -117,7 +117,7 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Reduced Motion:" VerticalAlignment="Center"/>
-                                <ComboBox Grid.Column="1" ItemsSource="{Binding AvailableReducedMotionModes}" SelectedItem="{Binding SelectedReducedMotion}"/>
+                                <ComboBox Grid.Column="1" ItemsSource="{Binding AvailableReducedMotionModes}" SelectedItem="{Binding SelectedReducedMotion}" AutomationProperties.Name="Reduced Motion Mode"/>
                             </Grid>
                         </GroupBox>
 
@@ -154,7 +154,7 @@
                                     <ColumnDefinition Width="48"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Cookie Size:" VerticalAlignment="Center"/>
-                                <Slider Grid.Column="1" Minimum="0.7" Maximum="1.4" Value="{Binding CookieSize}" SmallChange="0.05"/>
+                                <Slider Grid.Column="1" Minimum="0.7" Maximum="1.4" Value="{Binding CookieSize}" SmallChange="0.05" AutomationProperties.Name="Cookie Size"/>
                                 <TextBlock Grid.Column="2" Text="{Binding CookieSizePercent}" VerticalAlignment="Center" TextAlignment="Right" FontWeight="SemiBold"/>
                             </Grid>
                         </GroupBox>
@@ -167,7 +167,7 @@
                                     <ColumnDefinition Width="48"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Intensity:" VerticalAlignment="Center"/>
-                                <Slider Grid.Column="1" Minimum="0.5" Maximum="1.5" Value="{Binding AnimationIntensity}" SmallChange="0.1"/>
+                                <Slider Grid.Column="1" Minimum="0.5" Maximum="1.5" Value="{Binding AnimationIntensity}" SmallChange="0.1" AutomationProperties.Name="Animation Intensity"/>
                                 <TextBlock Grid.Column="2" Text="{Binding AnimationIntensityPercent}" VerticalAlignment="Center" TextAlignment="Right" FontWeight="SemiBold"/>
                             </Grid>
                         </GroupBox>
