@@ -65,6 +65,7 @@ public class CookieSettings
     public bool RememberPosition { get; set; } = true;
     public double? SavedPositionX { get; set; } = null;
     public double? SavedPositionY { get; set; } = null;
+    public bool HasCompletedOnboarding { get; set; } = false;
 
     // Appearance
     public double CookieSize { get; set; } = 1.0;

@@ -8,6 +8,7 @@
     <UseWPF>true</UseWPF>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Resources\Cookie.ico</ApplicationIcon>
     <RootNamespace>Cookie.Windows</RootNamespace>
     <AssemblyName>Cookie</AssemblyName>
     
@@ -53,6 +54,9 @@
     </Content>
     <!-- Assets Manifest -->
     <Content Include="Resources\AssetManifest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Cookie.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
