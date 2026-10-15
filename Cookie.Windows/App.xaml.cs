@@ -51,8 +51,13 @@ public partial class App : Application
 
         var audioManager = new WindowsAudioManager();
         var screenService = new ScreenGeometryService(new WindowsScreenGeometryProvider());
+        var envProvider = new WindowsDesktopEnvironmentProvider();
         var animationController = new CookieAnimationController();
-        var behaviorController = new CookieBehaviorController(animationController, screenService, audioManager);
+        var behaviorController = new CookieBehaviorController(
+            animationController,
+            screenService,
+            audioManager,
+            environmentProvider: envProvider);
 
         _companionWindow = new CompanionWindow(
             animationController,

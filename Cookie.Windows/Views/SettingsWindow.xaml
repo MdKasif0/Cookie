@@ -334,16 +334,59 @@
             <TabItem Header="Exploration">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,12,0,0">
                     <StackPanel>
-                        <GroupBox Header="Taskbar &amp; Surfaces">
+                        <GroupBox Header="Taskbar Exploration">
                             <StackPanel>
                                 <CheckBox Content="Taskbar interaction enabled" IsChecked="{Binding DockInteraction}"/>
                                 <CheckBox Content="Autonomous taskbar exploration" IsChecked="{Binding AutonomousDockExploration}" IsEnabled="{Binding DockInteraction}"/>
-                                <CheckBox Content="Window edge exploration" IsChecked="{Binding WindowInteraction}"/>
-                                <CheckBox Content="Window-to-window jumping" IsChecked="{Binding WindowJumpingEnabled}" IsEnabled="{Binding WindowInteraction}"/>
+                                <Grid Margin="0,6,0,0" IsEnabled="{Binding DockInteraction}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="140"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Exploration Frequency:" VerticalAlignment="Center"/>
+                                    <ComboBox Grid.Column="1" ItemsSource="{Binding AvailableDockExplorationFrequencies}" SelectedItem="{Binding SelectedDockExplorationFrequency}"/>
+                                </Grid>
                             </StackPanel>
                         </GroupBox>
 
-                        <Button Content="Reset Exploration Settings to Defaults" Command="{Binding ResetExplorationCommand}" HorizontalAlignment="Left"/>
+                        <GroupBox Header="Window Exploration">
+                            <StackPanel>
+                                <CheckBox Content="Window edge exploration enabled" IsChecked="{Binding WindowInteraction}"/>
+                                <CheckBox Content="Enable vertical window climbing" IsChecked="{Binding WindowVerticalClimbing}" IsEnabled="{Binding WindowInteraction}"/>
+                                <Grid Margin="0,6,0,0" IsEnabled="{Binding WindowInteraction}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="140"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Exploration Frequency:" VerticalAlignment="Center"/>
+                                    <ComboBox Grid.Column="1" ItemsSource="{Binding AvailableWindowExplorationFrequencies}" SelectedItem="{Binding SelectedWindowExplorationFrequency}"/>
+                                </Grid>
+                            </StackPanel>
+                        </GroupBox>
+
+                        <GroupBox Header="Window-to-Window Jumping">
+                            <StackPanel>
+                                <CheckBox Content="Enable surface &amp; window jumping" IsChecked="{Binding WindowJumpingEnabled}" IsEnabled="{Binding WindowInteraction}"/>
+                                <Grid Margin="0,6,0,0" IsEnabled="{Binding WindowJumpingEnabled}">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="140"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Text="Jump Frequency:" VerticalAlignment="Center" Margin="0,4"/>
+                                    <ComboBox Grid.Column="1" ItemsSource="{Binding AvailableJumpFrequencies}" SelectedItem="{Binding SelectedJumpFrequency}" Margin="0,4"/>
+
+                                    <TextBlock Grid.Row="1" Text="Jump Style:" VerticalAlignment="Center" Margin="0,4"/>
+                                    <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding AvailableJumpStyles}" SelectedItem="{Binding SelectedJumpStyle}" Margin="0,4"/>
+                                </Grid>
+                            </StackPanel>
+                        </GroupBox>
+
+                        <Button Content="Reset Exploration Settings to Defaults" Command="{Binding ResetExplorationCommand}" HorizontalAlignment="Left" Margin="0,8,0,0"/>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>

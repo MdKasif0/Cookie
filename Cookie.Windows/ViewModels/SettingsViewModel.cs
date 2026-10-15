@@ -465,17 +465,51 @@ public class SettingsViewModel : INotifyPropertyChanged
         set { if (_profile.Settings.AutonomousDockExploration != value) { _profile.Settings.AutonomousDockExploration = value; SaveAndNotify(); OnPropertyChanged(); } }
     }
 
+    public DockExplorationFrequency SelectedDockExplorationFrequency
+    {
+        get => _profile.Settings.DockExplorationFrequency;
+        set { if (_profile.Settings.DockExplorationFrequency != value) { _profile.Settings.DockExplorationFrequency = value; SaveAndNotify(); OnPropertyChanged(); } }
+    }
+    public IReadOnlyList<DockExplorationFrequency> AvailableDockExplorationFrequencies => Enum.GetValues<DockExplorationFrequency>();
+
     public bool WindowInteraction
     {
         get => _profile.Settings.WindowInteraction;
         set { if (_profile.Settings.WindowInteraction != value) { _profile.Settings.WindowInteraction = value; SaveAndNotify(); OnPropertyChanged(); } }
     }
 
+    public bool WindowVerticalClimbing
+    {
+        get => _profile.Settings.WindowVerticalClimbing;
+        set { if (_profile.Settings.WindowVerticalClimbing != value) { _profile.Settings.WindowVerticalClimbing = value; SaveAndNotify(); OnPropertyChanged(); } }
+    }
+
+    public WindowExplorationFrequency SelectedWindowExplorationFrequency
+    {
+        get => _profile.Settings.WindowExplorationFrequency;
+        set { if (_profile.Settings.WindowExplorationFrequency != value) { _profile.Settings.WindowExplorationFrequency = value; SaveAndNotify(); OnPropertyChanged(); } }
+    }
+    public IReadOnlyList<WindowExplorationFrequency> AvailableWindowExplorationFrequencies => Enum.GetValues<WindowExplorationFrequency>();
+
     public bool WindowJumpingEnabled
     {
         get => _profile.Settings.WindowJumpingEnabled;
         set { if (_profile.Settings.WindowJumpingEnabled != value) { _profile.Settings.WindowJumpingEnabled = value; SaveAndNotify(); OnPropertyChanged(); } }
     }
+
+    public JumpFrequency SelectedJumpFrequency
+    {
+        get => _profile.Settings.JumpFrequency;
+        set { if (_profile.Settings.JumpFrequency != value) { _profile.Settings.JumpFrequency = value; SaveAndNotify(); OnPropertyChanged(); } }
+    }
+    public IReadOnlyList<JumpFrequency> AvailableJumpFrequencies => Enum.GetValues<JumpFrequency>();
+
+    public JumpStyle SelectedJumpStyle
+    {
+        get => _profile.Settings.JumpStyle;
+        set { if (_profile.Settings.JumpStyle != value) { _profile.Settings.JumpStyle = value; SaveAndNotify(); OnPropertyChanged(); } }
+    }
+    public IReadOnlyList<JumpStyle> AvailableJumpStyles => Enum.GetValues<JumpStyle>();
 
     // Sound
     public bool SoundEnabled

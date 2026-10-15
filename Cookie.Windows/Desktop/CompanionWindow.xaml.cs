@@ -95,6 +95,11 @@ public partial class CompanionWindow : Window
         exStyle |= NativeMethods.WS_EX_TOOLWINDOW | NativeMethods.WS_EX_NOACTIVATE;
         NativeMethods.SetWindowLongPtr(hWnd, NativeMethods.GWL_EXSTYLE, new IntPtr(exStyle));
 
+        if (_behaviorController.EnvironmentProvider is WindowsDesktopEnvironmentProvider winEnv)
+        {
+            winEnv.RegisterCookieWindow(hWnd);
+        }
+
         var source = HwndSource.FromHwnd(hWnd);
         source?.AddHook(WndProc);
 
@@ -103,8 +108,12 @@ public partial class CompanionWindow : Window
 
     private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
     {
-        if (msg == NativeMethods.WM_DISPLAYCHANGE || msg == NativeMethods.WM_DPICHANGED)
+        if (msg is NativeMethods.WM_DISPLAYCHANGE or NativeMethods.WM_DPICHANGED or NativeMethods.WM_SETTINGCHANGE)
         {
+            if (_behaviorController.EnvironmentProvider is WindowsDesktopEnvironmentProvider winEnv)
+            {
+                winEnv.InvalidateCache();
+            }
             Dispatcher.InvokeAsync(RecoverPositionToVisibleScreen);
         }
         return IntPtr.Zero;
