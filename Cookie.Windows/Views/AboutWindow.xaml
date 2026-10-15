@@ -1,0 +1,77 @@
+<Window x:Class="Cookie.Windows.Views.AboutWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:rendering="clr-namespace:Cookie.Windows.Rendering"
+        Title="About Cookie"
+        Height="490" Width="420"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        Background="#FDFBF7"
+        Foreground="#2D2A26"
+        FontFamily="Segoe UI"
+        FontSize="13">
+
+    <Window.Resources>
+        <!-- Palette Brushes -->
+        <SolidColorBrush x:Key="BgWarmCream" Color="#FDFBF7"/>
+        <SolidColorBrush x:Key="BgIvory" Color="#F5EFEB"/>
+        <SolidColorBrush x:Key="BorderBeige" Color="#E8DFD1"/>
+        <SolidColorBrush x:Key="AccentWarmOrange" Color="#E08744"/>
+        <SolidColorBrush x:Key="AccentCaramel" Color="#C67A38"/>
+        <SolidColorBrush x:Key="TextCharcoal" Color="#2D2A26"/>
+        <SolidColorBrush x:Key="TextMuted" Color="#75726D"/>
+        <SolidColorBrush x:Key="MutedSage" Color="#8A9A86"/>
+
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource BgIvory}"/>
+            <Setter Property="Foreground" Value="{StaticResource TextCharcoal}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBeige}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="14,6"/>
+            <Setter Property="Margin" Value="4"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header / Character Card -->
+        <Border Grid.Row="0" Background="{StaticResource BgIvory}" BorderBrush="{StaticResource BorderBeige}" 
+                BorderThickness="1" CornerRadius="18" Padding="16" HorizontalAlignment="Center" Margin="0,0,0,16">
+            <StackPanel HorizontalAlignment="Center">
+                <rendering:CookieCanvas x:Name="AboutCanvas" Width="120" Height="120" HorizontalAlignment="Center"/>
+                <TextBlock Text="Cookie 🍪" FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextCharcoal}" 
+                           HorizontalAlignment="Center" Margin="0,8,0,2"/>
+                <TextBlock Text="Version 1.1.0 (Windows Edition)" FontSize="12" Foreground="{StaticResource TextMuted}" 
+                           HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Body Content -->
+        <StackPanel Grid.Row="1" Margin="8,0">
+            <TextBlock Text="Your small, intelligent desktop companion." FontWeight="SemiBold" 
+                       FontSize="14" Foreground="{StaticResource TextCharcoal}" TextAlignment="Center" Margin="0,0,0,8"/>
+
+            <TextBlock Text="Cookie strolls your desktop, climbs window frames, visits the taskbar, and responds to your pointer with gentle curiosity." 
+                       TextWrapping="Wrap" TextAlignment="Center" Foreground="{StaticResource TextMuted}" LineHeight="19" Margin="0,0,0,14"/>
+
+            <TextBlock Text="Built natively for Windows with custom high-fidelity animation, active application awareness, and full local privacy." 
+                       TextWrapping="Wrap" TextAlignment="Center" Foreground="{StaticResource TextMuted}" LineHeight="19" Margin="0,0,0,10"/>
+
+            <TextBlock Text="© 2026 Md Kasif Uddin. All rights reserved." FontSize="11" 
+                       Foreground="{StaticResource TextMuted}" TextAlignment="Center" Margin="0,6,0,0"/>
+        </StackPanel>
+
+        <!-- Footer Actions -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,16,0,0">
+            <Button x:Name="CheckUpdatesBtn" Content="Check for Updates..." Click="CheckUpdatesBtn_Click" AutomationProperties.Name="Check for Updates"/>
+            <Button x:Name="WebsiteBtn" Content="Website 🌐" Click="WebsiteBtn_Click" AutomationProperties.Name="Visit Website"/>
+            <Button x:Name="CloseBtn" Content="Close" Click="CloseBtn_Click" IsDefault="True" IsCancel="True" AutomationProperties.Name="Close About Window"/>
+        </StackPanel>
+    </Grid>
+</Window>
