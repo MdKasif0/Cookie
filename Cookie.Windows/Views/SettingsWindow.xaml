@@ -125,7 +125,8 @@
                             <StackPanel>
                                 <CheckBox Content="Automatically check for updates" IsChecked="{Binding AutomaticallyCheckForUpdates}"/>
                                 <TextBlock Text="Cookie checks for updates securely. No personal data is sent." 
-                                           Foreground="{StaticResource TextMuted}" FontSize="11" Margin="0,4,0,0"/>
+                                           Foreground="{StaticResource TextMuted}" FontSize="11" Margin="0,4,0,8"/>
+                                <Button Content="Check for Updates Now..." Command="{Binding CheckForUpdatesCommand}" HorizontalAlignment="Left" Padding="12,4"/>
                             </StackPanel>
                         </GroupBox>
                     </StackPanel>

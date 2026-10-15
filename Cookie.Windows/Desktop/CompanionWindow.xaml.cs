@@ -11,7 +11,10 @@ using Cookie.Windows.Core.Behaviors;
 using Cookie.Windows.Core.Desktop;
 using Cookie.Windows.Core.Models;
 using Cookie.Windows.Core.Persistence;
+using Cookie.Windows.Core.Startup;
+using Cookie.Windows.Core.Updates;
 using Cookie.Windows.Interop;
+using Cookie.Windows.Startup;
 using Cookie.Windows.Views;
 
 namespace Cookie.Windows.Desktop;
@@ -23,7 +26,12 @@ public partial class CompanionWindow : Window
     private readonly ScreenGeometryService _screenService;
     private readonly SettingsManager _settingsManager;
     private readonly AudioManagerBase _audioManager;
+    private readonly IStartupService _startupService;
+    private readonly IUpdateService _updateService;
     private CookieProfile _profile;
+
+    private WindowsTrayService? _trayService;
+    private uint _wmShowSettings = 0;
 
     private readonly DispatcherTimer _gameLoopTimer;
     private DateTime _lastTickTime;
@@ -34,6 +42,8 @@ public partial class CompanionWindow : Window
     private bool _hasDraggedEnough = false;
 
     private EmotePickerWindow? _activeEmotePicker;
+    private AboutWindow? _activeAboutWindow;
+    private UpdateDialogWindow? _activeUpdateWindow;
 
     public CompanionWindow(
         CookieAnimationController animationController,
@@ -41,7 +51,9 @@ public partial class CompanionWindow : Window
         ScreenGeometryService screenService,
         SettingsManager settingsManager,
         AudioManagerBase audioManager,
-        CookieProfile profile)
+        CookieProfile profile,
+        IStartupService? startupService = null,
+        IUpdateService? updateService = null)
     {
         InitializeComponent();
 
@@ -51,6 +63,8 @@ public partial class CompanionWindow : Window
         _settingsManager = settingsManager;
         _audioManager = audioManager;
         _profile = profile;
+        _startupService = startupService ?? new WindowsStartupService();
+        _updateService = updateService ?? new UpdateService();
 
         ApplyProfileAppearance();
 
@@ -105,11 +119,39 @@ public partial class CompanionWindow : Window
 
         NativeMethods.WTSRegisterSessionNotification(hWnd, NativeMethods.NOTIFY_FOR_THIS_SESSION);
 
+        _wmShowSettings = NativeMethods.RegisterWindowMessage("Cookie_ShowSettings_2026");
+
+        _trayService = new WindowsTrayService(
+            hWnd,
+            _behaviorController,
+            _settingsManager,
+            _audioManager,
+            _profile,
+            _startupService,
+            openSettingsAction: () => Dispatcher.InvokeAsync(OpenSettingsWindow),
+            openEmotePickerAction: () => Dispatcher.InvokeAsync(OpenEmotePickerWindow),
+            openAboutAction: () => Dispatcher.InvokeAsync(OpenAboutWindow),
+            checkForUpdatesAction: () => Dispatcher.InvokeAsync(OpenUpdateWindow));
+
         _audioManager.Play(SoundEffect.Welcome);
     }
 
     private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
     {
+        if (_wmShowSettings != 0 && (uint)msg == _wmShowSettings)
+        {
+            Dispatcher.InvokeAsync(OpenSettingsWindow);
+            handled = true;
+            return IntPtr.Zero;
+        }
+
+        if (msg == NativeMethods.WM_TRAYICON)
+        {
+            _trayService?.HandleTrayMessage(wParam, lParam);
+            handled = true;
+            return IntPtr.Zero;
+        }
+
         if (msg is NativeMethods.WM_DISPLAYCHANGE or NativeMethods.WM_DPICHANGED or NativeMethods.WM_SETTINGCHANGE)
         {
             if (_behaviorController.EnvironmentProvider is WindowsDesktopEnvironmentProvider winEnv)
@@ -298,6 +340,16 @@ public partial class CompanionWindow : Window
 
         menu.Items.Add(new Separator());
 
+        var updateItem = new MenuItem { Header = "Check for Updates..." };
+        updateItem.Click += (s, e) => OpenUpdateWindow();
+        menu.Items.Add(updateItem);
+
+        var aboutItem = new MenuItem { Header = "About Cookie..." };
+        aboutItem.Click += (s, e) => OpenAboutWindow();
+        menu.Items.Add(aboutItem);
+
+        menu.Items.Add(new Separator());
+
         var exitItem = new MenuItem { Header = "Exit Cookie" };
         exitItem.Click += (s, e) =>
         {
@@ -349,11 +401,46 @@ public partial class CompanionWindow : Window
             }
         }
 
-        var settingsWindow = new SettingsWindow(_profile, _settingsManager, _audioManager, () =>
-        {
-            ApplyProfileAppearance();
-        });
+        var settingsWindow = new SettingsWindow(
+            _profile,
+            _settingsManager,
+            _audioManager,
+            () => ApplyProfileAppearance(),
+            _startupService,
+            () => OpenUpdateWindow());
         settingsWindow.Show();
+    }
+
+    public void OpenAboutWindow()
+    {
+        foreach (Window w in Application.Current.Windows)
+        {
+            if (w is AboutWindow existing)
+            {
+                existing.Activate();
+                return;
+            }
+        }
+
+        _activeAboutWindow = new AboutWindow(_profile.Appearance, () => OpenUpdateWindow());
+        _activeAboutWindow.Closed += (s, e) => _activeAboutWindow = null;
+        _activeAboutWindow.Show();
+    }
+
+    public void OpenUpdateWindow()
+    {
+        foreach (Window w in Application.Current.Windows)
+        {
+            if (w is UpdateDialogWindow existing)
+            {
+                existing.Activate();
+                return;
+            }
+        }
+
+        _activeUpdateWindow = new UpdateDialogWindow(_updateService);
+        _activeUpdateWindow.Closed += (s, e) => _activeUpdateWindow = null;
+        _activeUpdateWindow.Show();
     }
 
     protected override void OnClosed(EventArgs e)
@@ -369,10 +456,29 @@ public partial class CompanionWindow : Window
         }
         catch { }
 
+        _trayService?.Dispose();
+        _trayService = null;
+
+        if (_updateService is IDisposable dispUpdate)
+        {
+            dispUpdate.Dispose();
+        }
+
         if (_activeEmotePicker != null && _activeEmotePicker.IsLoaded)
         {
             _activeEmotePicker.Close();
         }
+
+        if (_activeAboutWindow != null && _activeAboutWindow.IsLoaded)
+        {
+            _activeAboutWindow.Close();
+        }
+
+        if (_activeUpdateWindow != null && _activeUpdateWindow.IsLoaded)
+        {
+            _activeUpdateWindow.Close();
+        }
+
         base.OnClosed(e);
     }
 }

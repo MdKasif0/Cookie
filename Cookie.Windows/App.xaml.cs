@@ -11,6 +11,8 @@ using Cookie.Windows.Core.Desktop;
 using Cookie.Windows.Core.Models;
 using Cookie.Windows.Core.Persistence;
 using Cookie.Windows.Desktop;
+using Cookie.Windows.Interop;
+using Cookie.Windows.Views;
 
 namespace Cookie.Windows;
 
@@ -31,6 +33,11 @@ public partial class App : Application
         _singleInstanceMutex = new Mutex(true, SingleInstanceMutexName, out bool isOnlyInstance);
         if (!isOnlyInstance)
         {
+            uint wmShowSettings = NativeMethods.RegisterWindowMessage("Cookie_ShowSettings_2026");
+            if (wmShowSettings != 0)
+            {
+                NativeMethods.PostMessage((IntPtr)NativeMethods.HWND_BROADCAST, wmShowSettings, IntPtr.Zero, IntPtr.Zero);
+            }
             Shutdown();
             return;
         }
@@ -74,6 +81,16 @@ public partial class App : Application
         if (_profile.Settings.ShowOnStartup)
         {
             _companionWindow.Show();
+        }
+
+        if (!_profile.Settings.HasCompletedOnboarding)
+        {
+            var onboardingWindow = new OnboardingWindow(_profile, _settingsManager, () =>
+            {
+                _companionWindow.ApplyProfileAppearance();
+                _companionWindow.OpenSettingsWindow();
+            });
+            onboardingWindow.Show();
         }
     }
 

@@ -1,0 +1,85 @@
+<Window x:Class="Cookie.Windows.Views.UpdateDialogWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Software Update"
+        Height="440" Width="480"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        Background="#FDFBF7"
+        Foreground="#2D2A26"
+        FontFamily="Segoe UI"
+        FontSize="13">
+
+    <Window.Resources>
+        <!-- Palette Brushes -->
+        <SolidColorBrush x:Key="BgWarmCream" Color="#FDFBF7"/>
+        <SolidColorBrush x:Key="BgIvory" Color="#F5EFEB"/>
+        <SolidColorBrush x:Key="BorderBeige" Color="#E8DFD1"/>
+        <SolidColorBrush x:Key="AccentWarmOrange" Color="#E08744"/>
+        <SolidColorBrush x:Key="AccentCaramel" Color="#C67A38"/>
+        <SolidColorBrush x:Key="TextCharcoal" Color="#2D2A26"/>
+        <SolidColorBrush x:Key="TextMuted" Color="#75726D"/>
+        <SolidColorBrush x:Key="MutedSage" Color="#8A9A86"/>
+
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource BgIvory}"/>
+            <Setter Property="Foreground" Value="{StaticResource TextCharcoal}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBeige}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="16,6"/>
+            <Setter Property="Margin" Value="4"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+
+        <Style TargetType="ProgressBar">
+            <Setter Property="Height" Value="8"/>
+            <Setter Property="Foreground" Value="{StaticResource AccentWarmOrange}"/>
+            <Setter Property="Background" Value="{StaticResource BgIvory}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBeige}"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,16">
+            <TextBlock x:Name="StatusTitleText" Text="Checking for Updates..." FontSize="18" FontWeight="Bold" 
+                       Foreground="{StaticResource TextCharcoal}"/>
+            <TextBlock x:Name="StatusSubtitleText" Text="Connecting securely to update server..." FontSize="12" 
+                       Foreground="{StaticResource TextMuted}" Margin="0,4,0,0"/>
+        </StackPanel>
+
+        <!-- Body / Release Details -->
+        <Border Grid.Row="1" Background="{StaticResource BgIvory}" BorderBrush="{StaticResource BorderBeige}" 
+                BorderThickness="1" CornerRadius="12" Padding="14">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <TextBlock x:Name="DetailsHeadingText" Text="Release Notes" FontWeight="SemiBold" 
+                               Foreground="{StaticResource TextCharcoal}" Margin="0,0,0,6"/>
+                    <TextBlock x:Name="ReleaseNotesText" Text="Looking for newer releases..." 
+                               TextWrapping="Wrap" Foreground="{StaticResource TextMuted}" LineHeight="18"/>
+                    
+                    <!-- Progress Bar when downloading -->
+                    <StackPanel x:Name="ProgressPanel" Visibility="Collapsed" Margin="0,16,0,0">
+                        <TextBlock x:Name="ProgressText" Text="Downloading update package... 0%" FontSize="12" 
+                                   Foreground="{StaticResource TextCharcoal}" Margin="0,0,0,6"/>
+                        <ProgressBar x:Name="DownloadProgressBar" Minimum="0" Maximum="100" Value="0"/>
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <!-- Footer Buttons -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+            <Button x:Name="ActionBtn" Content="Install &amp; Restart" Click="ActionBtn_Click" 
+                    Background="{StaticResource AccentWarmOrange}" Foreground="White" FontWeight="SemiBold" 
+                    Visibility="Collapsed" AutomationProperties.Name="Install and Restart"/>
+            <Button x:Name="CloseBtn" Content="Close" Click="CloseBtn_Click" IsCancel="True" AutomationProperties.Name="Close Update Window"/>
+        </StackPanel>
+    </Grid>
+</Window>

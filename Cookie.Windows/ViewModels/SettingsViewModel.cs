@@ -7,6 +7,7 @@ using System.Windows.Input;
 using Cookie.Windows.Core.Audio;
 using Cookie.Windows.Core.Models;
 using Cookie.Windows.Core.Persistence;
+using Cookie.Windows.Core.Startup;
 
 namespace Cookie.Windows.ViewModels;
 
@@ -15,7 +16,9 @@ public class SettingsViewModel : INotifyPropertyChanged
     private readonly CookieProfile _profile;
     private readonly SettingsManager _settingsManager;
     private readonly AudioManagerBase _audioManager;
+    private readonly IStartupService? _startupService;
     private readonly Action? _onSettingsChanged;
+    private readonly Action? _onCheckForUpdates;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -23,12 +26,26 @@ public class SettingsViewModel : INotifyPropertyChanged
         CookieProfile profile,
         SettingsManager settingsManager,
         AudioManagerBase audioManager,
-        Action? onSettingsChanged = null)
+        Action? onSettingsChanged = null,
+        IStartupService? startupService = null,
+        Action? onCheckForUpdates = null)
     {
         _profile = profile;
         _settingsManager = settingsManager;
         _audioManager = audioManager;
         _onSettingsChanged = onSettingsChanged;
+        _startupService = startupService;
+        _onCheckForUpdates = onCheckForUpdates;
+
+        if (_startupService != null)
+        {
+            _profile.Settings.LaunchAtLogin = _startupService.IsStartupEnabled();
+        }
+
+        CheckForUpdatesCommand = new RelayCommand(() =>
+        {
+            _onCheckForUpdates?.Invoke();
+        });
 
         TestSoundCommand = new RelayCommand(() =>
         {
@@ -81,6 +98,7 @@ public class SettingsViewModel : INotifyPropertyChanged
     public ICommand RemoveAllAccessoriesCommand { get; }
     public ICommand ResetCursorCommand { get; }
     public ICommand ResetExplorationCommand { get; }
+    public ICommand CheckForUpdatesCommand { get; }
 
     public CookieProfile Profile => _profile;
     public CookieAppearanceConfig Appearance => _profile.Appearance;
@@ -103,7 +121,16 @@ public class SettingsViewModel : INotifyPropertyChanged
     public bool LaunchAtLogin
     {
         get => _profile.Settings.LaunchAtLogin;
-        set { if (_profile.Settings.LaunchAtLogin != value) { _profile.Settings.LaunchAtLogin = value; SaveAndNotify(); OnPropertyChanged(); } }
+        set
+        {
+            if (_profile.Settings.LaunchAtLogin != value)
+            {
+                _profile.Settings.LaunchAtLogin = value;
+                _startupService?.SetStartupEnabled(value);
+                SaveAndNotify();
+                OnPropertyChanged();
+            }
+        }
     }
 
     public bool ShowOnStartup
