@@ -93,6 +93,8 @@ public partial class App : Application
             catch { }
         }
 
+        _contextDetector?.Dispose();
+
         if (_singleInstanceMutex != null)
         {
             try
