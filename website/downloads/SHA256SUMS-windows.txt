@@ -1,0 +1,3 @@
+1b9990805306716a7a6720105580be40586f1aab4aaf96e9c04a892bde05e534  dist/windows/installer/Cookie-Setup.exe
+9de5ebe5753700d8e6564b5b94c270167695dedbed13b0030710b899df73ae56  dist/windows/Cookie-Windows-1.1.0-win-x64-Portable.zip
+671786ebd89e97cd01066394362aa813a14c1aed329e73b36e19eabb1336eae2  dist/windows/win-x64/Cookie.exe

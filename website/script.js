@@ -895,8 +895,10 @@ document.addEventListener("DOMContentLoaded", () => {
     // 2. Update Hero Action & Metadata
     if (downloadBtn && heroBtnLabel) {
       if (isWin) {
-        downloadBtn.setAttribute("href", rel.portable.downloadUrl);
-        downloadBtn.setAttribute("download", rel.portable.artifactName);
+        const downloadUrl = (rel.isInstallerAvailable && rel.downloadUrl) ? rel.downloadUrl : rel.portable.downloadUrl;
+        const artifactName = (rel.isInstallerAvailable && rel.artifactName) ? rel.artifactName : rel.portable.artifactName;
+        downloadBtn.setAttribute("href", downloadUrl);
+        downloadBtn.setAttribute("download", artifactName);
         heroBtnLabel.textContent = rel.heroButtonLabel;
       } else {
         downloadBtn.setAttribute("href", rel.downloadUrl);
@@ -918,7 +920,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     if (downloadSubhead) {
       downloadSubhead.textContent = isWin
-        ? "A quiet desktop companion crafted with native Windows WPF and C#. Download the verified 64-bit standalone package below."
+        ? "A quiet desktop companion crafted with native Windows WPF and C#. Download the official installer (.exe) below."
         : "A quiet desktop companion crafted with native Mac technologies. Download the disk image below to get started.";
     }
 
@@ -930,15 +932,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     if (downloadCardSpecs) {
       downloadCardSpecs.innerHTML = isWin
-        ? `<span>~74 MB Standalone Zip</span><span class="meta-dot">·</span><span>64-bit (x64)</span><span class="meta-dot">·</span><span>Free &amp; Open Source</span>`
+        ? `<span>~54.5 MB Installer (.exe)</span><span class="meta-dot">·</span><span>Windows 10 &amp; 11 (x64)</span><span class="meta-dot">·</span><span>Free &amp; Open Source</span>`
         : `<span>~23 MB Disk Image</span><span class="meta-dot">·</span><span>Universal Binary</span><span class="meta-dot">·</span><span>Free &amp; Open Source</span>`;
     }
 
     if (mainDownloadBtn && mainDownloadBtnText) {
       if (isWin) {
-        mainDownloadBtn.setAttribute("href", rel.portable.downloadUrl);
-        mainDownloadBtn.setAttribute("download", rel.portable.artifactName);
-        mainDownloadBtnText.textContent = "Download for Windows (x64 Zip)";
+        const downloadUrl = (rel.isInstallerAvailable && rel.downloadUrl) ? rel.downloadUrl : rel.portable.downloadUrl;
+        const artifactName = (rel.isInstallerAvailable && rel.artifactName) ? rel.artifactName : rel.portable.artifactName;
+        mainDownloadBtn.setAttribute("href", downloadUrl);
+        mainDownloadBtn.setAttribute("download", artifactName);
+        mainDownloadBtnText.textContent = "Download Cookie for Windows (.exe)";
       } else {
         mainDownloadBtn.setAttribute("href", rel.downloadUrl);
         mainDownloadBtn.setAttribute("download", rel.artifactName);
@@ -950,19 +954,22 @@ document.addEventListener("DOMContentLoaded", () => {
     if (downloadAltLinks) {
       if (isWin) {
         downloadAltLinks.innerHTML = `
-          <div class="installer-status-box" style="margin-top: 16px; padding: 14px 18px; background: rgba(224, 135, 68, 0.08); border-radius: 10px; border: 1px solid rgba(224, 135, 68, 0.22); font-size: 0.88rem; color: var(--soft-brown); text-align: left;">
+          <div class="installer-status-box" style="margin-top: 16px; padding: 14px 18px; background: rgba(46, 125, 50, 0.05); border-radius: 10px; border: 1px solid rgba(46, 125, 50, 0.22); font-size: 0.88rem; color: var(--soft-brown); text-align: left;">
             <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
               <strong style="color: var(--charcoal); display: inline-flex; align-items: center; gap: 6px;">
-                <span class="status-dot" style="background: var(--caramel);"></span>
-                Inno Setup Installer (Cookie-Setup.exe):
+                <span class="status-dot" style="background: #2e7d32;"></span>
+                Official Windows Installer (Cookie-Setup.exe):
               </strong>
-              <span class="parity-badge badge-planned" style="font-size: 0.72rem; padding: 2px 8px;">Pending Windows CI</span>
+              <span class="parity-badge badge-active" style="font-size: 0.72rem; padding: 2px 8px; background: rgba(46, 125, 50, 0.12); color: #2e7d32; border-color: rgba(46, 125, 50, 0.3);">Verified Release</span>
             </div>
-            <p style="margin: 6px 0 0 0; line-height: 1.5; font-size: 0.85rem; color: var(--charcoal-subtle);">
-              The Inno Setup compiler requires a native Windows build agent. While the installer script is ready, you can immediately download and run the verified standalone 64-bit portable package above.
-            </p>
             <div style="margin-top: 8px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.76rem; color: var(--muted-sage); word-break: break-all;">
-              SHA256: ${rel.portable.sha256}
+              SHA256: ${rel.sha256}
+            </div>
+            <div style="margin-top: 12px; padding-top: 10px; border-top: 1px dashed rgba(46, 125, 50, 0.25); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+              <span style="font-size: 0.82rem; color: var(--charcoal);">Prefer a portable standalone version?</span>
+              <a href="${rel.portable.downloadUrl}" download="${rel.portable.artifactName}" class="alt-portable-link" style="color: var(--caramel); font-weight: 600; text-decoration: underline; font-size: 0.82rem; display: inline-flex; align-items: center; gap: 4px;">
+                Download Portable Zip (${rel.portable.formattedSize}) →
+              </a>
             </div>
           </div>
         `;
@@ -996,7 +1003,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     if (installSubhead) {
       installSubhead.textContent = isWin
-        ? "Simple uncompress-and-run workflow. No admin elevation or registry clutter."
+        ? "Clean per-user installation with desktop shortcut. No admin elevation or system clutter."
         : "Simple drag-and-drop installation. No root privileges or complex setup needed.";
     }
     if (installStepsContainer && rel.installSteps) {

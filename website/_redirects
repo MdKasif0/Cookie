@@ -1,5 +1,6 @@
 # Netlify Redirects for Cookie Website
-/download/mac        /downloads/Cookie-1.1.0.dmg                          302!
-/download/windows    /downloads/Cookie-Windows-1.1.0-win-x64-Portable.zip 302!
-/download            /downloads/Cookie-1.1.0.dmg                          302!
+/download/mac              /downloads/Cookie-1.1.0.dmg                          302!
+/download/windows          /downloads/Cookie-Setup.exe                          302!
+/download/windows-portable /downloads/Cookie-Windows-1.1.0-win-x64-Portable.zip 302!
+/download                  /downloads/Cookie-1.1.0.dmg                          302!
 /dist/*              /downloads/:splat                                    301

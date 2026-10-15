@@ -89,11 +89,14 @@ const CookieReleases = {
     installerType: "Windows Installer (.exe)",
     artifactName: "Cookie-Setup.exe",
     downloadUrl: "downloads/Cookie-Setup.exe",
-    isInstallerAvailable: false, // Inno Setup compiler requires Windows CI runner
-    installerStatusText: "Installer (.exe) Packaging",
-    installerNote: "The official Inno Setup installer (Cookie-Setup.exe) is prepared and awaiting Windows CI build. In the meantime, the verified standalone portable package is available below.",
+    fileSizeBytes: 57123680,
+    formattedSize: "54.5 MB",
+    sha256: "1b9990805306716a7a6720105580be40586f1aab4aaf96e9c04a892bde05e534",
+    isInstallerAvailable: true,
+    installerStatusText: "Official Windows Setup (.exe)",
+    installerNote: "Compiled with Inno Setup 6 on GitHub Actions Windows runner. Fully self-contained .NET 8 desktop companion.",
     
-    // Verified portable release built in Phase 5
+    // Verified portable release built on Windows CI
     portable: {
       isAvailable: true,
       name: "Portable 64-bit (.zip)",
@@ -108,7 +111,7 @@ const CookieReleases = {
     architecture: "64-bit (x64)",
     minimumOS: "Windows 10 (version 19041+) & Windows 11",
     heroButtonLabel: "Download for Windows",
-    heroReleaseTag: "Version 1.1.0 · 64-bit (x64) · Windows 10 & 11 · 100% Offline",
+    heroReleaseTag: "Version 1.1.0 · 54.5 MB Installer (.exe) · Windows 10 & 11 · 100% Offline",
     cardMeta: "Version 1.1.0 · Windows 10 (build 19041+) & Windows 11",
     specs: [
       {
@@ -123,39 +126,39 @@ const CookieReleases = {
       },
       {
         title: "Privacy & Elevation",
-        desc: "Runs completely per-user with zero administrative elevation required. 100% offline companion.",
+        desc: "Installs cleanly per-user with zero administrative elevation required. 100% offline companion.",
         pill: "No Admin Required"
       },
       {
         title: "Package Size",
-        desc: "Self-contained standalone build (~74 MB) including all sprite sheets and audio effects.",
-        pill: "74 MB Zip"
+        desc: "Inno Setup installer (~54.5 MB) including all sprite sheets, audio effects, and clean uninstaller.",
+        pill: "54.5 MB Installer"
       }
     ],
     installSteps: [
       {
         step: 1,
-        title: "Download the Package",
-        desc: "Download the official Cookie for Windows package from the button above."
+        title: "Download Cookie-Setup.exe",
+        desc: "Click 'Download for Windows' to save the official Cookie-Setup.exe installer directly from our site."
       },
       {
         step: 2,
-        title: "Extract the Archive",
-        desc: "Right-click the downloaded zip file and select 'Extract All…' to your preferred location (e.g. AppData or Documents)."
+        title: "Run the Installer",
+        desc: "Double-click Cookie-Setup.exe. If Windows Defender SmartScreen prompts on first run, click 'More info' → 'Run anyway'."
       },
       {
         step: 3,
-        title: "Run Cookie.exe",
-        desc: "Double-click Cookie.exe in the extracted folder to launch your desktop companion."
+        title: "Choose Shortcut Options",
+        desc: "Select whether to create a Desktop shortcut and Start Menu folder. Installs per-user without requiring admin rights."
       },
       {
         step: 4,
-        title: "Notification Area Icon",
-        desc: "Cookie will appear on your desktop and create a discreet icon in your Windows notification area (System Tray)."
+        title: "Launch Cookie",
+        desc: "Click 'Finish' with 'Launch Cookie' checked. Cookie will spawn directly onto your desktop screen."
       },
       {
         step: 5,
-        title: "Customize & Interact",
+        title: "Interact & Enjoy",
         desc: "Click Cookie to pet her, drag to relocate, or right-click the system tray icon to configure sound, wander cadence, and coat colors."
       }
     ],

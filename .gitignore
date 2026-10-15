@@ -13,5 +13,6 @@ xcuserdata/
 # .NET
 bin/
 obj/
-*.user
-*.suo
+# CI / Local distribution artifacts
+dist/
+downloaded-ci-artifacts/
