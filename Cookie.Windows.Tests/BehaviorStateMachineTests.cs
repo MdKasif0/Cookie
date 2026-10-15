@@ -12,9 +12,11 @@ public class TestAudioManager : AudioManagerBase
     public string? LastPlayedSoundFile { get; private set; }
     public double LastPlayedVolume { get; private set; }
 
+    protected override bool ValidateFileExists => false;
+
     protected override void PlayInternal(string filePath, double volume)
     {
-        LastPlayedSoundFile = filePath;
+        LastPlayedSoundFile = System.IO.Path.GetFileName(filePath);
         LastPlayedVolume = volume;
     }
 }

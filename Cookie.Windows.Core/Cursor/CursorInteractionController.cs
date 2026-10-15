@@ -44,6 +44,7 @@ public class CursorInteractionController
     // MARK: - Internal State
 
     private CorePoint _previousCursorPoint;
+    private bool _hasInitializedPosition = false;
     private DateTime _zoneTransitionCooldownUntil = DateTime.MinValue;
     private double _interactionDwellTime = 0.0;
     private double _anticipationRemaining = 0.0;
@@ -96,6 +97,12 @@ public class CursorInteractionController
         }
 
         var rawCursor = cursorPoint ?? LastGlobalCursorPoint;
+        if (!_hasInitializedPosition)
+        {
+            _hasInitializedPosition = true;
+            _previousCursorPoint = rawCursor;
+            LastGlobalCursorPoint = rawCursor;
+        }
         LastGlobalCursorPoint = rawCursor;
 
         // 1. Calculate Cursor Velocity & Dynamics

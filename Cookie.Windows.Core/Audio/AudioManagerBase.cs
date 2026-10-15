@@ -16,6 +16,8 @@ public abstract class AudioManagerBase
     public bool InteractionSounds { get; set; } = true;
     public bool PurringSounds { get; set; } = true;
 
+    protected virtual bool ValidateFileExists => true;
+
     protected AudioManagerBase(string? customSoundsDirectory = null)
     {
         _soundsDirectory = customSoundsDirectory ?? Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "Sounds");
@@ -42,7 +44,7 @@ public abstract class AudioManagerBase
         _lastPlayTimes[sound] = now;
 
         string soundFile = Path.Combine(_soundsDirectory, sound.GetFileName());
-        if (!File.Exists(soundFile))
+        if (ValidateFileExists && !File.Exists(soundFile))
         {
             return false;
         }
