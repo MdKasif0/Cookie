@@ -5,7 +5,7 @@
   # Directory that contains the deploy-ready HTML files and assets
   publish = "website"
   # Build command (ensures downloads/ is populated even if built on Netlify CI)
-  command = "mkdir -p website/downloads && cp -f dist/Cookie-1.1.0.dmg website/downloads/Cookie-1.1.0.dmg || true"
+  command = "mkdir -p website/downloads && cp -f dist/Cookie-1.1.0.dmg website/downloads/Cookie-1.1.0.dmg || true && cp -f dist/windows/Cookie-Windows-1.1.0-win-x64-Portable.zip website/downloads/Cookie-Windows-1.1.0-win-x64-Portable.zip || true"
 
 # Global security headers & HTML revalidation
 [[headers]]
@@ -24,12 +24,11 @@
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
-# Direct download headers for macOS DMG installer
+# Download caching for releases
 [[headers]]
   for = "/downloads/*"
   [headers.values]
     Cache-Control = "public, max-age=86400"
-    Content-Disposition = "attachment; filename=\"Cookie-1.1.0.dmg\""
 
 # Revalidate stylesheets and scripts so updates apply immediately
 [[headers]]
@@ -43,6 +42,18 @@
     Cache-Control = "public, max-age=0, must-revalidate"
 
 # Convenient redirects
+[[redirects]]
+  from = "/download/windows"
+  to = "/downloads/Cookie-Windows-1.1.0-win-x64-Portable.zip"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/download/mac"
+  to = "/downloads/Cookie-1.1.0.dmg"
+  status = 302
+  force = true
+
 [[redirects]]
   from = "/download"
   to = "/downloads/Cookie-1.1.0.dmg"
