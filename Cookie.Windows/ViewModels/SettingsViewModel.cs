@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
-using Cookie.Windows.Audio;
-using Cookie.Windows.Models;
-using Cookie.Windows.Persistence;
+using Cookie.Windows.Core.Audio;
+using Cookie.Windows.Core.Models;
+using Cookie.Windows.Core.Persistence;
 
 namespace Cookie.Windows.ViewModels;
 
@@ -13,7 +13,7 @@ public class SettingsViewModel : INotifyPropertyChanged
 {
     private readonly CookieProfile _profile;
     private readonly SettingsManager _settingsManager;
-    private readonly WindowsAudioManager _audioManager;
+    private readonly AudioManagerBase _audioManager;
     private readonly Action? _onSettingsChanged;
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -21,7 +21,7 @@ public class SettingsViewModel : INotifyPropertyChanged
     public SettingsViewModel(
         CookieProfile profile,
         SettingsManager settingsManager,
-        WindowsAudioManager audioManager,
+        AudioManagerBase audioManager,
         Action? onSettingsChanged = null)
     {
         _profile = profile;
@@ -340,7 +340,6 @@ public class SettingsViewModel : INotifyPropertyChanged
         set { if (_profile.Settings.PurringSounds != value) { _profile.Settings.PurringSounds = value; SaveAndNotify(); } }
     }
 
-    // App Information
     public string AppVersion => "1.1.0";
     public string CopyrightText => "© 2026 Md Kasif Uddin. All rights reserved.";
 

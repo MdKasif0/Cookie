@@ -1,5 +1,5 @@
-using Cookie.Windows.Animation;
-using Cookie.Windows.Models;
+using Cookie.Windows.Core.Animation;
+using Cookie.Windows.Core.Models;
 using Xunit;
 
 namespace Cookie.Windows.Tests;
@@ -49,11 +49,9 @@ public class AnimationCatalogTests
     {
         var controller = new CookieAnimationController();
 
-        // Play Special animation (priority 40)
         controller.PlayAnimation(CookieAnimationId.PickedUp);
         Assert.Equal(CookieAnimationId.PickedUp, controller.CurrentAnimationId);
 
-        // Attempt to play Idle (priority 10) - should be rejected!
         bool played = controller.PlayAnimation(CookieAnimationId.Idle);
 
         Assert.False(played);
@@ -65,10 +63,8 @@ public class AnimationCatalogTests
     {
         var controller = new CookieAnimationController();
 
-        // Start in Idle (priority 10)
         Assert.Equal(CookieAnimationId.Idle, controller.CurrentAnimationId);
 
-        // Play Pet (priority 30) - should succeed!
         bool played = controller.PlayAnimation(CookieAnimationId.Pet);
 
         Assert.True(played);

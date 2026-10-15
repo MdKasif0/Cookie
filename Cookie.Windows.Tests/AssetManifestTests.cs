@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using System.Text.Json;
-using Cookie.Windows.Models;
+using Cookie.Windows.Core.Models;
 using Xunit;
 
 namespace Cookie.Windows.Tests;
@@ -12,7 +12,6 @@ public class AssetManifestTests
     public void AssetManifest_FileExistsAndIsValidJson()
     {
         string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-        // Check relative to output directory or source directory
         string manifestPath = Path.Combine(baseDir, "Resources", "AssetManifest.json");
         if (!File.Exists(manifestPath))
         {

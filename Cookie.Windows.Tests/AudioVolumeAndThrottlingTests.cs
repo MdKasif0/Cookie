@@ -1,5 +1,4 @@
-using Cookie.Windows.Audio;
-using Cookie.Windows.Models;
+using Cookie.Windows.Core.Models;
 using Xunit;
 
 namespace Cookie.Windows.Tests;
@@ -9,7 +8,6 @@ public class AudioVolumeAndThrottlingTests
     [Fact]
     public void SoundEffect_ThrottlingRules()
     {
-        // Purr interval is 1.0s, other sounds are 0.35s
         Assert.Equal(1.0, SoundEffect.Purr.GetMinimumIntervalSeconds());
         Assert.Equal(0.35, SoundEffect.Meow.GetMinimumIntervalSeconds());
         Assert.Equal(0.35, SoundEffect.Happy.GetMinimumIntervalSeconds());
@@ -32,7 +30,7 @@ public class AudioVolumeAndThrottlingTests
     [Fact]
     public void AudioManager_WhenSoundDisabled_DoesNotPlay()
     {
-        var manager = new WindowsAudioManager();
+        var manager = new TestAudioManager();
         manager.SoundEnabled = false;
 
         bool played = manager.Play(SoundEffect.Meow);
@@ -43,13 +41,12 @@ public class AudioVolumeAndThrottlingTests
     [Fact]
     public void AudioManager_ThrottlesRapidRepeatsOfSameSound()
     {
-        var manager = new WindowsAudioManager();
+        var manager = new TestAudioManager();
         manager.SoundEnabled = true;
 
-        // First play might succeed or fail if file not at exact path, but subsequent play within interval is always throttled
         manager.Play(SoundEffect.Purr);
         bool secondPlay = manager.Play(SoundEffect.Purr);
 
-        Assert.False(secondPlay); // Blocked by 1.0s throttle
+        Assert.False(secondPlay);
     }
 }

@@ -1,7 +1,7 @@
 using System;
 using System.IO;
-using Cookie.Windows.Models;
-using Cookie.Windows.Persistence;
+using Cookie.Windows.Core.Models;
+using Cookie.Windows.Core.Persistence;
 using Xunit;
 
 namespace Cookie.Windows.Tests;
@@ -54,7 +54,6 @@ public class SettingsPersistenceTests : IDisposable
 
         manager.SaveProfileImmediate(profile);
 
-        // Read again in a new manager instance
         var reloadedManager = new SettingsManager(filePath);
         var reloadedProfile = reloadedManager.LoadProfile();
 
@@ -78,7 +77,6 @@ public class SettingsPersistenceTests : IDisposable
         Assert.NotNull(profile);
         Assert.Equal("Cookie", profile.DisplayName);
 
-        // Check that a corrupt backup file was created
         var backupFiles = Directory.GetFiles(_testDirectory, "profile.corrupt.*.json");
         Assert.NotEmpty(backupFiles);
     }

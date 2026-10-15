@@ -1,25 +1,36 @@
-using System.Windows;
-using Cookie.Windows.Animation;
-using Cookie.Windows.Audio;
-using Cookie.Windows.Behaviors;
-using Cookie.Windows.Desktop;
-using Cookie.Windows.Models;
+using Cookie.Windows.Core.Animation;
+using Cookie.Windows.Core.Audio;
+using Cookie.Windows.Core.Behaviors;
+using Cookie.Windows.Core.Desktop;
+using Cookie.Windows.Core.Models;
 using Xunit;
 
 namespace Cookie.Windows.Tests;
+
+public class TestAudioManager : AudioManagerBase
+{
+    public string? LastPlayedSoundFile { get; private set; }
+    public double LastPlayedVolume { get; private set; }
+
+    protected override void PlayInternal(string filePath, double volume)
+    {
+        LastPlayedSoundFile = filePath;
+        LastPlayedVolume = volume;
+    }
+}
 
 public class BehaviorStateMachineTests
 {
     private readonly CookieAnimationController _animController;
     private readonly ScreenGeometryService _screenService;
-    private readonly WindowsAudioManager _audioManager;
+    private readonly TestAudioManager _audioManager;
     private readonly CookieBehaviorController _behaviorController;
 
     public BehaviorStateMachineTests()
     {
         _animController = new CookieAnimationController();
         _screenService = new ScreenGeometryService();
-        _audioManager = new WindowsAudioManager();
+        _audioManager = new TestAudioManager();
         _behaviorController = new CookieBehaviorController(_animController, _screenService, _audioManager);
     }
 
@@ -38,7 +49,7 @@ public class BehaviorStateMachineTests
         Assert.Equal(CookieState.BeingDragged, _behaviorController.State);
         Assert.Equal(CookieAnimationId.PickedUp, _animController.CurrentAnimationId);
 
-        _behaviorController.UpdateDrag(new Point(200, 300));
+        _behaviorController.UpdateDrag(new CorePoint(200, 300));
         Assert.Equal(200, _behaviorController.CurrentPosition.X);
         Assert.Equal(300, _behaviorController.CurrentPosition.Y);
 
