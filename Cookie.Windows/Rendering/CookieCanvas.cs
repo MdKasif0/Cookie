@@ -11,6 +11,7 @@ public class CookieCanvas : FrameworkElement
 {
     private CookiePose _currentPose = new();
     private CharacterPalette _palette = CharacterPalette.FromFurColor(FurColor.Cream);
+    private CookieAppearanceConfig _appearance = new();
     private CookieDirection _direction = CookieDirection.Right;
     private double _scale = 1.0;
     private Emote? _activeEmote;
@@ -32,6 +33,13 @@ public class CookieCanvas : FrameworkElement
     public void UpdatePalette(CharacterPalette palette)
     {
         _palette = palette;
+        InvalidateVisual();
+    }
+
+    public void UpdateAppearance(CookieAppearanceConfig appearance)
+    {
+        _appearance = appearance;
+        _palette = CharacterPalette.FromFurColor(appearance.FurColor);
         InvalidateVisual();
     }
 
@@ -94,7 +102,7 @@ public class CookieCanvas : FrameworkElement
             dc.PushTransform(new ScaleTransform(_scale, _scale));
         }
 
-        var characterDrawing = CookieSpriteRenderer.Render(_currentPose, _palette, _direction);
+        var characterDrawing = CookieSpriteRenderer.Render(_currentPose, _palette, _appearance, _direction);
         dc.DrawDrawing(characterDrawing);
 
         if (_activeEmote != null)
@@ -110,8 +118,14 @@ public class CookieCanvas : FrameworkElement
 
     private void DrawEmoteOverlay(DrawingContext dc)
     {
-        double bubbleX = _direction == CookieDirection.Right ? 130 : 20;
-        double bubbleY = 25;
+        double bubbleX = _direction == CookieDirection.Right ? 130 : 16;
+        double bubbleY = 22;
+
+        // Special heart effect for Love emote (warm peach / muted-coral heart)
+        if (_activeEmote?.Id == EmoteId.Love)
+        {
+            DrawLoveHeartEffect(dc, bubbleX, bubbleY);
+        }
 
         if (_emoteImage != null)
         {
@@ -119,8 +133,9 @@ public class CookieCanvas : FrameworkElement
         }
         else if (_activeEmote != null)
         {
-            var bgBrush = new SolidColorBrush(Color.FromArgb(235, 253, 251, 247));
+            var bgBrush = new SolidColorBrush(Color.FromArgb(240, 253, 251, 247));
             var borderPen = new Pen(new SolidColorBrush(Color.FromRgb(224, 135, 68)), 1.5);
+            borderPen.Freeze();
             dc.DrawRoundedRectangle(bgBrush, borderPen, new Rect(bubbleX, bubbleY, 34, 34), 8, 8);
 
             var formattedText = new FormattedText(
@@ -134,6 +149,41 @@ public class CookieCanvas : FrameworkElement
 
             dc.DrawText(formattedText, new Point(bubbleX + 6, bubbleY + 5));
         }
+    }
+
+    private void DrawLoveHeartEffect(DrawingContext dc, double bx, double by)
+    {
+        // Gentle floating warm peach / muted-coral heart above Cookie
+        double hx = _direction == CookieDirection.Right ? 110 : 70;
+        double hy = 18;
+
+        var heartGeo = new StreamGeometry();
+        using (var ctx = heartGeo.Open())
+        {
+            ctx.BeginFigure(new Point(hx, hy + 10), true, true);
+            ctx.BezierTo(new Point(hx - 12, hy + 2), new Point(hx - 12, hy - 8), new Point(hx, hy - 4), true, true);
+            ctx.BezierTo(new Point(hx + 12, hy - 8), new Point(hx + 12, hy + 2), new Point(hx, hy + 10), true, true);
+        }
+        heartGeo.Freeze();
+
+        var heartBrush = new SolidColorBrush(Color.FromArgb(230, 224, 135, 68)); // Warm muted coral
+        var heartPen = new Pen(new SolidColorBrush(Color.FromArgb(180, 198, 122, 56)), 1.5);
+        heartPen.Freeze();
+        dc.DrawGeometry(heartBrush, heartPen, heartGeo);
+
+        // Small secondary baby heart
+        var babyHeartGeo = new StreamGeometry();
+        using (var ctx = babyHeartGeo.Open())
+        {
+            double bx2 = hx + 14;
+            double by2 = hy - 8;
+            ctx.BeginFigure(new Point(bx2, by2 + 5), true, true);
+            ctx.BezierTo(new Point(bx2 - 6, by2 + 1), new Point(bx2 - 6, by2 - 4), new Point(bx2, by2 - 2), true, true);
+            ctx.BezierTo(new Point(bx2 + 6, by2 - 4), new Point(bx2 + 6, by2 + 1), new Point(bx2, by2 + 5), true, true);
+        }
+        babyHeartGeo.Freeze();
+        var babyBrush = new SolidColorBrush(Color.FromArgb(200, 242, 186, 140)); // Warm peach
+        dc.DrawGeometry(babyBrush, null, babyHeartGeo);
     }
 
     protected override HitTestResult HitTestCore(PointHitTestParameters hitTestParameters)

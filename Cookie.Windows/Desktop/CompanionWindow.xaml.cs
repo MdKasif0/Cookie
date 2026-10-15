@@ -33,6 +33,8 @@ public partial class CompanionWindow : Window
     private Point _dragStartWindow;
     private bool _hasDraggedEnough = false;
 
+    private EmotePickerWindow? _activeEmotePicker;
+
     public CompanionWindow(
         CookieAnimationController animationController,
         CookieBehaviorController behaviorController,
@@ -145,8 +147,7 @@ public partial class CompanionWindow : Window
 
     public void ApplyProfileAppearance()
     {
-        var palette = CharacterPalette.FromFurColor(_profile.Appearance.FurColor);
-        CatCanvas.UpdatePalette(palette);
+        CatCanvas.UpdateAppearance(_profile.Appearance);
 
         double sizeScale = _profile.Settings.CookieSize;
         Width = 180 * sizeScale;
@@ -154,6 +155,7 @@ public partial class CompanionWindow : Window
         CatCanvas.UpdateScale(sizeScale);
         _behaviorController.SetCompanionSize(new CoreSize(Width, Height));
 
+        _behaviorController.Settings = _profile.Settings;
         _animationController.AnimationIntensity = _profile.Settings.AnimationIntensity;
         _behaviorController.AutonomousBehaviorEnabled = _profile.Settings.AutonomousBehaviorEnabled;
         _behaviorController.PauseAutonomousBehavior = _profile.Settings.PauseAutonomousBehavior;
@@ -245,15 +247,19 @@ public partial class CompanionWindow : Window
         petItem.Click += (s, e) => _behaviorController.Pet();
         menu.Items.Add(petItem);
 
-        var emotesMenu = new MenuItem { Header = "Emotes" };
+        var emotePickerItem = new MenuItem { Header = "Emotes... 🎨" };
+        emotePickerItem.Click += (s, e) => OpenEmotePickerWindow();
+        menu.Items.Add(emotePickerItem);
+
+        var quickEmotesMenu = new MenuItem { Header = "Quick Emote" };
         foreach (var emote in Emote.All)
         {
             var item = new MenuItem { Header = $"{emote.Emoji} {emote.Name}" };
             var capturedEmote = emote;
             item.Click += (s, e) => _behaviorController.TriggerEmote(capturedEmote);
-            emotesMenu.Items.Add(item);
+            quickEmotesMenu.Items.Add(item);
         }
-        menu.Items.Add(emotesMenu);
+        menu.Items.Add(quickEmotesMenu);
 
         menu.Items.Add(new Separator());
 
@@ -274,6 +280,33 @@ public partial class CompanionWindow : Window
         menu.Items.Add(exitItem);
 
         menu.IsOpen = true;
+    }
+
+    public void OpenEmotePickerWindow()
+    {
+        if (_activeEmotePicker != null && _activeEmotePicker.IsLoaded)
+        {
+            _activeEmotePicker.Activate();
+            return;
+        }
+
+        _activeEmotePicker = new EmotePickerWindow(_behaviorController, () =>
+        {
+            _activeEmotePicker = null;
+        });
+
+        // Position above Cookie, or below if near top
+        double pickerX = Left + (Width - _activeEmotePicker.Width) / 2.0;
+        double pickerY = Top - _activeEmotePicker.Height - 8.0;
+
+        if (pickerY < 20)
+        {
+            pickerY = Top + Height + 8.0;
+        }
+
+        _activeEmotePicker.Left = pickerX;
+        _activeEmotePicker.Top = pickerY;
+        _activeEmotePicker.Show();
     }
 
     public void OpenSettingsWindow()
@@ -297,6 +330,10 @@ public partial class CompanionWindow : Window
     protected override void OnClosed(EventArgs e)
     {
         _gameLoopTimer.Stop();
+        if (_activeEmotePicker != null && _activeEmotePicker.IsLoaded)
+        {
+            _activeEmotePicker.Close();
+        }
         base.OnClosed(e);
     }
 }

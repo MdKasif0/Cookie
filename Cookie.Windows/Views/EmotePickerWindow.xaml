@@ -1,0 +1,211 @@
+<Window x:Class="Cookie.Windows.Views.EmotePickerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Cookie Emotes"
+        Width="310" Height="270"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ShowInTaskbar="False"
+        Topmost="True"
+        ResizeMode="NoResize"
+        WindowStartupLocation="Manual"
+        KeyDown="OnWindowKeyDown">
+
+    <Window.Resources>
+        <!-- Colors -->
+        <SolidColorBrush x:Key="BgWarmWhite" Color="#FDFBF7"/>
+        <SolidColorBrush x:Key="BgCream" Color="#F7F2E8"/>
+        <SolidColorBrush x:Key="BgIvory" Color="#F5EFEB"/>
+        <SolidColorBrush x:Key="BorderSubtle" Color="#E8DFD1"/>
+        <SolidColorBrush x:Key="AccentWarmOrange" Color="#E08744"/>
+        <SolidColorBrush x:Key="AccentPeach" Color="#F2BA8C"/>
+        <SolidColorBrush x:Key="TextCharcoal" Color="#2D2A26"/>
+        <SolidColorBrush x:Key="TextMuted" Color="#75726D"/>
+        <SolidColorBrush x:Key="MutedSage" Color="#8A9A86"/>
+
+        <Style x:Key="EmoteTileButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource BgWarmWhite}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderSubtle}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Width" Value="84"/>
+            <Setter Property="Height" Value="86"/>
+            <Setter Property="Margin" Value="4"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="TileBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="12"
+                                Padding="4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="TileBorder" Property="Background" Value="{StaticResource BgCream}"/>
+                                <Setter TargetName="TileBorder" Property="BorderBrush" Value="{StaticResource AccentPeach}"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="TileBorder" Property="BorderBrush" Value="{StaticResource AccentWarmOrange}"/>
+                                <Setter TargetName="TileBorder" Property="BorderThickness" Value="2"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="TileBorder" Property="Background" Value="{StaticResource AccentPeach}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="TileBorder" Property="Opacity" Value="0.5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <!-- Main Container Card -->
+    <Border Background="{StaticResource BgWarmWhite}"
+            BorderBrush="{StaticResource BorderSubtle}"
+            BorderThickness="1"
+            CornerRadius="16"
+            Margin="6">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="14" ShadowDepth="4" Direction="270" Color="#4A3B32" Opacity="0.18"/>
+        </Border.Effect>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- 1. Header -->
+            <Border Grid.Row="0" Background="{StaticResource BgCream}" CornerRadius="15,15,0,0" Padding="12,8">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel>
+                        <TextBlock Text="Emotes" FontSize="13" FontWeight="Bold" Foreground="{StaticResource TextCharcoal}"/>
+                        <TextBlock Text="Choose a little moment for Cookie." FontSize="10.5" Foreground="{StaticResource TextMuted}"/>
+                    </StackPanel>
+
+                    <Button Grid.Column="1" Click="OnCloseClick" Width="22" Height="22" Cursor="Hand" ToolTip="Close (Esc)">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border Background="{StaticResource BgIvory}" CornerRadius="11">
+                                    <TextBlock Text="✕" FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextMuted}" 
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                </Grid>
+            </Border>
+
+            <!-- 2. Emote Tiles Grid: 3 top row, 2 bottom row -->
+            <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,4">
+                <!-- Row 1: Wave, Happy, Love -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <!-- Wave -->
+                    <Button x:Name="WaveBtn" Style="{StaticResource EmoteTileButtonStyle}" Click="OnWaveClick"
+                            AutomationProperties.Name="Wave Emote" AutomationProperties.HelpText="Cookie says hello (1)">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <Grid Width="42" Height="42">
+                                <Border Background="{StaticResource BgIvory}" CornerRadius="10"/>
+                                <Image x:Name="WaveImg" Width="36" Height="36" RenderOptions.BitmapScalingMode="HighQuality"/>
+                                <TextBlock Text="👋" FontSize="12" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-2,-2,0"/>
+                            </Grid>
+                            <TextBlock Text="Wave" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextCharcoal}" 
+                                       HorizontalAlignment="Center" Margin="0,3,0,0"/>
+                            <TextBlock Text="1" FontSize="9" FontWeight="Bold" Foreground="{StaticResource TextMuted}" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <!-- Happy -->
+                    <Button x:Name="HappyBtn" Style="{StaticResource EmoteTileButtonStyle}" Click="OnHappyClick"
+                            AutomationProperties.Name="Happy Emote" AutomationProperties.HelpText="Cookie is feeling happy (2)">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <Grid Width="42" Height="42">
+                                <Border Background="{StaticResource BgIvory}" CornerRadius="10"/>
+                                <Image x:Name="HappyImg" Width="36" Height="36" RenderOptions.BitmapScalingMode="HighQuality"/>
+                                <TextBlock Text="✨" FontSize="12" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-2,-2,0"/>
+                            </Grid>
+                            <TextBlock Text="Happy" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextCharcoal}" 
+                                       HorizontalAlignment="Center" Margin="0,3,0,0"/>
+                            <TextBlock Text="2" FontSize="9" FontWeight="Bold" Foreground="{StaticResource TextMuted}" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <!-- Love -->
+                    <Button x:Name="LoveBtn" Style="{StaticResource EmoteTileButtonStyle}" Click="OnLoveClick"
+                            AutomationProperties.Name="Love Emote" AutomationProperties.HelpText="Cookie sends you some love (3)">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <Grid Width="42" Height="42">
+                                <Border Background="{StaticResource BgIvory}" CornerRadius="10"/>
+                                <Image x:Name="LoveImg" Width="36" Height="36" RenderOptions.BitmapScalingMode="HighQuality"/>
+                                <TextBlock Text="🧡" FontSize="12" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-2,-2,0"/>
+                            </Grid>
+                            <TextBlock Text="Love" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextCharcoal}" 
+                                       HorizontalAlignment="Center" Margin="0,3,0,0"/>
+                            <TextBlock Text="3" FontSize="9" FontWeight="Bold" Foreground="{StaticResource TextMuted}" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+
+                <!-- Row 2: Sleepy, Playful -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <!-- Sleepy -->
+                    <Button x:Name="SleepyBtn" Style="{StaticResource EmoteTileButtonStyle}" Click="OnSleepyClick"
+                            AutomationProperties.Name="Sleepy Emote" AutomationProperties.HelpText="Cookie is getting sleepy (4)">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <Grid Width="42" Height="42">
+                                <Border Background="{StaticResource BgIvory}" CornerRadius="10"/>
+                                <Image x:Name="SleepyImg" Width="36" Height="36" RenderOptions.BitmapScalingMode="HighQuality"/>
+                                <TextBlock Text="💤" FontSize="12" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-2,-2,0"/>
+                            </Grid>
+                            <TextBlock Text="Sleepy" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextCharcoal}" 
+                                       HorizontalAlignment="Center" Margin="0,3,0,0"/>
+                            <TextBlock Text="4" FontSize="9" FontWeight="Bold" Foreground="{StaticResource TextMuted}" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <!-- Playful -->
+                    <Button x:Name="PlayfulBtn" Style="{StaticResource EmoteTileButtonStyle}" Click="OnPlayfulClick"
+                            AutomationProperties.Name="Playful Emote" AutomationProperties.HelpText="Cookie wants to play (5)">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <Grid Width="42" Height="42">
+                                <Border Background="{StaticResource BgIvory}" CornerRadius="10"/>
+                                <Image x:Name="PlayfulImg" Width="36" Height="36" RenderOptions.BitmapScalingMode="HighQuality"/>
+                                <TextBlock Text="🧶" FontSize="12" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-2,-2,0"/>
+                            </Grid>
+                            <TextBlock Text="Playful" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextCharcoal}" 
+                                       HorizontalAlignment="Center" Margin="0,3,0,0"/>
+                            <TextBlock Text="5" FontSize="9" FontWeight="Bold" Foreground="{StaticResource TextMuted}" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- 3. Footer -->
+            <Border Grid.Row="2" Background="{StaticResource BgCream}" CornerRadius="0,0,15,15" Padding="12,6">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="Press 1–5 to play • Esc to close" FontSize="10" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center"/>
+                    <TextBlock x:Name="StatusBadge" Grid.Column="1" Text="Ready" FontSize="10" FontWeight="SemiBold" 
+                               Foreground="{StaticResource MutedSage}" VerticalAlignment="Center"/>
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
+</Window>
