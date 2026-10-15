@@ -1,0 +1,56 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <RootNamespace>Cookie.Windows</RootNamespace>
+    <AssemblyName>Cookie</AssemblyName>
+    
+    <!-- Application Metadata -->
+    <Product>Cookie</Product>
+    <Title>Cookie</Title>
+    <Company>Cookie Desktop Companion</Company>
+    <Description>Cookie Desktop Companion for Windows</Description>
+    <Version>1.1.0</Version>
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <FileVersion>1.1.0.0</FileVersion>
+    <Copyright>© 2026 Md Kasif Uddin. All rights reserved.</Copyright>
+    
+    <!-- Build Configurations -->
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <Optimize>false</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Link Original Audio Resources from Shared Location -->
+    <Content Include="..\Cookie\Resources\Sounds\*.wav" Link="Resources\Sounds\%(Filename)%(Extension)">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <!-- Link Original Emote Sprites and Metadata -->
+    <Content Include="..\Cookie\Resources\Sprites\Cookie\Emotes\**\*.png" Link="Resources\Sprites\Cookie\Emotes\%(RecursiveDir)%(Filename)%(Extension)">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Cookie\Resources\Sprites\Cookie\Emotes\**\*.json" Link="Resources\Sprites\Cookie\Emotes\%(RecursiveDir)%(Filename)%(Extension)">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <!-- Assets Manifest -->
+    <Content Include="Resources\AssetManifest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

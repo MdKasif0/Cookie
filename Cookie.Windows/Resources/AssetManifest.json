@@ -1,0 +1,166 @@
+{
+  "manifestVersion": "1.0.0",
+  "character": "Cookie",
+  "generatedFor": "Cookie for Windows Phase 1",
+  "assets": [
+    {
+      "identifier": "sound.purr",
+      "fileLocation": "Resources/Sounds/cookie-purr.wav",
+      "type": "audio",
+      "intendedUse": "Soft continuous or stroked purring sound effect",
+      "durationSeconds": 1.2,
+      "exists": true
+    },
+    {
+      "identifier": "sound.meow",
+      "fileLocation": "Resources/Sounds/cookie-meow.wav",
+      "type": "audio",
+      "intendedUse": "Standard communicative meow vocalization",
+      "durationSeconds": 0.8,
+      "exists": true
+    },
+    {
+      "identifier": "sound.happy",
+      "fileLocation": "Resources/Sounds/cookie-happy.wav",
+      "type": "audio",
+      "intendedUse": "Joyful rising mrrp vocalization",
+      "durationSeconds": 0.7,
+      "exists": true
+    },
+    {
+      "identifier": "sound.mew",
+      "fileLocation": "Resources/Sounds/cookie-mew.wav",
+      "type": "audio",
+      "intendedUse": "Tiny shy mew vocalization",
+      "durationSeconds": 0.5,
+      "exists": true
+    },
+    {
+      "identifier": "sound.chirp",
+      "fileLocation": "Resources/Sounds/cookie-chirp.wav",
+      "type": "audio",
+      "intendedUse": "Two quick pips when Cookie notices the user",
+      "durationSeconds": 0.4,
+      "exists": true
+    },
+    {
+      "identifier": "sound.surprise",
+      "fileLocation": "Resources/Sounds/cookie-surprise.wav",
+      "type": "audio",
+      "intendedUse": "Surprised gasp or startle sound",
+      "durationSeconds": 0.6,
+      "exists": true
+    },
+    {
+      "identifier": "sound.eat",
+      "fileLocation": "Resources/Sounds/cookie-eat.wav",
+      "type": "audio",
+      "intendedUse": "Gentle munching or eating sound effect",
+      "durationSeconds": 0.8,
+      "exists": true
+    },
+    {
+      "identifier": "sound.toy",
+      "fileLocation": "Resources/Sounds/cookie-toy.wav",
+      "type": "audio",
+      "intendedUse": "Playful toy interaction sound",
+      "durationSeconds": 0.6,
+      "exists": true
+    },
+    {
+      "identifier": "sound.drop",
+      "fileLocation": "Resources/Sounds/cookie-drop.wav",
+      "type": "audio",
+      "intendedUse": "Gentle landing thump after being dragged and dropped",
+      "durationSeconds": 0.4,
+      "exists": true
+    },
+    {
+      "identifier": "sound.sleep",
+      "fileLocation": "Resources/Sounds/cookie-sleep.wav",
+      "type": "audio",
+      "intendedUse": "Soft breathing or sleepy ambient sound",
+      "durationSeconds": 1.0,
+      "exists": true
+    },
+    {
+      "identifier": "sound.welcome",
+      "fileLocation": "Resources/Sounds/cookie-welcome.wav",
+      "type": "audio",
+      "intendedUse": "Warm greeting vocalization upon launch",
+      "durationSeconds": 0.9,
+      "exists": true
+    },
+    {
+      "identifier": "emote.wave",
+      "fileLocation": "Resources/Sprites/Cookie/Emotes/Wave/wave.png",
+      "type": "sprite",
+      "intendedUse": "Friendly waving emote overlay and icon",
+      "frameDuration": 0.25,
+      "exists": true
+    },
+    {
+      "identifier": "emote.happy",
+      "fileLocation": "Resources/Sprites/Cookie/Emotes/Happy/happy.png",
+      "type": "sprite",
+      "intendedUse": "Sparkling joyful emote overlay and icon",
+      "frameDuration": 0.25,
+      "exists": true
+    },
+    {
+      "identifier": "emote.love",
+      "fileLocation": "Resources/Sprites/Cookie/Emotes/Love/love.png",
+      "type": "sprite",
+      "intendedUse": "Heart affectionate emote overlay and icon",
+      "frameDuration": 0.25,
+      "exists": true
+    },
+    {
+      "identifier": "emote.sleepy",
+      "fileLocation": "Resources/Sprites/Cookie/Emotes/Sleepy/sleepy.png",
+      "type": "sprite",
+      "intendedUse": "Sleepy Zzz emote overlay and icon",
+      "frameDuration": 0.25,
+      "exists": true
+    },
+    {
+      "identifier": "emote.playful",
+      "fileLocation": "Resources/Sprites/Cookie/Emotes/Playful/playful.png",
+      "type": "sprite",
+      "intendedUse": "Playful yarn/play emote overlay and icon",
+      "frameDuration": 0.25,
+      "exists": true
+    },
+    {
+      "identifier": "spritesheet.idle",
+      "fileLocation": "Resources/Sprites/Cookie/Idle/idle.png",
+      "type": "spritesheet",
+      "intendedUse": "External bitmap sprite sheet fallback for idle animation",
+      "frameSequence": [0, 1, 2, 3],
+      "frameDuration": 0.25,
+      "exists": false
+    },
+    {
+      "identifier": "spritesheet.walk",
+      "fileLocation": "Resources/Sprites/Cookie/Walk/walk.png",
+      "type": "spritesheet",
+      "intendedUse": "External bitmap sprite sheet fallback for walk cycle",
+      "frameSequence": [0, 1, 2, 3],
+      "frameDuration": 0.15,
+      "exists": false
+    },
+    {
+      "identifier": "vector.procedural_poses",
+      "fileLocation": "Internal:CookieSpriteRenderer",
+      "type": "vector_definitions",
+      "intendedUse": "High-fidelity authoritative vector renderer for all character states and poses",
+      "poses": [
+        "idle", "idleBlink", "sit", "sleep", "wake", "stretch", "yawn", "groom",
+        "walk", "run", "curious", "happy", "surprised", "scared", "annoyed",
+        "playful", "eat", "drink", "pet", "meow", "jump", "fall", "pickedUp",
+        "dropped", "investigate", "tired", "inBox", "boxPeek", "wave", "love", "sleepy"
+      ],
+      "exists": true
+    }
+  ]
+}
