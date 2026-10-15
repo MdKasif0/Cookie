@@ -833,6 +833,15 @@ public class CookieBehaviorController
         }
     }
 
+    public void AutonomousWalkForTesting(CorePoint target)
+    {
+        _walkTarget = target;
+        var dir = target.X >= _currentPosition.X ? CookieDirection.Right : CookieDirection.Left;
+        TransitionToState(CookieState.Walking);
+        SetFacing(dir);
+        _animationController.PlayAnimation(dir == CookieDirection.Right ? CookieAnimationId.WalkRight : CookieAnimationId.WalkLeft);
+    }
+
     private void UpdateWalking(double deltaTimeSeconds)
     {
         if (!_walkTarget.HasValue)
