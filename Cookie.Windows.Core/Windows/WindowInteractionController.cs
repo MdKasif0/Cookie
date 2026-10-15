@@ -315,7 +315,7 @@ public class WindowInteractionController
                 if (_phaseElapsed >= _phaseDuration)
                 {
                     // Launch jump
-                    LaunchPreparedJump(environment);
+                    LaunchPreparedJump(environment, settings);
                 }
                 return null;
 
@@ -475,7 +475,7 @@ public class WindowInteractionController
         return false;
     }
 
-    private void LaunchPreparedJump(DesktopEnvironment environment)
+    private void LaunchPreparedJump(DesktopEnvironment environment, CookieSettings? settings = null)
     {
         if (ActiveJumpProposal == null)
         {
@@ -496,11 +496,17 @@ public class WindowInteractionController
             }
         }
 
+        double apex = ActiveJumpProposal.ApexHeight;
+        if (settings?.ReducedMotion == ReducedMotionMode.Always)
+        {
+            apex *= 0.65;
+        }
+
         ActiveJumpTrajectory = new JumpTrajectory(
             ActiveJumpProposal.StartPoint,
             ActiveJumpProposal.TargetSurface.LandingPoint,
             ActiveJumpProposal.JumpDuration,
-            ActiveJumpProposal.ApexHeight,
+            apex,
             ActiveJumpProposal.Style);
 
         JumpProgress = 0.0;
