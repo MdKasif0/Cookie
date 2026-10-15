@@ -78,25 +78,103 @@ public class CookieBehaviorController
     public bool AutonomousBehaviorEnabled
     {
         get => Settings.AutonomousBehaviorEnabled;
-        set => Settings.AutonomousBehaviorEnabled = value;
+        set
+        {
+            Settings.AutonomousBehaviorEnabled = value;
+            if (!value)
+            {
+                CancelAutonomousMovement();
+            }
+        }
     }
 
     public bool PauseAutonomousBehavior
     {
         get => Settings.PauseAutonomousBehavior;
-        set => Settings.PauseAutonomousBehavior = value;
+        set
+        {
+            Settings.PauseAutonomousBehavior = value;
+            if (value)
+            {
+                CancelAutonomousMovement();
+            }
+        }
     }
 
     public bool CursorInteractionEnabled
     {
         get => Settings.CursorInteraction;
-        set => Settings.CursorInteraction = value;
+        set
+        {
+            Settings.CursorInteraction = value;
+            if (!value && _state == CookieState.FollowingCursor)
+            {
+                MovementInterpolator.Stop2D();
+                TransitionToState(CookieState.Idle);
+                _animationController.PlayAnimation(CookieAnimationId.Idle);
+            }
+        }
     }
 
     public ActivityLevel Activity
     {
         get => Settings.Activity;
         set => Settings.Activity = value;
+    }
+
+    private bool _isSessionLocked = false;
+    public bool IsSessionLocked => _isSessionLocked;
+
+    public void CancelAutonomousMovement()
+    {
+        if (_state is CookieState.Walking or CookieState.ExploringWindow or CookieState.ExploringTaskbar)
+        {
+            _walkTarget = null;
+            _dodgeTarget = null;
+            MovementInterpolator.Stop2D();
+            WindowController.CancelExploration();
+            TaskbarController.CancelExploration();
+            TransitionToState(CookieState.Idle);
+            _animationController.PlayAnimation(CookieAnimationId.Idle);
+        }
+    }
+
+    public void PauseForSessionLock()
+    {
+        _isSessionLocked = true;
+        _walkTarget = null;
+        _dodgeTarget = null;
+        MovementInterpolator.Stop2D();
+        WindowController.CancelExploration();
+        TaskbarController.CancelExploration();
+        TransitionToState(CookieState.Sitting);
+        _animationController.PlayAnimation(CookieAnimationId.Sit);
+    }
+
+    public void ResumeFromSessionLock()
+    {
+        _isSessionLocked = false;
+        _currentPosition = _screenService.RecoverPosition(_currentPosition, _companionSize);
+        OnPositionChanged?.Invoke(_currentPosition);
+        _nextBehaviorTime = 3.0;
+        TransitionToState(CookieState.Idle);
+        _animationController.PlayAnimation(CookieAnimationId.Idle);
+    }
+
+    public void HandleDisplayConfigurationChanged()
+    {
+        _walkTarget = null;
+        _dodgeTarget = null;
+        MovementInterpolator.Stop2D();
+        WindowController.CancelExploration();
+        TaskbarController.CancelExploration();
+
+        _currentPosition = _screenService.RecoverPosition(_currentPosition, _companionSize);
+        OnPositionChanged?.Invoke(_currentPosition);
+
+        TransitionToState(CookieState.Idle);
+        _animationController.PlayAnimation(CookieAnimationId.Idle);
+        _nextBehaviorTime = 2.0;
     }
 
     public Func<DateTime> Now
@@ -197,6 +275,12 @@ public class CookieBehaviorController
     {
         if (deltaTimeSeconds <= 0.0) return;
 
+        if (_isSessionLocked)
+        {
+            _animationController.Update(deltaTimeSeconds);
+            return;
+        }
+
         _animationController.Update(deltaTimeSeconds);
 
         // Calculate cat center in DIPs
@@ -280,6 +364,12 @@ public class CookieBehaviorController
         if (!Memory.CanReactToAppSwitch()) return;
 
         Memory.RecordAppSwitchReaction();
+
+        if (_state == CookieState.Walking)
+        {
+            _walkTarget = null;
+            TransitionToState(CookieState.Idle);
+        }
 
         if (_state == CookieState.Idle && _currentEmote == null)
         {
