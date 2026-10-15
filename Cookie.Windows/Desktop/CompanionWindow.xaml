@@ -1,0 +1,24 @@
+<Window x:Class="Cookie.Windows.Desktop.CompanionWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:rendering="clr-namespace:Cookie.Windows.Rendering"
+        Title="Cookie"
+        Width="180" Height="180"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ShowInTaskbar="False"
+        Topmost="True"
+        ResizeMode="NoResize"
+        ShowActivated="False"
+        Focusable="False">
+    <Grid Background="Transparent">
+        <rendering:CookieCanvas x:Name="CatCanvas"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               MouseLeftButtonDown="OnCanvasMouseLeftButtonDown"
+                               MouseLeftButtonUp="OnCanvasMouseLeftButtonUp"
+                               MouseMove="OnCanvasMouseMove"
+                               MouseRightButtonUp="OnCanvasMouseRightButtonUp"/>
+    </Grid>
+</Window>
