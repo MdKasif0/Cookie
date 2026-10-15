@@ -46,8 +46,9 @@ public class ExplorationBehaviorTests
         envProvider.AddWindow(win);
 
         // Directly mount on window for deterministic testing
-        controller.WindowController.MountOnWindow(win, new CorePoint(250, 286));
+        controller.MountOnWindow(win, new CorePoint(250, 286));
         Assert.Equal(WindowExplorationPhase.WalkingTopEdge, controller.WindowController.CurrentPhase);
+        Assert.Equal(CookieState.ExploringWindow, controller.State);
 
         // Update several frames
         for (int i = 0; i < 20; i++)
@@ -175,9 +176,7 @@ public class ExplorationBehaviorTests
         var win = new ObservableWindow(new IntPtr(3001), "WorkWin", "App", 31, new CoreRect(200, 300, 400, 300));
         envProvider.AddWindow(win);
 
-        controller.WindowController.MountOnWindow(win, new CorePoint(250, 286));
-        controller.Update(0.05);
-
+        controller.MountOnWindow(win, new CorePoint(250, 286));
         Assert.Equal(CookieState.ExploringWindow, controller.State);
         Assert.True(controller.WindowController.IsExploringWindow);
 
@@ -197,9 +196,7 @@ public class ExplorationBehaviorTests
         var win = new ObservableWindow(new IntPtr(4001), "ActiveWin", "App", 41, new CoreRect(200, 300, 400, 300));
         envProvider.AddWindow(win);
 
-        controller.WindowController.MountOnWindow(win, new CorePoint(250, 286));
-        controller.Update(0.05);
-
+        controller.MountOnWindow(win, new CorePoint(250, 286));
         Assert.Equal(CookieState.ExploringWindow, controller.State);
 
         // Explicit emote triggered by user
@@ -227,8 +224,8 @@ public class ExplorationBehaviorTests
         Assert.True(taskbarController.IsExploringTaskbar);
         Assert.Equal(TaskbarSessionPhase.Anticipating, taskbarController.CurrentPhase);
 
-        // Advance through anticipation phase
-        taskbarController.Update(1.0, new CorePoint(500, 800), new CoreSize(180, 180), env);
+        // Advance through anticipation phase (duration is at most 1.3s)
+        taskbarController.Update(1.5, new CorePoint(500, 800), new CoreSize(180, 180), env);
         Assert.Equal(TaskbarSessionPhase.Approaching, taskbarController.CurrentPhase);
         Assert.NotNull(taskbarController.DestinationPoint);
 

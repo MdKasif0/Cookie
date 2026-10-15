@@ -671,6 +671,20 @@ public class CookieBehaviorController
         _animationController.PlayAnimation(CookieAnimationId.Idle);
     }
 
+    public void MountOnWindow(ObservableWindow window, CorePoint landingPoint)
+    {
+        CancelActiveEmote();
+        _walkTarget = null;
+        _dodgeTarget = null;
+        MovementInterpolator.Stop2D();
+        TaskbarController.CancelExploration();
+
+        WindowController.MountOnWindow(window, landingPoint);
+        TransitionToState(CookieState.ExploringWindow);
+        _currentPosition = landingPoint;
+        OnPositionChanged?.Invoke(_currentPosition);
+    }
+
     public void BeginDrag()
     {
         CancelActiveEmote();

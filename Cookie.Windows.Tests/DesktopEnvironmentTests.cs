@@ -102,7 +102,7 @@ public class DesktopEnvironmentTests
             new[] { taskbar },
             Array.Empty<ObservableWindow>());
 
-        var charSize = new CoreSize(80, 80);
+        var charSize = new CoreSize(80, 50);
 
         // Clamping a point far to the left
         var clamped1 = env.ClampToTaskbarWalkingSurface(new CorePoint(10, 970), charSize);
