@@ -3,19 +3,16 @@ name: Build Cookie for Windows
 on:
   workflow_dispatch:
   push:
-    branches: [ main ]
-    paths:
-      - 'Cookie.Windows/**'
-      - 'Cookie.Windows.Core/**'
-      - 'Cookie.Windows.Tests/**'
-      - 'Cookie.Windows.sln'
-      - 'Packaging/windows/**'
-      - '.github/workflows/build-windows.yml'
+    branches:
+      - main
 
 jobs:
   build:
     name: Build & Package Windows Installer
     runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
 
     steps:
       - name: Checkout Repository
@@ -33,15 +30,9 @@ jobs:
         run: dotnet test Cookie.Windows.Tests/Cookie.Windows.Tests.csproj -c Release --no-restore
 
       - name: Publish Self-Contained win-x64 Application
-        run: |
-          dotnet publish Cookie.Windows/Cookie.Windows.csproj `
-            -c Release `
-            -r win-x64 `
-            --self-contained true `
-            -o dist/windows/win-x64
+        run: dotnet publish Cookie.Windows/Cookie.Windows.csproj -c Release -r win-x64 --self-contained true -o dist/windows/win-x64
 
       - name: Verify Required Assets
-        shell: pwsh
         run: |
           $required = @(
             "dist/windows/win-x64/Cookie.exe",
@@ -65,27 +56,23 @@ jobs:
           Write-Host "All required assets verified successfully."
 
       - name: Install Inno Setup
-        shell: pwsh
         run: |
           choco install innosetup --no-progress -y
           "C:\Program Files (x86)\Inno Setup 6" | Out-File -FilePath $env:GITHUB_PATH -Append
 
       - name: Compile Inno Setup Installer
-        shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path dist/windows/installer
-          iscc Packaging/windows/CookieSetup.iss
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" Packaging/windows/CookieSetup.iss
           Copy-Item dist/windows/installer/CookieSetup-1.1.0.exe dist/windows/installer/Cookie-Setup.exe -Force
           Write-Host "Inno Setup installer compiled successfully."
 
       - name: Package Portable Zip
-        shell: pwsh
         run: |
           Compress-Archive -Path dist/windows/win-x64/* -DestinationPath dist/windows/Cookie-Windows-1.1.0-win-x64-Portable.zip -Force
           Write-Host "Portable zip packaged successfully."
 
       - name: Compute Checksums
-        shell: pwsh
         run: |
           $installerHash = (Get-FileHash -Algorithm SHA256 dist/windows/installer/Cookie-Setup.exe).Hash.ToLower()
           $zipHash = (Get-FileHash -Algorithm SHA256 dist/windows/Cookie-Windows-1.1.0-win-x64-Portable.zip).Hash.ToLower()
