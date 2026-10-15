@@ -156,7 +156,6 @@ public class MovementInterpolator
         }
 
         double direction = delta > 0.0 ? 1.0 : -1.0;
-        double speed = Math.Abs(CurrentVelocity);
         double stoppingDistance = (speed * speed) / (2.0 * Math.Max(10.0, Deceleration));
 
         if (distance <= stoppingDistance)

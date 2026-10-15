@@ -16,13 +16,13 @@ public class CustomizationParityTests
         foreach (var color in colors)
         {
             var palette = CharacterPalette.FromFurColor(color);
-            Assert.NotNull(palette.Fur);
-            Assert.NotNull(palette.FurShade);
-            Assert.NotNull(palette.Outline);
-            Assert.NotNull(palette.InnerEar);
-            Assert.NotNull(palette.Blush);
-            Assert.NotNull(palette.Stripe);
-            Assert.NotNull(palette.Eye);
+            Assert.True(palette.Fur.R > 0);
+            Assert.True(palette.FurShade.R > 0);
+            Assert.True(palette.Outline.R > 0);
+            Assert.True(palette.InnerEar.R > 0);
+            Assert.True(palette.Blush.R > 0);
+            Assert.True(palette.Stripe.R > 0);
+            Assert.True(palette.Eye.R > 0);
         }
     }
 

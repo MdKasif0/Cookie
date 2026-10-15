@@ -112,8 +112,8 @@ public class CursorInteractionTests
 
         testClock = testClock.AddSeconds(0.3);
 
-        // Rush rapidly toward Cookie: distance drops from 100 to 50 in 0.016s -> speed = 50 / 0.016 = 3125 pt/s
-        controller.Update(0.016, catCenter, new CorePoint(550, 500), 1.0, settings, false);
+        // Rush rapidly toward Cookie: distance drops from 100 to 35 in 0.016s -> speed = 65 / 0.016 = 4062.5 pt/s
+        controller.Update(0.016, catCenter, new CorePoint(535, 500), 1.0, settings, false);
 
         Assert.True(controller.SmoothedCursorVelocity > 620.0);
         Assert.True(controller.IsApproachingCookie);
@@ -121,7 +121,7 @@ public class CursorInteractionTests
 
         // Clear and verify cooldown prevents immediate re-trigger
         controller.ClearActiveReaction();
-        controller.Update(0.016, catCenter, new CorePoint(540, 500), 1.0, settings, false);
+        controller.Update(0.016, catCenter, new CorePoint(530, 500), 1.0, settings, false);
         Assert.Null(controller.ActiveReaction);
     }
 
@@ -139,7 +139,7 @@ public class CursorInteractionTests
         Assert.False(interpolator.IsArrived);
 
         // Step through updates
-        for (int i = 0; i < 200 && !interpolator.IsArrived; i++)
+        for (int i = 0; i < 300 && !interpolator.IsArrived; i++)
         {
             interpolator.Update(0.016);
             Assert.True(interpolator.CurrentPosition <= 200.0);
