@@ -16,17 +16,14 @@ public class BehaviorSchedulerTests
     {
         var monitor = new DisplayMonitorInfo("M1", new CoreRect(0, 0, 1920, 1080), new CoreRect(0, 0, 1920, 1040), true);
         var taskbar = new TaskbarInfo("M1", new CoreRect(0, 1040, 1920, 40), TaskbarOrientation.Bottom, TaskbarVisibilityState.Visible, 40, new CoreRect(40, 980, 1840, 50));
-        var win = new ObservableWindow(new IntPtr(1001), "Editor", "Code", new CoreRect(200, 300, 600, 400), false, false, false, 0);
+        var win = new ObservableWindow(new IntPtr(1001), "Editor", "Code", 1234, new CoreRect(200, 300, 600, 400));
 
         return new DesktopEnvironment(
-            new List<DisplayMonitorInfo> { monitor },
             monitor,
+            new List<DisplayMonitorInfo> { monitor },
             new List<TaskbarInfo> { taskbar },
-            taskbar,
             new List<ObservableWindow> { win },
-            new List<CoreRect> { new CoreRect(200, 300, 600, 400) },
-            new CorePoint(100, 900),
-            DateTime.UtcNow);
+            new CorePoint(100, 900));
     }
 
     [Fact]
@@ -44,7 +41,7 @@ public class BehaviorSchedulerTests
             new CorePoint(100, 900),
             null,
             0,
-            CursorProximityZone.Distant,
+            CursorProximityZone.Departure,
             ApplicationContext.Unknown,
             env,
             settings,
@@ -62,7 +59,7 @@ public class BehaviorSchedulerTests
             new CorePoint(100, 900),
             null,
             0,
-            CursorProximityZone.Distant,
+            CursorProximityZone.Departure,
             ApplicationContext.Unknown,
             env,
             settings,
@@ -85,7 +82,7 @@ public class BehaviorSchedulerTests
             new CorePoint(100, 900),
             null,
             0,
-            CursorProximityZone.Distant,
+            CursorProximityZone.Departure,
             ApplicationContext.Unknown,
             env,
             settings,
@@ -100,7 +97,7 @@ public class BehaviorSchedulerTests
             new CorePoint(100, 900),
             null,
             0,
-            CursorProximityZone.Distant,
+            CursorProximityZone.Departure,
             ApplicationContext.Unknown,
             env,
             settings,
@@ -152,7 +149,7 @@ public class BehaviorSchedulerTests
             new CorePoint(100, 900),
             null,
             0,
-            CursorProximityZone.Distant,
+            CursorProximityZone.Departure,
             ApplicationContext.Unknown,
             env,
             settings,
@@ -187,7 +184,7 @@ public class BehaviorSchedulerTests
             new CorePoint(100, 900),
             null,
             0,
-            CursorProximityZone.Distant,
+            CursorProximityZone.Departure,
             ApplicationContext.Unknown,
             env,
             settings,
@@ -203,7 +200,7 @@ public class BehaviorSchedulerTests
             new CorePoint(100, 900),
             null,
             0,
-            CursorProximityZone.Distant,
+            CursorProximityZone.Departure,
             ApplicationContext.Unknown,
             env,
             settings,
@@ -233,7 +230,7 @@ public class BehaviorSchedulerTests
             new CorePoint(100, 900),
             null,
             0,
-            CursorProximityZone.Distant,
+            CursorProximityZone.Departure,
             ApplicationContext.Unknown,
             env,
             settings,
@@ -251,7 +248,7 @@ public class BehaviorSchedulerTests
             new CorePoint(100, 900),
             null,
             0,
-            CursorProximityZone.Distant,
+            CursorProximityZone.Departure,
             ApplicationContext.Unknown,
             env,
             settings,

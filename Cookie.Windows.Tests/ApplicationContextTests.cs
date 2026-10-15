@@ -63,7 +63,7 @@ public class ApplicationContextTests
         Assert.Equal(ApplicationCategory.CodeEditor, context.Category);
         Assert.False(context.IsCookieActive);
         Assert.Equal(rect, context.FrontmostWindowBounds);
-        Assert.Equal(now, context.ObservedAt);
+        Assert.Equal(now, context.Timestamp);
     }
 
     [Fact]

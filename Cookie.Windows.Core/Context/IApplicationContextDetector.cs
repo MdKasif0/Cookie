@@ -40,6 +40,8 @@ public class DefaultApplicationContextDetector : IApplicationContextDetector
         }
     }
 
+    public void SimulateSwitch(ApplicationContext context) => SetContext(context);
+
     public ApplicationContext RefreshContext()
     {
         return _currentContext;
