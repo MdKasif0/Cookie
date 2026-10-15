@@ -786,4 +786,280 @@ document.addEventListener("DOMContentLoaded", () => {
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
   }
+
+  // ------------------------------------------------------------------------
+  // Dual-Platform Release Management (Windows & macOS)
+  // ------------------------------------------------------------------------
+  const heroSelectWin = document.getElementById("heroSelectWin");
+  const heroSelectMac = document.getElementById("heroSelectMac");
+  const downloadSelectWin = document.getElementById("downloadSelectWin");
+  const downloadSelectMac = document.getElementById("downloadSelectMac");
+
+  const downloadBtn = document.getElementById("downloadBtn");
+  const heroBtnLabel = document.getElementById("heroBtnLabel");
+  const heroReleaseTag = document.getElementById("heroReleaseTag");
+
+  const downloadBadgeText = document.getElementById("downloadBadgeText");
+  const downloadHeadline = document.getElementById("downloadHeadline");
+  const downloadSubhead = document.getElementById("downloadSubhead");
+  const downloadCardTitle = document.getElementById("downloadCardTitle");
+  const downloadCardVersion = document.getElementById("downloadCardVersion");
+  const downloadCardSpecs = document.getElementById("downloadCardSpecs");
+  const mainDownloadBtn = document.getElementById("mainDownloadBtn");
+  const mainDownloadBtnText = document.getElementById("mainDownloadBtnText");
+  const downloadAltLinks = document.getElementById("downloadAltLinks");
+  const compatGrid = document.getElementById("compatGrid");
+  const installHeadline = document.getElementById("installHeadline");
+  const installSubhead = document.getElementById("installSubhead");
+  const installStepsContainer = document.getElementById("installStepsContainer");
+  const securityNoticeTitle = document.getElementById("securityNoticeTitle");
+  const securityNoticeDesc = document.getElementById("securityNoticeDesc");
+  const platformAnnouncer = document.getElementById("platformAnnouncer");
+
+  function detectInitialPlatform() {
+    // 1. Saved user preference
+    try {
+      const saved = localStorage.getItem("cookie_platform");
+      if (saved && (saved === "windows" || saved === "mac")) {
+        return saved;
+      }
+    } catch (e) {
+      // Ignore localStorage exceptions in restrictive sandbox / privacy mode
+    }
+
+    // 2. Client Hints API if available
+    if (navigator.userAgentData && navigator.userAgentData.platform) {
+      const p = navigator.userAgentData.platform.toLowerCase();
+      if (p.includes("win")) return "windows";
+      if (p.includes("mac") || p.includes("ios")) return "mac";
+    }
+
+    // 3. Fallback to navigator.userAgent / navigator.platform
+    const ua = (navigator.userAgent || "").toLowerCase();
+    const plat = (navigator.platform || "").toLowerCase();
+
+    if (plat.includes("win") || ua.includes("windows")) {
+      return "windows";
+    }
+    if (plat.includes("mac") || ua.includes("macintosh") || ua.includes("mac os x")) {
+      return "mac";
+    }
+
+    // Default to macOS as the flagship platform
+    return "mac";
+  }
+
+  function escapeHtml(str) {
+    if (!str) return "";
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function setPlatform(platformId, persist = true, announce = false) {
+    if (!window.CookieReleases || !window.CookieReleases[platformId]) {
+      platformId = "mac";
+    }
+
+    if (persist) {
+      try {
+        localStorage.setItem("cookie_platform", platformId);
+      } catch (e) {
+        // Ignore localStorage restrictions
+      }
+    }
+
+    const rel = window.CookieReleases[platformId];
+    const isWin = platformId === "windows";
+
+    // 1. Update Platform Selector Buttons (Hero & Download Section)
+    const updatePill = (btnWin, btnMac) => {
+      if (btnWin && btnMac) {
+        btnWin.classList.toggle("active", isWin);
+        btnWin.setAttribute("aria-checked", isWin ? "true" : "false");
+        btnMac.classList.toggle("active", !isWin);
+        btnMac.setAttribute("aria-checked", !isWin ? "true" : "false");
+      }
+    };
+
+    updatePill(heroSelectWin, heroSelectMac);
+    updatePill(downloadSelectWin, downloadSelectMac);
+
+    // 2. Update Hero Action & Metadata
+    if (downloadBtn && heroBtnLabel) {
+      if (isWin) {
+        downloadBtn.setAttribute("href", rel.portable.downloadUrl);
+        downloadBtn.setAttribute("download", rel.portable.artifactName);
+        heroBtnLabel.textContent = rel.heroButtonLabel;
+      } else {
+        downloadBtn.setAttribute("href", rel.downloadUrl);
+        downloadBtn.setAttribute("download", rel.artifactName);
+        heroBtnLabel.textContent = rel.heroButtonLabel;
+      }
+    }
+
+    if (heroReleaseTag) {
+      heroReleaseTag.textContent = rel.heroReleaseTag;
+    }
+
+    // 3. Update Download Section
+    if (downloadBadgeText) {
+      downloadBadgeText.textContent = `Cookie for ${rel.displayName} • Version ${rel.version}`;
+    }
+    if (downloadHeadline) {
+      downloadHeadline.textContent = `Cookie for ${rel.displayName}`;
+    }
+    if (downloadSubhead) {
+      downloadSubhead.textContent = isWin
+        ? "A quiet desktop companion crafted with native Windows WPF and C#. Download the verified 64-bit standalone package below."
+        : "A quiet desktop companion crafted with native Mac technologies. Download the disk image below to get started.";
+    }
+
+    if (downloadCardTitle) {
+      downloadCardTitle.textContent = `Cookie for ${rel.displayName}`;
+    }
+    if (downloadCardVersion) {
+      downloadCardVersion.textContent = rel.cardMeta;
+    }
+    if (downloadCardSpecs) {
+      downloadCardSpecs.innerHTML = isWin
+        ? `<span>~74 MB Standalone Zip</span><span class="meta-dot">·</span><span>64-bit (x64)</span><span class="meta-dot">·</span><span>Free &amp; Open Source</span>`
+        : `<span>~23 MB Disk Image</span><span class="meta-dot">·</span><span>Universal Binary</span><span class="meta-dot">·</span><span>Free &amp; Open Source</span>`;
+    }
+
+    if (mainDownloadBtn && mainDownloadBtnText) {
+      if (isWin) {
+        mainDownloadBtn.setAttribute("href", rel.portable.downloadUrl);
+        mainDownloadBtn.setAttribute("download", rel.portable.artifactName);
+        mainDownloadBtnText.textContent = "Download for Windows (x64 Zip)";
+      } else {
+        mainDownloadBtn.setAttribute("href", rel.downloadUrl);
+        mainDownloadBtn.setAttribute("download", rel.artifactName);
+        mainDownloadBtnText.textContent = "Download for macOS (DMG)";
+      }
+    }
+
+    // 4. Update Alternative Links & Honest Status Note
+    if (downloadAltLinks) {
+      if (isWin) {
+        downloadAltLinks.innerHTML = `
+          <div class="installer-status-box" style="margin-top: 16px; padding: 14px 18px; background: rgba(224, 135, 68, 0.08); border-radius: 10px; border: 1px solid rgba(224, 135, 68, 0.22); font-size: 0.88rem; color: var(--soft-brown); text-align: left;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
+              <strong style="color: var(--charcoal); display: inline-flex; align-items: center; gap: 6px;">
+                <span class="status-dot" style="background: var(--caramel);"></span>
+                Inno Setup Installer (Cookie-Setup.exe):
+              </strong>
+              <span class="parity-badge badge-planned" style="font-size: 0.72rem; padding: 2px 8px;">Pending Windows CI</span>
+            </div>
+            <p style="margin: 6px 0 0 0; line-height: 1.5; font-size: 0.85rem; color: var(--charcoal-subtle);">
+              The Inno Setup compiler requires a native Windows build agent. While the installer script is ready, you can immediately download and run the verified standalone 64-bit portable package above.
+            </p>
+            <div style="margin-top: 8px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.76rem; color: var(--muted-sage); word-break: break-all;">
+              SHA256: ${rel.portable.sha256}
+            </div>
+          </div>
+        `;
+      } else {
+        downloadAltLinks.innerHTML = `
+          <div style="margin-top: 14px; font-size: 0.82rem; color: var(--muted-sage); text-align: center; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;">
+            <span>SHA256: ${rel.sha256}</span>
+            <span class="meta-dot">·</span>
+            <span>Universal arm64 / x86_64</span>
+          </div>
+        `;
+      }
+    }
+
+    // 5. Render Compatibility Specs Grid
+    if (compatGrid && rel.specs) {
+      compatGrid.innerHTML = rel.specs.map(s => `
+        <div class="compat-card">
+          <div class="compat-icon-badge">
+            <span class="compat-pill-text">${escapeHtml(s.pill)}</span>
+          </div>
+          <h3 class="compat-card-title">${escapeHtml(s.title)}</h3>
+          <p class="compat-card-desc">${escapeHtml(s.desc)}</p>
+        </div>
+      `).join("");
+    }
+
+    // 6. Render Installation Steps
+    if (installHeadline) {
+      installHeadline.textContent = `Installing Cookie on ${rel.displayName}`;
+    }
+    if (installSubhead) {
+      installSubhead.textContent = isWin
+        ? "Simple uncompress-and-run workflow. No admin elevation or registry clutter."
+        : "Simple drag-and-drop installation. No root privileges or complex setup needed.";
+    }
+    if (installStepsContainer && rel.installSteps) {
+      installStepsContainer.innerHTML = rel.installSteps.map(step => `
+        <div class="install-step-card">
+          <div class="step-badge">${step.step}</div>
+          <div class="step-content">
+            <h3 class="step-title">${escapeHtml(step.title)}</h3>
+            <p class="step-desc">${escapeHtml(step.desc)}</p>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    // 7. Security Notice
+    if (securityNoticeTitle && securityNoticeDesc && rel.securityNotes) {
+      securityNoticeTitle.textContent = rel.securityNotes.title;
+      securityNoticeDesc.textContent = rel.securityNotes.desc;
+    }
+
+    // 8. Accessibility Announcement
+    if (announce && platformAnnouncer) {
+      platformAnnouncer.textContent = `Selected platform changed to ${rel.displayName}. Download button updated.`;
+    }
+  }
+
+  function setupPlatformGroup(groupSelector) {
+    const wrap = document.querySelector(groupSelector);
+    if (!wrap) return;
+
+    const buttons = Array.from(wrap.querySelectorAll(".platform-pill-btn"));
+    buttons.forEach((btn, idx) => {
+      btn.addEventListener("click", () => {
+        const plat = btn.getAttribute("data-platform");
+        setPlatform(plat, true, true);
+      });
+
+      btn.addEventListener("keydown", (e) => {
+        let targetIdx = null;
+        if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+          e.preventDefault();
+          targetIdx = (idx - 1 + buttons.length) % buttons.length;
+        } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+          e.preventDefault();
+          targetIdx = (idx + 1) % buttons.length;
+        } else if (e.key === "Home") {
+          e.preventDefault();
+          targetIdx = 0;
+        } else if (e.key === "End") {
+          e.preventDefault();
+          targetIdx = buttons.length - 1;
+        }
+
+        if (targetIdx !== null) {
+          const targetBtn = buttons[targetIdx];
+          targetBtn.focus();
+          const plat = targetBtn.getAttribute("data-platform");
+          setPlatform(plat, true, true);
+        }
+      });
+    });
+  }
+
+  // Setup platform selectors in Hero and Download sections
+  setupPlatformGroup(".hero-section .platform-selector");
+  setupPlatformGroup(".download-section .platform-selector");
+
+  // Initial detection & render
+  const initialPlatform = detectInitialPlatform();
+  setPlatform(initialPlatform, false, false);
 });
