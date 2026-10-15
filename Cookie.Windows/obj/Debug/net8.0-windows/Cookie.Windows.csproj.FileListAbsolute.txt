@@ -44,3 +44,4 @@
 /Users/mdkasifuddin/Developer/macOS/Cookie/Cookie.Windows/obj/Debug/net8.0-windows/refint/Cookie.dll
 /Users/mdkasifuddin/Developer/macOS/Cookie/Cookie.Windows/obj/Debug/net8.0-windows/Cookie.Windows.genruntimeconfig.cache
 /Users/mdkasifuddin/Developer/macOS/Cookie/Cookie.Windows/obj/Debug/net8.0-windows/ref/Cookie.dll
+/Users/mdkasifuddin/Developer/macOS/Cookie/Cookie.Windows/obj/Debug/net8.0-windows/Cookie.Windows.csproj.AssemblyReference.cache

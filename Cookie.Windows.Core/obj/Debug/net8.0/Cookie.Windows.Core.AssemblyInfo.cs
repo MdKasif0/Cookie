@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyCopyrightAttribute("© 2026 Md Kasif Uddin. All rights reserved.")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.1.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.1.0+258162677453281306ada51db9fd0f651ff42741")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.1.0+fab3f81828b74c846edc09d61bbe1ca2d3ca29fc")]
 [assembly: System.Reflection.AssemblyProductAttribute("Cookie")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Cookie.Windows.Core")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.1.0.0")]

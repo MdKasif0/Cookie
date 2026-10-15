@@ -2,12 +2,14 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Windows;
-using Cookie.Windows.Animation;
 using Cookie.Windows.Audio;
-using Cookie.Windows.Behaviors;
+using Cookie.Windows.Core.Animation;
+using Cookie.Windows.Core.Audio;
+using Cookie.Windows.Core.Behaviors;
+using Cookie.Windows.Core.Desktop;
+using Cookie.Windows.Core.Models;
+using Cookie.Windows.Core.Persistence;
 using Cookie.Windows.Desktop;
-using Cookie.Windows.Models;
-using Cookie.Windows.Persistence;
 
 namespace Cookie.Windows;
 
@@ -24,16 +26,13 @@ public partial class App : Application
     {
         base.OnStartup(e);
 
-        // 1. Single-instance enforcement
         _singleInstanceMutex = new Mutex(true, SingleInstanceMutexName, out bool isOnlyInstance);
         if (!isOnlyInstance)
         {
-            // Another instance of Cookie is already running on this desktop
             Shutdown();
             return;
         }
 
-        // Global exception logging
         DispatcherUnhandledException += (s, args) =>
         {
             try
@@ -47,16 +46,14 @@ public partial class App : Application
             args.Handled = true;
         };
 
-        // 2. Initialize Core Services
         _settingsManager = new SettingsManager();
         _profile = _settingsManager.LoadProfile();
 
         var audioManager = new WindowsAudioManager();
-        var screenService = new ScreenGeometryService();
+        var screenService = new ScreenGeometryService(new WindowsScreenGeometryProvider());
         var animationController = new CookieAnimationController();
         var behaviorController = new CookieBehaviorController(animationController, screenService, audioManager);
 
-        // 3. Create and show Companion Window
         _companionWindow = new CompanionWindow(
             animationController,
             behaviorController,

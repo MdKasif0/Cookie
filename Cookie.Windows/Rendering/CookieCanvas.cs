@@ -3,7 +3,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using Cookie.Windows.Models;
+using Cookie.Windows.Core.Models;
 
 namespace Cookie.Windows.Rendering;
 
@@ -50,7 +50,6 @@ public class CookieCanvas : FrameworkElement
 
         if (emote != null)
         {
-            // Attempt to load corresponding emote PNG
             string emoteFolder = emote.Id switch
             {
                 EmoteId.Wave => "Wave",
@@ -90,17 +89,14 @@ public class CookieCanvas : FrameworkElement
     {
         base.OnRender(dc);
 
-        // Apply scale transform if needed
         if (Math.Abs(_scale - 1.0) > 0.001)
         {
             dc.PushTransform(new ScaleTransform(_scale, _scale));
         }
 
-        // Draw character vector drawing
         var characterDrawing = CookieSpriteRenderer.Render(_currentPose, _palette, _direction);
         dc.DrawDrawing(characterDrawing);
 
-        // Draw emote bubble or icon if active
         if (_activeEmote != null)
         {
             DrawEmoteOverlay(dc);
@@ -123,7 +119,6 @@ public class CookieCanvas : FrameworkElement
         }
         else if (_activeEmote != null)
         {
-            // Draw warm background badge with emoji
             var bgBrush = new SolidColorBrush(Color.FromArgb(235, 253, 251, 247));
             var borderPen = new Pen(new SolidColorBrush(Color.FromRgb(224, 135, 68)), 1.5);
             dc.DrawRoundedRectangle(bgBrush, borderPen, new Rect(bubbleX, bubbleY, 34, 34), 8, 8);
@@ -147,7 +142,6 @@ public class CookieCanvas : FrameworkElement
         double cx = ActualWidth / 2.0;
         double cy = ActualHeight / 2.0;
 
-        // Approximate character silhouette ellipse for accurate hit testing
         double rx = (55.0 * _scale);
         double ry = (55.0 * _scale);
 

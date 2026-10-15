@@ -36,6 +36,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Cookie.Windows.Core\Cookie.Windows.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <!-- Link Original Audio Resources from Shared Location -->
     <Content Include="..\Cookie\Resources\Sounds\*.wav" Link="Resources\Sounds\%(Filename)%(Extension)">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

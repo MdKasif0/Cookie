@@ -1,7 +1,7 @@
 using System;
 using System.Windows;
 using System.Windows.Media;
-using Cookie.Windows.Models;
+using Cookie.Windows.Core.Models;
 
 namespace Cookie.Windows.Rendering;
 
@@ -20,24 +20,18 @@ public static class CookieSpriteRenderer
 
         using (var dc = group.Open())
         {
-            // Center is (90, 90)
             double centerX = CanvasSize.Width / 2.0;
             double centerY = CanvasSize.Height / 2.0;
 
-            // Handle horizontal facing flip around center
             if (direction == CookieDirection.Left)
             {
                 dc.PushTransform(new ScaleTransform(-1, 1, centerX, centerY));
             }
 
-            // Character volume squash & position transform
-            // Note: In SpriteKit, Y increases UP. In WPF, Y increases DOWN.
-            // bodyY in SK is inverted for WPF.
             double wpfBodyY = -pose.BodyY;
             double scaleX = 1.0 + (1.0 - pose.Squash) * 0.7;
             double scaleY = pose.Squash;
 
-            // Push character transform group centered at (centerX, centerY)
             var charTransform = new TransformGroup();
             charTransform.Children.Add(new TranslateTransform(0, wpfBodyY));
             charTransform.Children.Add(new ScaleTransform(scaleX, scaleY, centerX, centerY + wpfBodyY));
@@ -55,10 +49,8 @@ public static class CookieSpriteRenderer
             // 4. Head
             RenderHead(dc, centerX, centerY, pose, palette);
 
-            // Pop character transform
             dc.Pop();
 
-            // Pop facing flip if applied
             if (direction == CookieDirection.Left)
             {
                 dc.Pop();
@@ -70,20 +62,11 @@ public static class CookieSpriteRenderer
 
     private static void RenderTail(DrawingContext dc, double cx, double cy, double tailAngleDeg, CharacterPalette palette)
     {
-        // Tail root at (cx + 26, cy + 20) in WPF coordinates
         double tailRootX = cx + 26;
         double tailRootY = cy + 20;
 
-        // In SK: tail zRotation = angle * pi / 180.
-        // Rotation around tail root
         dc.PushTransform(new RotateTransform(-tailAngleDeg, tailRootX, tailRootY));
 
-        // Tail path relative to tailRoot:
-        // SK: move (0,0), curveTo (36, -2) cp1:(14, 12), cp2:(30, 10), curveTo (46, -30) cp1:(42, -12), cp2:(50, -20)
-        // Convert to WPF (invert y):
-        // p0 = (0, 0)
-        // p1 = (36, 2), cp1 = (14, -12), cp2 = (30, -10)
-        // p2 = (46, 30), cp1 = (42, 12), cp2 = (50, 20)
         var pathGeo = new StreamGeometry();
         using (var ctx = pathGeo.Open())
         {
@@ -101,8 +84,7 @@ public static class CookieSpriteRenderer
         }
         pathGeo.Freeze();
 
-        // Outline stroke
-        var outlinePen = new Pen(new SolidColorBrush(palette.Outline), 15)
+        var outlinePen = new Pen(new SolidColorBrush(palette.Outline.ToMediaColor()), 15)
         {
             StartLineCap = PenLineCap.Round,
             EndLineCap = PenLineCap.Round
@@ -110,8 +92,7 @@ public static class CookieSpriteRenderer
         outlinePen.Freeze();
         dc.DrawGeometry(null, outlinePen, pathGeo);
 
-        // Fur stroke
-        var furPen = new Pen(new SolidColorBrush(palette.Fur), 10)
+        var furPen = new Pen(new SolidColorBrush(palette.Fur.ToMediaColor()), 10)
         {
             StartLineCap = PenLineCap.Round,
             EndLineCap = PenLineCap.Round
@@ -119,31 +100,28 @@ public static class CookieSpriteRenderer
         furPen.Freeze();
         dc.DrawGeometry(null, furPen, pathGeo);
 
-        // Tail tip
         var tipCenter = new Point(tailRootX + 46, tailRootY + 30);
-        var tipPen = new Pen(new SolidColorBrush(palette.Outline), 3);
+        var tipPen = new Pen(new SolidColorBrush(palette.Outline.ToMediaColor()), 3);
         tipPen.Freeze();
-        dc.DrawEllipse(new SolidColorBrush(palette.FurShade), tipPen, tipCenter, 6.5, 6.5);
+        dc.DrawEllipse(new SolidColorBrush(palette.FurShade.ToMediaColor()), tipPen, tipCenter, 6.5, 6.5);
 
         dc.Pop();
     }
 
     private static void RenderBody(DrawingContext dc, double cx, double cy, CharacterPalette palette)
     {
-        // SK: body size (88, 72) at y = -26 -> in WPF cy + 26
         var bodyCenter = new Point(cx, cy + 26);
-        var bodyPen = new Pen(new SolidColorBrush(palette.Outline), 4);
+        var bodyPen = new Pen(new SolidColorBrush(palette.Outline.ToMediaColor()), 4);
         bodyPen.Freeze();
-        dc.DrawEllipse(new SolidColorBrush(palette.Fur), bodyPen, bodyCenter, 44, 36);
+        dc.DrawEllipse(new SolidColorBrush(palette.Fur.ToMediaColor()), bodyPen, bodyCenter, 44, 36);
     }
 
     private static void RenderPaws(DrawingContext dc, double cx, double cy, CookiePose pose, CharacterPalette palette)
     {
-        // SK: paws at side * 16 + pawOffsetX, y = -58 + pawLift -> WPF: cy + 58 - pawLift
         double pawY = cy + 58 - pose.PawLift;
-        var pawPen = new Pen(new SolidColorBrush(palette.Outline), 3.5);
+        var pawPen = new Pen(new SolidColorBrush(palette.Outline.ToMediaColor()), 3.5);
         pawPen.Freeze();
-        var pawBrush = new SolidColorBrush(palette.Fur);
+        var pawBrush = new SolidColorBrush(palette.Fur.ToMediaColor());
 
         foreach (double side in new[] { -1.0, 1.0 })
         {
@@ -154,11 +132,9 @@ public static class CookieSpriteRenderer
 
     private static void RenderHead(DrawingContext dc, double cx, double cy, CookiePose pose, CharacterPalette palette)
     {
-        // SK: head at (cx + headX, cy - 30 - headY)
         double headCenterX = cx + pose.HeadX;
         double headCenterY = cy - 30 - pose.HeadY;
 
-        // Head tilt transform
         dc.PushTransform(new RotateTransform(-pose.HeadTilt, headCenterX, headCenterY));
 
         // 1. Ears
@@ -172,7 +148,6 @@ public static class CookieSpriteRenderer
                 dc.PushTransform(new RotateTransform(-side * 31.5, earRootX, earRootY + 4));
             }
 
-            // Outer Ear Triangle: [(side * 12, 14), (side * 2, -16), (side * -12, 6)]
             var earGeo = new StreamGeometry();
             using (var ctx = earGeo.Open())
             {
@@ -182,14 +157,13 @@ public static class CookieSpriteRenderer
             }
             earGeo.Freeze();
 
-            var earPen = new Pen(new SolidColorBrush(palette.Outline), 5)
+            var earPen = new Pen(new SolidColorBrush(palette.Outline.ToMediaColor()), 5)
             {
                 LineJoin = PenLineJoin.Round
             };
             earPen.Freeze();
-            dc.DrawGeometry(new SolidColorBrush(palette.Fur), earPen, earGeo);
+            dc.DrawGeometry(new SolidColorBrush(palette.Fur.ToMediaColor()), earPen, earGeo);
 
-            // Inner Ear Triangle: [(side * 6, 8), (side * 1, -8), (side * -7, 5)]
             var innerEarGeo = new StreamGeometry();
             using (var ctx = innerEarGeo.Open())
             {
@@ -198,7 +172,7 @@ public static class CookieSpriteRenderer
                 ctx.LineTo(new Point(earRootX + side * -7, earRootY + 5), true, true);
             }
             innerEarGeo.Freeze();
-            var innerEarBrush = new SolidColorBrush(palette.InnerEar) { Opacity = 0.9 };
+            var innerEarBrush = new SolidColorBrush(palette.InnerEar.ToMediaColor()) { Opacity = 0.9 };
             dc.DrawGeometry(innerEarBrush, null, innerEarGeo);
 
             if (pose.EarStyle == CookieEarStyle.Back)
@@ -208,12 +182,12 @@ public static class CookieSpriteRenderer
         }
 
         // 2. Skull Ellipse: size 82 x 72 (radius 41 x 36)
-        var skullPen = new Pen(new SolidColorBrush(palette.Outline), 4);
+        var skullPen = new Pen(new SolidColorBrush(palette.Outline.ToMediaColor()), 4);
         skullPen.Freeze();
-        dc.DrawEllipse(new SolidColorBrush(palette.Fur), skullPen, new Point(headCenterX, headCenterY), 41, 36);
+        dc.DrawEllipse(new SolidColorBrush(palette.Fur.ToMediaColor()), skullPen, new Point(headCenterX, headCenterY), 41, 36);
 
         // 3. Forehead Stripes
-        var stripePen = new Pen(new SolidColorBrush(palette.Stripe) { Opacity = 0.85 }, 5)
+        var stripePen = new Pen(new SolidColorBrush(palette.Stripe.ToMediaColor()) { Opacity = 0.85 }, 5)
         {
             StartLineCap = PenLineCap.Round,
             EndLineCap = PenLineCap.Round
@@ -227,7 +201,7 @@ public static class CookieSpriteRenderer
         RenderEyes(dc, headCenterX, headCenterY, pose, palette);
 
         // 5. Blush Cheeks
-        var blushBrush = new SolidColorBrush(palette.Blush) { Opacity = 0.55 };
+        var blushBrush = new SolidColorBrush(palette.Blush.ToMediaColor()) { Opacity = 0.55 };
         double blushRadius = 8 * pose.BlushScale;
         foreach (double side in new[] { -1.0, 1.0 })
         {
@@ -238,7 +212,7 @@ public static class CookieSpriteRenderer
         RenderMouth(dc, headCenterX, headCenterY, pose, palette);
 
         // 7. Whiskers
-        var whiskerPen = new Pen(new SolidColorBrush(palette.Eye) { Opacity = 0.45 }, 2)
+        var whiskerPen = new Pen(new SolidColorBrush(palette.Eye.ToMediaColor()) { Opacity = 0.45 }, 2)
         {
             StartLineCap = PenLineCap.Round,
             EndLineCap = PenLineCap.Round
@@ -255,7 +229,7 @@ public static class CookieSpriteRenderer
 
     private static void RenderEyes(DrawingContext dc, double hcx, double hcy, CookiePose pose, CharacterPalette palette)
     {
-        var eyeBrush = new SolidColorBrush(palette.Eye);
+        var eyeBrush = new SolidColorBrush(palette.Eye.ToMediaColor());
         var eyePen = new Pen(eyeBrush, 3)
         {
             StartLineCap = PenLineCap.Round,
@@ -276,7 +250,6 @@ public static class CookieSpriteRenderer
 
                 case CookieEyeStyle.Wide:
                     dc.DrawEllipse(eyeBrush, null, new Point(eyeX, eyeY), 5.5, 7);
-                    // Glint
                     dc.DrawEllipse(Brushes.White, null, new Point(eyeX - 2, eyeY - 2.5), 1.25, 1.25);
                     break;
 
@@ -287,7 +260,6 @@ public static class CookieSpriteRenderer
                     break;
 
                 case CookieEyeStyle.Happy:
-                    // Upward curved arc for smiling eye: arc from angle 180 to 0 (top half)
                     var happyGeo = new StreamGeometry();
                     using (var ctx = happyGeo.Open())
                     {
@@ -299,7 +271,6 @@ public static class CookieSpriteRenderer
                     break;
 
                 case CookieEyeStyle.Closed:
-                    // Downward curved arc for sleeping eye
                     var closedGeo = new StreamGeometry();
                     using (var ctx = closedGeo.Open())
                     {
@@ -315,7 +286,7 @@ public static class CookieSpriteRenderer
 
     private static void RenderMouth(DrawingContext dc, double hcx, double hcy, CookiePose pose, CharacterPalette palette)
     {
-        var mouthBrush = new SolidColorBrush(palette.Eye);
+        var mouthBrush = new SolidColorBrush(palette.Eye.ToMediaColor());
         var mouthPen = new Pen(mouthBrush, 2.5)
         {
             StartLineCap = PenLineCap.Round,
@@ -328,7 +299,6 @@ public static class CookieSpriteRenderer
         switch (pose.MouthStyle)
         {
             case CookieMouthStyle.Smile:
-                // Double arc cat smile :3
                 foreach (double side in new[] { -1.0, 1.0 })
                 {
                     double startX = hcx + (side == -1.0 ? -7 : 0);
@@ -354,7 +324,7 @@ public static class CookieSpriteRenderer
 
             case CookieMouthStyle.OpenWide:
                 dc.DrawEllipse(mouthBrush, null, new Point(hcx, mouthY + 2), 6.5, 7.5);
-                var tongueBrush = new SolidColorBrush(palette.InnerEar);
+                var tongueBrush = new SolidColorBrush(palette.InnerEar.ToMediaColor());
                 dc.DrawEllipse(tongueBrush, null, new Point(hcx, mouthY + 5), 4, 3.5);
                 break;
         }

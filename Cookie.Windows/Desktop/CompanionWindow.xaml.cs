@@ -4,12 +4,14 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Threading;
-using Cookie.Windows.Animation;
 using Cookie.Windows.Audio;
-using Cookie.Windows.Behaviors;
+using Cookie.Windows.Core.Animation;
+using Cookie.Windows.Core.Audio;
+using Cookie.Windows.Core.Behaviors;
+using Cookie.Windows.Core.Desktop;
+using Cookie.Windows.Core.Models;
+using Cookie.Windows.Core.Persistence;
 using Cookie.Windows.Interop;
-using Cookie.Windows.Models;
-using Cookie.Windows.Persistence;
 using Cookie.Windows.Views;
 
 namespace Cookie.Windows.Desktop;
@@ -20,7 +22,7 @@ public partial class CompanionWindow : Window
     private readonly CookieBehaviorController _behaviorController;
     private readonly ScreenGeometryService _screenService;
     private readonly SettingsManager _settingsManager;
-    private readonly WindowsAudioManager _audioManager;
+    private readonly AudioManagerBase _audioManager;
     private CookieProfile _profile;
 
     private readonly DispatcherTimer _gameLoopTimer;
@@ -36,7 +38,7 @@ public partial class CompanionWindow : Window
         CookieBehaviorController behaviorController,
         ScreenGeometryService screenService,
         SettingsManager settingsManager,
-        WindowsAudioManager audioManager,
+        AudioManagerBase audioManager,
         CookieProfile profile)
     {
         InitializeComponent();
@@ -48,10 +50,8 @@ public partial class CompanionWindow : Window
         _audioManager = audioManager;
         _profile = profile;
 
-        // Apply appearance from profile
         ApplyProfileAppearance();
 
-        // Bind animation and behavior updates
         _animationController.OnFrameChanged += (pose, direction) =>
         {
             Dispatcher.InvokeAsync(() => CatCanvas.UpdatePose(pose, direction));
@@ -71,10 +71,8 @@ public partial class CompanionWindow : Window
             Dispatcher.InvokeAsync(() => CatCanvas.SetActiveEmote(emote));
         };
 
-        // Restore saved position or default spawn
         RestoreInitialPosition();
 
-        // Game loop timer at 60 FPS
         _lastTickTime = DateTime.UtcNow;
         _gameLoopTimer = new DispatcherTimer(DispatcherPriority.Render)
         {
@@ -91,16 +89,13 @@ public partial class CompanionWindow : Window
         var helper = new WindowInteropHelper(this);
         IntPtr hWnd = helper.Handle;
 
-        // Apply WS_EX_TOOLWINDOW (hide from Alt-Tab) and WS_EX_NOACTIVATE (never steal keyboard focus)
         int exStyle = NativeMethods.GetWindowLongPtr(hWnd, NativeMethods.GWL_EXSTYLE).ToInt32();
         exStyle |= NativeMethods.WS_EX_TOOLWINDOW | NativeMethods.WS_EX_NOACTIVATE;
         NativeMethods.SetWindowLongPtr(hWnd, NativeMethods.GWL_EXSTYLE, new IntPtr(exStyle));
 
-        // Hook Win32 messages for display change and DPI notifications
         var source = HwndSource.FromHwnd(hWnd);
         source?.AddHook(WndProc);
 
-        // Play welcome audio upon initialization if enabled
         _audioManager.Play(SoundEffect.Welcome);
     }
 
@@ -119,7 +114,6 @@ public partial class CompanionWindow : Window
         double dt = (now - _lastTickTime).TotalSeconds;
         _lastTickTime = now;
 
-        // Guard against massive dt spikes during debugger pauses or system sleep
         if (dt > 0.1) dt = 0.1;
 
         _behaviorController.Update(dt);
@@ -127,14 +121,14 @@ public partial class CompanionWindow : Window
 
     private void RestoreInitialPosition()
     {
-        var companionSize = new Size(Width, Height);
-        Point initialPos;
+        var companionSize = new CoreSize(Width, Height);
+        CorePoint initialPos;
 
         if (_profile.Settings.RememberPosition &&
             _profile.Settings.SavedPositionX.HasValue &&
             _profile.Settings.SavedPositionY.HasValue)
         {
-            var saved = new Point(_profile.Settings.SavedPositionX.Value, _profile.Settings.SavedPositionY.Value);
+            var saved = new CorePoint(_profile.Settings.SavedPositionX.Value, _profile.Settings.SavedPositionY.Value);
             initialPos = _screenService.RecoverPosition(saved, companionSize);
         }
         else
@@ -158,7 +152,7 @@ public partial class CompanionWindow : Window
         Width = 180 * sizeScale;
         Height = 180 * sizeScale;
         CatCanvas.UpdateScale(sizeScale);
-        _behaviorController.SetCompanionSize(new Size(Width, Height));
+        _behaviorController.SetCompanionSize(new CoreSize(Width, Height));
 
         _animationController.AnimationIntensity = _profile.Settings.AnimationIntensity;
         _behaviorController.AutonomousBehaviorEnabled = _profile.Settings.AutonomousBehaviorEnabled;
@@ -175,8 +169,8 @@ public partial class CompanionWindow : Window
 
     private void RecoverPositionToVisibleScreen()
     {
-        var current = new Point(Left, Top);
-        var size = new Size(Width, Height);
+        var current = new CorePoint(Left, Top);
+        var size = new CoreSize(Width, Height);
         var safe = _screenService.RecoverPosition(current, size);
 
         Left = safe.X;
@@ -212,7 +206,7 @@ public partial class CompanionWindow : Window
 
             Left = newLeft;
             Top = newTop;
-            _behaviorController.UpdateDrag(new Point(newLeft, newTop));
+            _behaviorController.UpdateDrag(new CorePoint(newLeft, newTop));
         }
     }
 
@@ -225,14 +219,12 @@ public partial class CompanionWindow : Window
 
             if (!_hasDraggedEnough)
             {
-                // Clicks count as Petting Cookie!
                 _behaviorController.Pet();
             }
             else
             {
                 _behaviorController.EndDrag();
 
-                // Persist new coordinates
                 _profile.Settings.SavedPositionX = Left;
                 _profile.Settings.SavedPositionY = Top;
                 _settingsManager.DebouncedSave(_profile);
@@ -249,12 +241,10 @@ public partial class CompanionWindow : Window
     {
         var menu = new ContextMenu();
 
-        // Pet item
         var petItem = new MenuItem { Header = "Pet Cookie 🧡" };
         petItem.Click += (s, e) => _behaviorController.Pet();
         menu.Items.Add(petItem);
 
-        // Emotes Submenu
         var emotesMenu = new MenuItem { Header = "Emotes" };
         foreach (var emote in Emote.All)
         {
@@ -267,14 +257,12 @@ public partial class CompanionWindow : Window
 
         menu.Items.Add(new Separator());
 
-        // Settings item
         var settingsItem = new MenuItem { Header = "Settings..." };
         settingsItem.Click += (s, e) => OpenSettingsWindow();
         menu.Items.Add(settingsItem);
 
         menu.Items.Add(new Separator());
 
-        // Exit item
         var exitItem = new MenuItem { Header = "Exit Cookie" };
         exitItem.Click += (s, e) =>
         {
@@ -290,7 +278,6 @@ public partial class CompanionWindow : Window
 
     public void OpenSettingsWindow()
     {
-        // Check if Settings window is already open
         foreach (Window w in Application.Current.Windows)
         {
             if (w is SettingsWindow existing)
