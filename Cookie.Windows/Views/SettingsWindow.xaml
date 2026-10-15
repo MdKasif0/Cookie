@@ -264,7 +264,7 @@
                     <StackPanel>
                         <GroupBox Header="Temperament Preset">
                             <StackPanel>
-                                <ComboBox ItemsSource="{Binding AvailablePersonalities}" SelectedItem="{Binding SelectedPersonality}" Margin="0,4"/>
+                                <ComboBox ItemsSource="{Binding AvailablePersonalities}" SelectedItem="{Binding SelectedPersonality}" Margin="0,4" AutomationProperties.Name="Temperament Preset"/>
                                 <Border Background="{StaticResource BgIvory}" BorderBrush="{StaticResource BorderBeige}" BorderThickness="1" CornerRadius="8" Padding="10" Margin="0,6">
                                     <StackPanel>
                                         <TextBlock Text="{Binding PersonalitySummary}" FontWeight="Medium" Foreground="{StaticResource TextCharcoal}" TextWrapping="Wrap"/>
@@ -281,7 +281,7 @@
 
                         <GroupBox Header="Activity Level">
                             <StackPanel>
-                                <ComboBox ItemsSource="{Binding AvailableActivities}" SelectedItem="{Binding SelectedActivity}" Margin="0,4"/>
+                                <ComboBox ItemsSource="{Binding AvailableActivities}" SelectedItem="{Binding SelectedActivity}" Margin="0,4" AutomationProperties.Name="Activity Level"/>
                                 <TextBlock Text="Controls how actively Cookie strolls or rests: Calm, Balanced, or Playful." 
                                            Foreground="{StaticResource TextMuted}" FontSize="11" Margin="0,4,0,0"/>
                             </StackPanel>
@@ -296,7 +296,7 @@
                         </GroupBox>
 
                         <GroupBox Header="Sleep Cycle">
-                            <ComboBox ItemsSource="{Binding AvailableSleepBehaviors}" SelectedItem="{Binding SelectedSleepBehavior}" Margin="0,4"/>
+                            <ComboBox ItemsSource="{Binding AvailableSleepBehaviors}" SelectedItem="{Binding SelectedSleepBehavior}" Margin="0,4" AutomationProperties.Name="Sleep Cycle"/>
                         </GroupBox>
 
                         <Button Content="Reset Personality &amp; Activity to Defaults" Command="{Binding ResetPersonalityCommand}" HorizontalAlignment="Left"/>
