@@ -29,6 +29,24 @@ public static class NativeMethods
     public const int WM_WTSSESSION_CHANGE = 0x02B1;
     public const int NOTIFY_FOR_THIS_SESSION = 0;
 
+    public const int NIM_ADD = 0x00000000;
+    public const int NIM_MODIFY = 0x00000001;
+    public const int NIM_DELETE = 0x00000002;
+    public const int NIM_SETVERSION = 0x00000004;
+
+    public const int NIF_MESSAGE = 0x00000001;
+    public const int NIF_ICON = 0x00000002;
+    public const int NIF_TIP = 0x00000004;
+    public const int NIF_STATE = 0x00000008;
+    public const int NIF_INFO = 0x00000010;
+
+    public const int WM_TRAYICON = 0x8001;
+    public const int WM_LBUTTONUP = 0x0202;
+    public const int WM_RBUTTONUP = 0x0205;
+    public const int WM_LBUTTONDBLCLK = 0x0203;
+
+    public static readonly IntPtr HWND_BROADCAST = new IntPtr(0xffff);
+
     public const int WTS_CONSOLE_CONNECT = 0x1;
     public const int WTS_CONSOLE_DISCONNECT = 0x2;
     public const int WTS_REMOTE_CONNECT = 0x3;
@@ -139,4 +157,22 @@ public static class NativeMethods
 
     [DllImport("wtsapi32.dll", SetLastError = true)]
     public static extern bool WTSUnRegisterSessionNotification(IntPtr hWnd);
+
+    [DllImport("shell32.dll", CharSet = CharSet.Auto)]
+    public static extern bool Shell_NotifyIcon(int dwMessage, ref NOTIFYICONDATA lpData);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    public static extern bool DestroyIcon(IntPtr hIcon);
+
+    [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+    public static extern IntPtr LoadImage(IntPtr hinst, string lpszName, uint uType, int cxDesired, int cyDesired, uint fuLoad);
+
+    [DllImport("user32.dll", CharSet = CharSet.Auto)]
+    public static extern uint RegisterWindowMessage(string lpString);
+
+    [DllImport("user32.dll")]
+    public static extern bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+
+    [DllImport("user32.dll")]
+    public static extern bool SetForegroundWindow(IntPtr hWnd);
 }
