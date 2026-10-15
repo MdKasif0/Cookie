@@ -166,6 +166,14 @@ const CookieReleases = {
   }
 };
 
+// Global browser window attachment
+if (typeof window !== "undefined") {
+  window.CookieReleases = CookieReleases;
+}
+if (typeof globalThis !== "undefined") {
+  globalThis.CookieReleases = CookieReleases;
+}
+
 // Export for node/testing if applicable
 if (typeof module !== "undefined" && module.exports) {
   module.exports = CookieReleases;

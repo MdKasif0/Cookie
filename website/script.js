@@ -859,7 +859,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function setPlatform(platformId, persist = true, announce = false) {
-    if (!window.CookieReleases || !window.CookieReleases[platformId]) {
+    const releasesObj = (typeof window !== "undefined" && window.CookieReleases) ||
+                        (typeof CookieReleases !== "undefined" ? CookieReleases : null);
+    if (!releasesObj) return;
+
+    if (!releasesObj[platformId]) {
       platformId = "mac";
     }
 
@@ -871,7 +875,8 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    const rel = window.CookieReleases[platformId];
+    const rel = releasesObj[platformId];
+    if (!rel) return;
     const isWin = platformId === "windows";
 
     // 1. Update Platform Selector Buttons (Hero & Download Section)
