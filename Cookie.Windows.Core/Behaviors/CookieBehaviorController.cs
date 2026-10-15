@@ -1,39 +1,36 @@
 using System;
-using System.Windows;
-using Cookie.Windows.Animation;
-using Cookie.Windows.Audio;
-using Cookie.Windows.Desktop;
-using Cookie.Windows.Models;
+using Cookie.Windows.Core.Animation;
+using Cookie.Windows.Core.Audio;
+using Cookie.Windows.Core.Desktop;
+using Cookie.Windows.Core.Models;
 
-namespace Cookie.Windows.Behaviors;
+namespace Cookie.Windows.Core.Behaviors;
 
 public class CookieBehaviorController
 {
     private readonly CookieAnimationController _animationController;
     private readonly ScreenGeometryService _screenService;
-    private readonly WindowsAudioManager _audioManager;
+    private readonly AudioManagerBase _audioManager;
 
     private CookieState _state = CookieState.Idle;
-    private Point _currentPosition;
-    private Size _companionSize = new(180, 180);
+    private CorePoint _currentPosition;
+    private CoreSize _companionSize = new(180, 180);
     private readonly Random _random = new();
 
-    // Autonomous locomotion state
     private double _stateTimer = 0.0;
     private double _nextBehaviorTime = 4.0;
-    private Point? _walkTarget;
+    private CorePoint? _walkTarget;
     private const double WalkSpeedDipPerSecond = 55.0;
 
-    // Emote playback state
     private Emote? _currentEmote;
     private double _emoteTimer = 0.0;
 
     public CookieState State => _state;
-    public Point CurrentPosition => _currentPosition;
-    public Size CompanionSize => _companionSize;
+    public CorePoint CurrentPosition => _currentPosition;
+    public CoreSize CompanionSize => _companionSize;
     public Emote? CurrentEmote => _currentEmote;
 
-    public event Action<Point>? OnPositionChanged;
+    public event Action<CorePoint>? OnPositionChanged;
     public event Action<CookieState>? OnStateChanged;
     public event Action<Emote?>? OnEmoteChanged;
 
@@ -45,26 +42,25 @@ public class CookieBehaviorController
     public CookieBehaviorController(
         CookieAnimationController animationController,
         ScreenGeometryService screenService,
-        WindowsAudioManager audioManager)
+        AudioManagerBase audioManager)
     {
         _animationController = animationController;
         _screenService = screenService;
         _audioManager = audioManager;
 
-        // Default start position
         var primaryArea = _screenService.GetPrimaryWorkArea();
         _currentPosition = DesktopCoordinateSpace.CalculateDefaultSpawn(primaryArea, _companionSize);
 
         _animationController.OnAnimationCompleted += HandleAnimationCompleted;
     }
 
-    public void SetPosition(Point position)
+    public void SetPosition(CorePoint position)
     {
         _currentPosition = position;
         OnPositionChanged?.Invoke(_currentPosition);
     }
 
-    public void SetCompanionSize(Size size)
+    public void SetCompanionSize(CoreSize size)
     {
         _companionSize = size;
     }
@@ -86,17 +82,8 @@ public class CookieBehaviorController
             case CookieState.Emoting:
                 UpdateEmoting(deltaTimeSeconds);
                 break;
-
-            case CookieState.BeingDragged:
-                // Handled directly via DragMove
-                break;
-
-            case CookieState.Reacting:
-                // Waits for reaction animation to complete
-                break;
         }
 
-        // Check cursor observation if idle
         if (_state == CookieState.Idle && CursorInteractionEnabled)
         {
             UpdateCursorObservation();
@@ -121,7 +108,6 @@ public class CookieBehaviorController
 
     private void DecideNextAutonomousBehavior()
     {
-        // Activity-based timing
         double baseInterval = Activity switch
         {
             ActivityLevel.Calm => 8.0,
@@ -135,7 +121,6 @@ public class CookieBehaviorController
 
         if (choice < 5)
         {
-            // Autonomous short walk
             StartAutonomousWalk();
         }
         else if (choice == 5)
@@ -156,7 +141,6 @@ public class CookieBehaviorController
         }
         else
         {
-            // Stay peacefully idle
             _animationController.PlayAnimation(CookieAnimationId.Idle);
         }
     }
@@ -165,16 +149,14 @@ public class CookieBehaviorController
     {
         var primaryArea = _screenService.GetPrimaryWorkArea();
 
-        // Walk distance: 40 to 140 DIPs
         double distance = _random.Next(40, 140) * (_random.Next(0, 2) == 0 ? -1 : 1);
         double targetX = _currentPosition.X + distance;
 
-        // Clamp target X to visible work area
         targetX = Math.Max(primaryArea.Left + 20, Math.Min(targetX, primaryArea.Right - _companionSize.Width - 20));
 
         if (Math.Abs(targetX - _currentPosition.X) > 15)
         {
-            _walkTarget = new Point(targetX, _currentPosition.Y);
+            _walkTarget = new CorePoint(targetX, _currentPosition.Y);
             var dir = targetX > _currentPosition.X ? CookieDirection.Right : CookieDirection.Left;
 
             TransitionToState(CookieState.Walking);
@@ -196,15 +178,14 @@ public class CookieBehaviorController
 
         if (Math.Abs(dx) <= step)
         {
-            // Arrived at target
-            _currentPosition.X = _walkTarget.Value.X;
+            _currentPosition = new CorePoint(_walkTarget.Value.X, _currentPosition.Y);
             OnPositionChanged?.Invoke(_currentPosition);
             StopWalking();
         }
         else
         {
             double moveDirection = Math.Sign(dx);
-            _currentPosition.X += moveDirection * step;
+            _currentPosition = new CorePoint(_currentPosition.X + moveDirection * step, _currentPosition.Y);
             OnPositionChanged?.Invoke(_currentPosition);
         }
     }
@@ -232,7 +213,6 @@ public class CookieBehaviorController
         double deltaY = cursorPos.Value.Y - catCenterY;
         double distance = Math.Sqrt(deltaX * deltaX + deltaY * deltaY);
 
-        // Within awareness radius of 280 DIPs
         if (distance < 280)
         {
             double normalizedX = Math.Clamp(deltaX / 140.0, -1.0, 1.0);
@@ -254,7 +234,7 @@ public class CookieBehaviorController
         _animationController.PlayAnimation(CookieAnimationId.PickedUp);
     }
 
-    public void UpdateDrag(Point newPosition)
+    public void UpdateDrag(CorePoint newPosition)
     {
         _currentPosition = newPosition;
         OnPositionChanged?.Invoke(_currentPosition);
@@ -262,11 +242,9 @@ public class CookieBehaviorController
 
     public void EndDrag()
     {
-        // Safe position clamping
         _currentPosition = _screenService.RecoverPosition(_currentPosition, _companionSize);
         OnPositionChanged?.Invoke(_currentPosition);
 
-        // Play drop landing animation and sound
         TransitionToState(CookieState.Reacting);
         _audioManager.Play(SoundEffect.Drop);
         _animationController.PlayAnimation(CookieAnimationId.Dropped);
