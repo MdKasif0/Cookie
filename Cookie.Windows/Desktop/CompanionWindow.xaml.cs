@@ -133,6 +133,21 @@ public partial class CompanionWindow : Window
             checkForUpdatesAction: () => Dispatcher.InvokeAsync(OpenUpdateWindow));
 
         _audioManager.Play(SoundEffect.Welcome);
+
+        // Gentle background update check 15 seconds after companion spawns
+        _ = System.Threading.Tasks.Task.Run(async () =>
+        {
+            await System.Threading.Tasks.Task.Delay(15000).ConfigureAwait(false);
+            try
+            {
+                var result = await _updateService.CheckForUpdatesAsync().ConfigureAwait(false);
+                if (result.Status == UpdateCheckStatus.UpdateAvailable && result.AvailableRelease != null)
+                {
+                    await Dispatcher.InvokeAsync(OpenUpdateWindow);
+                }
+            }
+            catch { }
+        });
     }
 
     private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)

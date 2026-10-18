@@ -123,7 +123,7 @@ cat <<EOF > "$MANIFEST_FILE"
 {
   "version": "${VERSION}",
   "releaseNotes": "Cookie for Windows ${VERSION} Official Release\n\n- Full feature parity with macOS companion\n- Transparent desktop companion with pixel-perfect character rendering\n- Cursor interactions, pet reactions, and 5 expressive emotes\n- Window climbing, jumping, and dynamic taskbar exploration\n- Active application awareness and autonomous behaviors\n- Native notification area system tray integration\n- Single-instance protection and graceful activation\n- Local settings persistence with corrupt recovery\n- Privacy-first design: 100% offline local companion",
-  "downloadUrl": "https://getcookie.app/updates/windows/CookieSetup-${VERSION}.exe",
+  "downloadUrl": "https://cookie-v1.netlify.app/downloads/Cookie-Setup.exe",
   "sha256Hash": "${ZIP_HASH}",
   "releaseDate": "${RELEASE_DATE}",
   "packageSizeBytes": ${ZIP_SIZE},
