@@ -24,7 +24,7 @@ public class UpdateService : IUpdateService, IDisposable
     private readonly bool _ownsClient;
 
     public string CurrentVersion { get; }
-    public string DefaultManifestUrl { get; set; } = "https://getcookie.app/updates/windows/release.json";
+    public string DefaultManifestUrl { get; set; } = "https://cookie-v1.netlify.app/updates/windows/release.json";
 
     public UpdateService(HttpClient? httpClient = null, string? currentVersion = null)
     {

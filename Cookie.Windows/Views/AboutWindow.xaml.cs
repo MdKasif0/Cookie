@@ -31,7 +31,7 @@ public partial class AboutWindow : Window
         {
             Process.Start(new ProcessStartInfo
             {
-                FileName = "https://getcookie.app",
+                FileName = "https://cookie-v1.netlify.app",
                 UseShellExecute = true
             });
         }

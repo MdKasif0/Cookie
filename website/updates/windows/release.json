@@ -1,7 +1,7 @@
 {
   "version": "1.1.0",
   "releaseNotes": "Cookie for Windows 1.1.0 Official Release\n\n- Full feature parity with macOS companion\n- Transparent desktop companion with pixel-perfect character rendering\n- Cursor interactions, pet reactions, and 5 expressive emotes\n- Window climbing, jumping, and dynamic taskbar exploration\n- Active application awareness and autonomous behaviors\n- Native notification area system tray integration\n- Single-instance protection and graceful activation\n- Local settings persistence with corrupt recovery\n- Privacy-first design: 100% offline local companion",
-  "downloadUrl": "https://getcookie.app/downloads/Cookie-Setup.exe",
+  "downloadUrl": "https://cookie-v1.netlify.app/downloads/Cookie-Setup.exe",
   "sha256Hash": "1b9990805306716a7a6720105580be40586f1aab4aaf96e9c04a892bde05e534",
   "releaseDate": "2026-10-15T21:12:00Z",
   "packageSizeBytes": 57123680,
