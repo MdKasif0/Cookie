@@ -5,6 +5,43 @@
 
 document.addEventListener("DOMContentLoaded", () => {
   // ------------------------------------------------------------------------
+  // 0. Demo clip: plays only while visible, never starts by itself for people who
+  //    prefer reduced motion, and can always be paused.
+  // ------------------------------------------------------------------------
+  const demoVideo = document.getElementById("demoVideo");
+  const demoToggle = document.getElementById("demoToggle");
+  if (demoVideo && demoToggle) {
+    let userPaused = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const playDemo = () => {
+      const started = demoVideo.play();
+      if (started) started.catch(() => {});
+    };
+    const showState = () => {
+      demoToggle.setAttribute("aria-pressed", String(userPaused));
+      demoToggle.setAttribute("aria-label", userPaused ? "Play the animation" : "Pause the animation");
+    };
+    showState();
+
+    demoToggle.addEventListener("click", () => {
+      userPaused = !userPaused;
+      showState();
+      if (userPaused) demoVideo.pause();
+      else playDemo();
+    });
+
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting && !userPaused) playDemo();
+          else demoVideo.pause();
+        }
+      }, { threshold: 0.35 }).observe(demoVideo);
+    } else if (!userPaused) {
+      playDemo();
+    }
+  }
+
+  // ------------------------------------------------------------------------
   // 1. Hero Cookie Interactive Click (Purr & Boop)
   // ------------------------------------------------------------------------
   const cookieActor = document.getElementById("cookieActor");

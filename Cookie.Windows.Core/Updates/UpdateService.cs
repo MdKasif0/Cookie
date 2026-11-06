@@ -20,14 +20,19 @@ public interface IUpdateService
 
 public class UpdateService : IUpdateService, IDisposable
 {
+    /// <summary>Update information larger than this is not a manifest.</summary>
+    private const long MaxManifestBytes = 256 * 1024;
+
     private readonly HttpClient _httpClient;
     private readonly bool _ownsClient;
+    private readonly IManifestVerifier _verifier;
 
     public string CurrentVersion { get; }
     public string DefaultManifestUrl { get; set; } = "https://cookie-v1.netlify.app/updates/windows/release.json";
 
-    public UpdateService(HttpClient? httpClient = null, string? currentVersion = null)
+    public UpdateService(HttpClient? httpClient = null, string? currentVersion = null, IManifestVerifier? verifier = null)
     {
+        _verifier = verifier ?? new EcdsaManifestVerifier(UpdateSigning.TrustedPublicKeys);
         if (httpClient != null)
         {
             _httpClient = httpClient;
@@ -83,9 +88,38 @@ public class UpdateService : IUpdateService, IDisposable
                     $"Server returned HTTP {(int)response.StatusCode}: {response.ReasonPhrase}");
             }
 
-            string json = await response.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
+            if (response.Content.Headers.ContentLength > MaxManifestBytes)
+            {
+                return new UpdateCheckResult(UpdateCheckStatus.InvalidMetadata, false, activeVersion, null, "Update information was larger than expected.");
+            }
+
+            byte[] manifestBytes = await response.Content.ReadAsByteArrayAsync(ct).ConfigureAwait(false);
+            if (manifestBytes.Length > MaxManifestBytes)
+            {
+                return new UpdateCheckResult(UpdateCheckStatus.InvalidMetadata, false, activeVersion, null, "Update information was larger than expected.");
+            }
+
+            // The signature is checked before anything inside the manifest is trusted or even parsed.
+            if (!await HasValidSignatureAsync(targetUrl, manifestBytes, ct).ConfigureAwait(false))
+            {
+                return new UpdateCheckResult(
+                    UpdateCheckStatus.SignatureInvalid,
+                    false,
+                    activeVersion,
+                    null,
+                    "The update information could not be verified, so it was ignored.");
+            }
+
             var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            var manifest = JsonSerializer.Deserialize<UpdateManifest>(json, options);
+            UpdateManifest? manifest;
+            try
+            {
+                manifest = JsonSerializer.Deserialize<UpdateManifest>(manifestBytes, options);
+            }
+            catch (JsonException)
+            {
+                manifest = null;
+            }
 
             if (manifest == null || string.IsNullOrWhiteSpace(manifest.Version) || string.IsNullOrWhiteSpace(manifest.DownloadUrl))
             {
@@ -121,12 +155,43 @@ public class UpdateService : IUpdateService, IDisposable
         }
     }
 
+    private async Task<bool> HasValidSignatureAsync(string manifestUrl, byte[] manifestBytes, CancellationToken ct)
+    {
+        try
+        {
+            using var response = await _httpClient.GetAsync(UpdateSigning.SignatureUrlFor(manifestUrl), ct).ConfigureAwait(false);
+            if (!response.IsSuccessStatusCode) return false;
+
+            string text = await response.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
+            return UpdateSigning.TryDecodeSignature(text, out byte[] signature)
+                   && _verifier.IsValid(manifestBytes, signature);
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
+
     public async Task<UpdateDownloadResult> DownloadUpdateAsync(
         UpdateManifest manifest,
         string destinationDirectory,
         IProgress<double>? progress = null,
         CancellationToken ct = default)
     {
+        // Updates travel over HTTPS only. A local file is accepted so tests and offline installs work.
+        if (!Uri.TryCreate(manifest.DownloadUrl, UriKind.Absolute, out var downloadUri)
+            || (downloadUri.Scheme != Uri.UriSchemeHttps && !downloadUri.IsFile))
+        {
+            return new UpdateDownloadResult(
+                UpdateDownloadStatus.DownloadFailed,
+                null,
+                "The update location is not a secure (HTTPS) address, so it was not downloaded.");
+        }
+
         Directory.CreateDirectory(destinationDirectory);
         string filename = Path.GetFileName(new Uri(manifest.DownloadUrl).LocalPath);
         if (string.IsNullOrWhiteSpace(filename))

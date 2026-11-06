@@ -20,6 +20,10 @@
 
 ---
 
+<div align="center">
+  <img src="website/assets/cookie-demo.gif" width="480" alt="Cookie walks onto a desk, waves, and plays with a ball of yarn." />
+</div>
+
 ## 📖 Overview
 
 **Cookie** is a lightweight, offline desktop companion for macOS built with **SwiftUI** and **SpriteKit**. She roams your screen, leaps across window edges and the Dock, follows your cursor, and naps quietly beside your work—whisper-quiet on hardware (~0% idle CPU) and completely private.

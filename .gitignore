@@ -13,6 +13,13 @@ xcuserdata/
 # .NET
 bin/
 obj/
-# CI / Local distribution artifacts
+# Release binaries are published to GitHub Releases, never committed.
+# See "Publishing a release" in DISTRIBUTION.md.
 dist/
 downloaded-ci-artifacts/
+website/downloads/
+
+# Signing keys must never be committed
+*.pem
+*.p12
+*.pfx

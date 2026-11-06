@@ -38,7 +38,7 @@ if [ -z "$SPARKLE_BIN" ] || [ ! -x "${SPARKLE_BIN}/sign_update" ]; then
 fi
 
 DMG_PATH="${3:-}"
-OUTPUT_DMG="${PROJECT_ROOT}/website/downloads/Cookie-${VERSION}.dmg"
+OUTPUT_DMG="${PROJECT_ROOT}/dist/Cookie-${VERSION}.dmg"
 
 if [ -z "$DMG_PATH" ]; then
     echo "📦 Building Cookie Release via Xcode..."
@@ -57,7 +57,7 @@ if [ -z "$DMG_PATH" ]; then
     fi
 
     echo "💿 Creating DMG at: $OUTPUT_DMG"
-    mkdir -p "${PROJECT_ROOT}/website/downloads"
+    mkdir -p "${PROJECT_ROOT}/dist"
     hdiutil create -volname "Cookie" -srcfolder "$BUILT_APP" -ov -format UDZO "$OUTPUT_DMG"
     DMG_PATH="$OUTPUT_DMG"
 fi
@@ -117,7 +117,8 @@ EOF
 echo "------------------------------------------------------"
 echo ""
 echo "Next steps:"
-echo "1. Paste the <item> into website/appcast.xml"
-echo "2. Push changes to GitHub (git add, git commit, git push)"
-echo "3. Create GitHub Release v${VERSION} and attach Cookie-${VERSION}.dmg"
-echo "4. The website and in-app updater will automatically serve the new release!"
+echo "1. Write release-notes/${VERSION}.md"
+echo "2. Publish the DMG: scripts/publish-release.sh ${VERSION}"
+echo "   (binaries go to GitHub Releases and are never committed to the repository)"
+echo "3. Paste the <item> above into website/appcast.xml, and bump the version in website/_redirects"
+echo "4. Commit and push those text changes. The website and in-app updater then serve the new release."

@@ -8,7 +8,10 @@ public enum UpdateCheckStatus
     UpdateAvailable,
     NetworkError,
     InvalidMetadata,
-    HostingNotConfigured
+    HostingNotConfigured,
+
+    /// <summary>The update information was missing its signature or the signature did not match.</summary>
+    SignatureInvalid
 }
 
 public enum UpdateDownloadStatus

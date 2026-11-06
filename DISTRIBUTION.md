@@ -103,9 +103,87 @@ Update the website only after a signed build has been checked on a clean machine
 
 ---
 
-## 6. Verification Checklist Before Release
+## 6. Publishing a Release
 
-- [ ] Version numbers match in `project.yml`, `Cookie.Windows.csproj`, `CookieSetup.iss`, `website/releases.js` and the appcast.
+Binaries are never committed to this repository. `dist/` and `website/downloads/` are ignored, and every download is a **GitHub Release** asset. The website's `/download/...` addresses (`website/_redirects`) redirect to them.
+
+1. Write `release-notes/<version>.md`.
+2. **Mac:** `./scripts/release_update.sh <version> <build>` builds and Sparkle-signs the DMG into `dist/` and prints the appcast `<item>`.
+3. **Windows:** push a tag such as `v1.2.0`. The *Build Cookie for Windows* workflow builds, signs, creates the signed update manifest, and publishes the installer, the portable zip, the checksums and the update feed to the release. (Without a tag it only builds and keeps the files as a workflow artifact.)
+4. **Everything else:** `./scripts/publish-release.sh <version>` uploads the DMG and any local Windows files to the release. Run it with `--dry-run` first: it builds and verifies everything and publishes nothing.
+5. Update the version numbers in `website/_redirects`, `website/releases.js` and `website/appcast.xml`, then commit and push those text files.
+
+Publish the release **before** pushing website changes that redirect to it, or the download buttons point at files that do not exist yet.
+
+---
+
+## 7. Windows Update Signing
+
+The Windows app checks for updates by downloading a small manifest (`windows-update.json`) that names the new installer and its SHA-256 checksum. That checksum only protects the download if the manifest itself can be trusted, so the manifest is **signed**:
+
+- The signature is an ECDSA P-256 / SHA-256 signature over the manifest's exact bytes, stored beside it as `windows-update.json.sig` (base64).
+- The app contains the matching **public key** (`UpdateSigning.TrustedPublicKeys`) and checks the signature before it reads anything in the manifest. A missing, malformed or wrong signature means the update information is ignored, and Settings says it could not be verified.
+- Downloads must use HTTPS, and the installer is still checked against the signed SHA-256.
+- The hosted feed (`https://cookie-v1.netlify.app/updates/windows/release.json`) redirects to the newest release's `windows-update.json`.
+
+### The private key
+
+`Tools/CookieUpdateTool` creates and uses the key. The current private key was generated at `~/.cookie-release-keys/windows-update-signing.pem` (readable only by you). **Whoever holds this file can publish updates that every installed Cookie will accept.**
+
+1. Back it up somewhere private (a password manager), then store the file's text as the GitHub secret **`WINDOWS_UPDATE_SIGNING_KEY`** (Settings → Secrets and variables → Actions). Tag builds fail if it is missing.
+2. Never commit it. `*.pem` is ignored, but keep it out of the repository folder anyway.
+3. If you lose it, nobody can sign updates for already-installed copies, and they would have to be reinstalled by hand. If it leaks, rotate it.
+
+### Rotating the key
+
+The app trusts a list of keys, so a rotation does not strand anyone:
+
+1. `dotnet run --project Tools/CookieUpdateTool -- keygen ~/.cookie-release-keys/new-key.pem` and copy the printed public key.
+2. Add it to `UpdateSigning.TrustedPublicKeys` **next to** the old one and ship that version, signed with the old key.
+3. Once most people have updated, sign with the new key, then remove the old public key in a later release.
+
+### Useful commands
+
+```bash
+# Check a published manifest against the app's trusted key
+curl -sLO https://cookie-v1.netlify.app/updates/windows/release.json
+curl -sLO https://cookie-v1.netlify.app/updates/windows/release.json.sig
+dotnet run --project Tools/CookieUpdateTool -- verify release.json
+```
+
+The first time this protects anyone is the release *after* the one that contains it: copies of Cookie 1.1.0 already installed do not check signatures. They update to the first signed version over the unsigned path, and are protected from then on.
+
+---
+
+## 8. Shrinking the Repository
+
+Earlier releases were committed to git, so `.git` carries every binary version ever added: about **224 MB of its 293 MB** is `dist/` and `website/downloads/`. Untracking them (this change) stops it growing but does not shrink history. Shrinking needs a **history rewrite**, which is destructive and was deliberately *not* done for you:
+
+- Every commit id changes, so existing clones and forks break and must be re-cloned.
+- It requires a force-push, and open pull requests are lost.
+
+If you decide you want it (it should bring `.git` to roughly 70 MB):
+
+```bash
+brew install git-filter-repo
+git clone --mirror git@github.com:MdKasif0/Cookie.git cookie-clean.git   # work on a copy
+cd cookie-clean.git
+git filter-repo --invert-paths --path dist --path website/downloads
+# check the result, then (only then) push it over the original:
+git push --force --mirror
+```
+
+Publish the GitHub Release assets first (section 6), because the old binaries disappear from history. Tags and releases themselves are not affected.
+
+Until then, anything you need from before this change can be restored with, for example, `git show <old-commit>:website/downloads/Cookie-Setup.exe > Cookie-Setup.exe`.
+
+---
+
+## 9. Verification Checklist Before Release
+
+- [ ] Version numbers match in `project.yml`, `Cookie.Windows.csproj`, `CookieSetup.iss`, `website/releases.js`, `website/_redirects` and the appcast.
+- [ ] `release-notes/<version>.md` exists.
+- [ ] `WINDOWS_UPDATE_SIGNING_KEY` is set, and `verify` passes on the published manifest.
 - [ ] macOS and Windows test suites pass.
 - [ ] `codesign --verify --deep --strict` passes and `xcrun stapler validate` succeeds on the DMG.
 - [ ] `signtool verify /pa` passes on `Cookie-Setup.exe`.
