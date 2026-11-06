@@ -8,22 +8,22 @@ const CookieReleases = {
     id: "mac",
     name: "macOS",
     displayName: "macOS",
-    version: "1.1.0",
-    releaseDate: "2026-10-11",
-    formattedReleaseDate: "October 11, 2026",
+    version: "1.2.0",
+    releaseDate: "2026-11-06",
+    formattedReleaseDate: "November 6, 2026",
     installerType: "Mac Disk Image (.dmg)",
-    artifactName: "Cookie-1.1.0.dmg",
-    downloadUrl: "downloads/Cookie-1.1.0.dmg",
-    fileSizeBytes: 24332011,
-    formattedSize: "23.2 MB",
+    artifactName: "Cookie-1.2.0.dmg",
+    downloadUrl: "download/mac",
+    fileSizeBytes: 43674860,
+    formattedSize: "41.7 MB",
     architecture: "Universal Binary (Apple Silicon & Intel 64-bit)",
     minimumOS: "macOS 14 Sonoma, macOS 15 Sequoia or later",
     isAvailable: true,
-    sha256: "758add0f71d907ca32ad41abec2f49f5acc2569d9e5bcda62efb81a57d2b7447",
+    sha256: "ccffd768aabf4bd5bd8b77a438fd15d17b851c6a6e90544fbf4644de2092d440",
     signatureStatus: "Cryptographically verified via Sparkle EdDSA signature",
     heroButtonLabel: "Download for macOS",
-    heroReleaseTag: "Version 1.1.0 · 23 MB Disk Image · Apple Silicon & Intel",
-    cardMeta: "Version 1.1.0 · macOS 14 Sonoma & later",
+    heroReleaseTag: "Version 1.2.0 · 42 MB Disk Image · Apple Silicon & Intel",
+    cardMeta: "Version 1.2.0 · macOS 14 Sonoma & later",
     specs: [
       {
         title: "Apple Silicon",
@@ -42,15 +42,15 @@ const CookieReleases = {
       },
       {
         title: "Download Size",
-        desc: "Compact ~23 MB disk image. 100% offline with zero background daemons.",
-        pill: "23 MB DMG"
+        desc: "Compact ~42 MB disk image. 100% offline with zero background daemons.",
+        pill: "42 MB DMG"
       }
     ],
     installSteps: [
       {
         step: 1,
         title: "Download the Disk Image",
-        desc: "Click the download button to save Cookie-1.1.0.dmg directly from our official site."
+        desc: "Click the download button to save Cookie-1.2.0.dmg directly from our official site."
       },
       {
         step: 2,
@@ -88,7 +88,7 @@ const CookieReleases = {
     formattedReleaseDate: "October 15, 2026",
     installerType: "Windows Installer (.exe)",
     artifactName: "Cookie-Setup.exe",
-    downloadUrl: "downloads/Cookie-Setup.exe",
+    downloadUrl: "download/windows",
     fileSizeBytes: 57123680,
     formattedSize: "54.5 MB",
     sha256: "1b9990805306716a7a6720105580be40586f1aab4aaf96e9c04a892bde05e534",
@@ -101,7 +101,7 @@ const CookieReleases = {
       isAvailable: true,
       name: "Portable 64-bit (.zip)",
       artifactName: "Cookie-Windows-1.1.0-win-x64-Portable.zip",
-      downloadUrl: "downloads/Cookie-Windows-1.1.0-win-x64-Portable.zip",
+      downloadUrl: "download/windows-portable",
       fileSizeBytes: 77247713,
       formattedSize: "73.6 MB",
       sha256: "474777092e9f4303a5255c518650537f7a5dc20c855560e84e728a0b7db41f0a",

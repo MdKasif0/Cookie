@@ -1,6 +1,25 @@
-# Netlify Redirects for Cookie Website
-/download/mac              /downloads/Cookie-1.1.0.dmg                          302!
-/download/windows          /downloads/Cookie-Setup.exe                          302!
-/download/windows-portable /downloads/Cookie-Windows-1.1.0-win-x64-Portable.zip 302!
-/download                  /downloads/Cookie-1.1.0.dmg                          302!
-/dist/*              /downloads/:splat                                    301
+# Netlify redirects for the Cookie website.
+#
+# Downloads are not stored in this repository. They live on GitHub Releases, and these
+# stable addresses send people there. When you publish a new version, update the two
+# version numbers below (see "Publishing a release" in DISTRIBUTION.md).
+
+# Mac: the disk image of the current release.
+/download                     https://github.com/MdKasif0/Cookie/releases/download/v1.2.0/Cookie-1.2.0.dmg                           302!
+/download/mac                 https://github.com/MdKasif0/Cookie/releases/download/v1.2.0/Cookie-1.2.0.dmg                           302!
+
+# Windows: the installer always follows the newest release; the portable zip is versioned.
+/download/windows             https://github.com/MdKasif0/Cookie/releases/latest/download/Cookie-Setup.exe                           302!
+/download/windows-portable    https://github.com/MdKasif0/Cookie/releases/download/v1.1.0/Cookie-Windows-1.1.0-win-x64-Portable.zip  302!
+
+# Addresses that earlier pages and emails may still link to.
+/downloads/Cookie-1.2.0.dmg                              https://github.com/MdKasif0/Cookie/releases/download/v1.2.0/Cookie-1.2.0.dmg                           302!
+/downloads/Cookie-1.1.0.dmg                              https://github.com/MdKasif0/Cookie/releases/download/v1.1.0/Cookie-1.1.0.dmg                           302!
+/downloads/Cookie-Setup.exe                              https://github.com/MdKasif0/Cookie/releases/latest/download/Cookie-Setup.exe                           302!
+/downloads/Cookie-Windows-1.1.0-win-x64-Portable.zip     https://github.com/MdKasif0/Cookie/releases/download/v1.1.0/Cookie-Windows-1.1.0-win-x64-Portable.zip  302!
+/dist/*                                                  /download                                                                                              301
+
+# Update feed for the Windows app. The manifest and its signature are published with each
+# release; the app verifies the signature before trusting anything in the manifest.
+/updates/windows/release.json        https://github.com/MdKasif0/Cookie/releases/latest/download/windows-update.json        302!
+/updates/windows/release.json.sig    https://github.com/MdKasif0/Cookie/releases/latest/download/windows-update.json.sig    302!

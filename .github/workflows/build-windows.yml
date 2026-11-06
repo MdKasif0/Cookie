@@ -5,11 +5,18 @@ on:
   push:
     branches:
       - main
+    # Pushing a tag such as windows-v1.2.0 also publishes the build to GitHub Releases.
+    # Plain v* tags are Mac releases and must not start a Windows release.
+    tags:
+      - 'windows-v*'
 
 jobs:
   build:
     name: Build & Package Windows Installer
     runs-on: windows-latest
+    permissions:
+      # Only used to publish a release when a version tag is pushed.
+      contents: write
     defaults:
       run:
         shell: pwsh
@@ -156,3 +163,54 @@ jobs:
             dist/windows/Cookie-Windows-1.1.0-win-x64-Portable.zip
             dist/windows/SHA256SUMS.txt
           if-no-files-found: error
+
+      # Everything below runs only for Windows release tags (for example windows-v1.2.0).
+
+      - name: Create and sign the update manifest
+        if: startsWith(github.ref, 'refs/tags/windows-v')
+        env:
+          COOKIE_UPDATE_SIGNING_KEY: ${{ secrets.WINDOWS_UPDATE_SIGNING_KEY }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          if (-not $env:COOKIE_UPDATE_SIGNING_KEY) {
+            Write-Error "The WINDOWS_UPDATE_SIGNING_KEY secret is not set. Refusing to publish an update feed that installed apps would reject. See DISTRIBUTION.md."
+            exit 1
+          }
+          $version = $env:TAG -replace '^windows-v', ''
+          $notes = "release-notes/windows-$version.md"
+          if (-not (Test-Path $notes)) {
+            Write-Error "Missing $notes. Write the release notes before tagging."
+            exit 1
+          }
+          $url = "https://github.com/${{ github.repository }}/releases/download/$($env:TAG)/Cookie-Setup.exe"
+
+          dotnet run --project Tools/CookieUpdateTool -c Release -- manifest --version $version --installer dist/windows/installer/Cookie-Setup.exe --url $url --notes-file $notes --out dist/windows/windows-update.json
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          # Exits non-zero if the key is not one the app trusts, so a wrong secret fails here.
+          dotnet run --project Tools/CookieUpdateTool -c Release -- sign dist/windows/windows-update.json
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          dotnet run --project Tools/CookieUpdateTool -c Release -- verify dist/windows/windows-update.json
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+
+      - name: Publish to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/windows-v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          $version = $env:TAG -replace '^windows-v', ''
+          gh release view $env:TAG *> $null
+          if ($LASTEXITCODE -ne 0) {
+            # The newest Windows release is "latest": the website's Windows download and the update
+            # feed follow releases/latest. Mac releases are created with --latest=false.
+            gh release create $env:TAG --title "Cookie for Windows $version" --notes-file "release-notes/windows-$version.md" --verify-tag --latest
+            if ($LASTEXITCODE -ne 0) { exit 1 }
+          }
+
+          $zip = (Get-ChildItem dist/windows/Cookie-Windows-*-win-x64-Portable.zip).FullName
+          gh release upload $env:TAG dist/windows/installer/Cookie-Setup.exe $zip dist/windows/SHA256SUMS.txt --clobber
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+
+          # The update feed goes last, so installed apps never see a manifest whose installer is not there yet.
+          gh release upload $env:TAG dist/windows/windows-update.json dist/windows/windows-update.json.sig --clobber
+          if ($LASTEXITCODE -ne 0) { exit 1 }

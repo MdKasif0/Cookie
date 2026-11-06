@@ -49,6 +49,11 @@ public partial class UpdateDialogWindow : Window
             ActionBtn.Content = "Download & Install";
             ActionBtn.Visibility = Visibility.Visible;
         }
+        else if (result.Status == UpdateCheckStatus.SignatureInvalid)
+        {
+            StatusTitleText.Text = "Update Could Not Be Verified";
+            StatusSubtitleText.Text = "The update information failed its security check, so Cookie did not use it. Try again later, or download Cookie again from the official website.";
+        }
         else if (result.Status == UpdateCheckStatus.HostingNotConfigured)
         {
             StatusTitleText.Text = "Updates Not Configured";

@@ -117,24 +117,12 @@ $ZIP_HASH  $(basename "$PORTABLE_ZIP")
 EOF
 echo "✅ Checksums written to SHA256SUMS.txt"
 
-# 10. Generate Update Manifest (for release hosting)
-echo ""
-echo "🌐 Step 9: Generating update manifest (for HTTPS hosting)..."
-MANIFEST_FILE="${DIST_DIR}/update-manifest.json"
-RELEASE_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-
-cat <<EOF > "$MANIFEST_FILE"
-{
-  "version": "${VERSION}",
-  "releaseNotes": "Cookie for Windows ${VERSION} Official Release\n\n- Full feature parity with macOS companion\n- Transparent desktop companion with pixel-perfect character rendering\n- Cursor interactions, pet reactions, and 5 expressive emotes\n- Window climbing, jumping, and dynamic taskbar exploration\n- Active application awareness and autonomous behaviors\n- Native notification area system tray integration\n- Single-instance protection and graceful activation\n- Local settings persistence with corrupt recovery\n- Privacy-first design: 100% offline local companion",
-  "downloadUrl": "https://cookie-v1.netlify.app/downloads/Cookie-Setup.exe",
-  "sha256Hash": "${ZIP_HASH}",
-  "releaseDate": "${RELEASE_DATE}",
-  "packageSizeBytes": ${ZIP_SIZE},
-  "minimumOsVersion": "10.0.19041"
-}
-EOF
-echo "✅ Generated update manifest: $(basename "$MANIFEST_FILE")"
+# 10. The update manifest is made at publish time, not here.
+# It must describe the installer (Cookie-Setup.exe), which only exists after Inno Setup runs on
+# Windows, and it must be signed. An earlier version of this script wrote a manifest here that
+# paired the installer's address with the portable zip's checksum, which would fail every update.
+# See scripts/publish-release.sh and the "Publishing a release" section of DISTRIBUTION.md.
+MANIFEST_FILE="(made by scripts/publish-release.sh)"
 
 # 11. Compile Inno Setup Installer if Inno Setup is available
 echo ""

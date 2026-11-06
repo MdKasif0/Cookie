@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Cookie.UpdateTool</RootNamespace>
+    <AssemblyName>cookie-update-tool</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Cookie.Windows.Core\Cookie.Windows.Core.csproj" />
+  </ItemGroup>
+
+</Project>

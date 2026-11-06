@@ -6,6 +6,30 @@
     <description>Most recent updates and cozy improvements for Cookie.</description>
     <language>en</language>
     <item>
+      <title>Cookie 1.2.0</title>
+      <pubDate>Fri, 06 Nov 2026 16:29:10 +0000</pubDate>
+      <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+      <description><![CDATA[
+        <p>A big polish release: Cookie moves better, looks more like herself everywhere, and sounds warmer.</p>
+        <ul>
+          <li>Real animation: walking, running, sleeping, eating, waking, stretching and more are now drawn frame by frame from Cookie's own artwork.</li>
+          <li>A new welcome: Cookie walks in, reacts as you type her name, and each personality is an animated card.</li>
+          <li>Dark Mode throughout, and Liquid Glass on macOS 26.</li>
+          <li>Toys, treats and accessories are re-drawn as soft 3D art to match Cookie, and the cardboard box now sits around her.</li>
+          <li>A custom Cookie menu bar icon and menu icons, replacing the emoji.</li>
+          <li>Redesigned sounds with alternate takes, and a continuous purr that carries on while you pet her.</li>
+          <li>Fixed: accessories now sit on Cookie's head and neck, and toys and treats have their shadows underneath them.</li>
+        </ul>
+      ]]></description>
+      <enclosure
+        url="https://github.com/MdKasif0/Cookie/releases/download/v1.2.0/Cookie-1.2.0.dmg"
+        sparkle:version="3"
+        sparkle:shortVersionString="1.2.0"
+        length="43674860"
+        type="application/octet-stream"
+        sparkle:edSignature="y0sQ4TYgWmWCCSOpeiYAc3kLq3FuJ7DLCQTRCkoN3IwDnt+s5clnCquD9Npl7Zu2zf+TVF5ZMsw4PfC8JJQ9BQ=="/>
+    </item>
+    <item>
       <title>Cookie 1.1.0</title>
       <pubDate>Sun, 11 Oct 2026 12:00:00 +0000</pubDate>
       <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
