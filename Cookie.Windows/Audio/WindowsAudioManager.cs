@@ -78,7 +78,7 @@ public class WindowsAudioManager : AudioManagerBase
     private void UpdateLoopVolume()
     {
         if (_loop == null) return;
-        if (!SoundEnabled || !PurringSounds)
+        if (!SoundEnabled || !PurringSounds || IsMuted)
         {
             StopLoop();
             return;

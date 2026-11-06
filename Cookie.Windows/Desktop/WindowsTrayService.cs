@@ -29,6 +29,7 @@ public class WindowsTrayService : IDisposable
     private readonly Action _openEmotePickerAction;
     private readonly Action _openAboutAction;
     private readonly Action _checkForUpdatesAction;
+    private readonly ICompanionMenuSource _menuSource;
 
     private const int SmallIconWidthMetric = 49;
     private const int SmallIconHeightMetric = 50;
@@ -48,8 +49,10 @@ public class WindowsTrayService : IDisposable
         Action openSettingsAction,
         Action openEmotePickerAction,
         Action openAboutAction,
-        Action checkForUpdatesAction)
+        Action checkForUpdatesAction,
+        ICompanionMenuSource menuSource)
     {
+        _menuSource = menuSource;
         _hWnd = hWnd;
         _behaviorController = behaviorController;
         _settingsManager = settingsManager;
@@ -92,6 +95,14 @@ public class WindowsTrayService : IDisposable
         };
 
         _isCreated = NativeMethods.Shell_NotifyIcon(NativeMethods.NIM_ADD, ref _nid);
+    }
+
+    /// <summary>Shows a status such as the focus countdown in the tray tooltip, or restores the plain one.</summary>
+    public void UpdateTooltip(string? status)
+    {
+        if (_isDisposed || !_isCreated) return;
+        _nid.szTip = status == null ? "Cookie Desktop Companion" : $"Cookie · {status}";
+        NativeMethods.Shell_NotifyIcon(NativeMethods.NIM_MODIFY, ref _nid);
     }
 
     public void HandleTrayMessage(IntPtr wParam, IntPtr lParam)
@@ -138,7 +149,8 @@ public class WindowsTrayService : IDisposable
         menu.Items.Add(new Separator());
 
         // Feeding and toys
-        CareMenuBuilder.AddItems(menu, _behaviorController);
+        CareMenuBuilder.AddItems(menu, _behaviorController, _menuSource.Bond.IsUnlocked);
+        CompanionMenu.AddItems(menu, _menuSource);
 
         menu.Items.Add(new Separator());
 

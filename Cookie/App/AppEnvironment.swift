@@ -11,7 +11,11 @@ final class AppEnvironment: ObservableObject {
     let audioManager: AudioManager
     let behaviorEngine: CookieBehaviorEngine
     let windows: WindowManager
+    let focus: FocusController
+    let quietMode: QuietModeMonitor
+    let summonHotKey = SummonHotKey()
     private(set) var menuBarController: MenuBarController?
+    private var bondWatch: AnyCancellable?
 
     private let log = Logger(subsystem: "com.cookie.mac", category: "App")
     private var cancellables: Set<AnyCancellable> = []
@@ -25,6 +29,13 @@ final class AppEnvironment: ObservableObject {
         self.audioManager = audioManager
         self.behaviorEngine = behaviorEngine
         self.windows = windows
+        self.focus = FocusController(
+            store: store,
+            engine: behaviorEngine,
+            say: { [weak windows] text in windows?.say(text, seconds: 6) },
+            play: { [weak audioManager] effect in audioManager?.play(effect) }
+        )
+        self.quietMode = QuietModeMonitor(store: store)
         windows.environment = self
         windows.menuProvider = { [weak self] in
             self?.createCookieMenu()
@@ -48,6 +59,44 @@ final class AppEnvironment: ObservableObject {
             }
             .store(in: &cancellables)
 
+        // Step aside for full-screen apps.
+        quietMode.$isQuiet
+            .removeDuplicates()
+            .sink { [weak self] quiet in
+                self?.windows.setQuiet(quiet)
+                self?.audioManager.isMuted = quiet
+            }
+            .store(in: &cancellables)
+
+        // The summon shortcut, and whether she shows up in screen sharing.
+        summonHotKey.onTrigger = { [weak self] in self?.summonCookie() }
+        store.$profile
+            .map(\.settings.summonShortcut)
+            .removeDuplicates()
+            .sink { [weak self] raw in
+                self?.summonHotKey.register(SummonShortcut(rawValue: raw) ?? .controlOptionC)
+            }
+            .store(in: &cancellables)
+        store.$profile
+            .map(\.settings.hideFromScreenSharing)
+            .removeDuplicates()
+            .sink { [weak self] hidden in self?.windows.setSharingHidden(hidden) }
+            .store(in: &cancellables)
+
+        // The menu bar counts down while a focus session runs.
+        focus.$timer
+            .sink { [weak self] _ in
+                guard let self else { return }
+                self.menuBarController?.updateStatusTitle(self.focus.statusTitle)
+            }
+            .store(in: &cancellables)
+
+        // A new calendar day while she keeps running is another visit.
+        DailyClock.shared.$day
+            .dropFirst()
+            .sink { [weak self] _ in self?.store.statistics.recordVisit() }
+            .store(in: &cancellables)
+
         // Observe UpdateManager prompt visibility
         UpdateManager.shared.$isShowingUpdatePrompt
             .receive(on: DispatchQueue.main)
@@ -69,6 +118,7 @@ final class AppEnvironment: ObservableObject {
             menuBarController = MenuBarController(environment: self, store: store)
         }
         store.statistics.recordLaunch()
+        store.keepInUseItemsUnlocked()
         applySystemSettings()
         if store.profile.hasCompletedWelcome {
             log.info("Returning user — starting companion")
@@ -76,6 +126,8 @@ final class AppEnvironment: ObservableObject {
                 windows.showCompanion()
             }
             behaviorEngine.start()
+            startCompanionServices()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) { [weak self] in self?.greet() }
         } else {
             presentWelcome()
         }
@@ -86,6 +138,55 @@ final class AppEnvironment: ObservableObject {
                 self?.checkForUpdates(userInitiated: false)
             }
         }
+    }
+
+    // MARK: - Companion services
+
+    private func startCompanionServices() {
+        quietMode.start()
+        DailyClock.shared.start()
+        // Let her settle in before announcing anything.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 4) { [weak self] in self?.beginBondWatching() }
+    }
+
+    /// She says good morning, good evening or happy birthday when she first appears.
+    private func greet() {
+        let settings = store.profile.settings
+        guard settings.timeGreetings, store.profile.isCompanionVisible, !quietMode.isQuiet else { return }
+        windows.say(DailyRhythm.greeting(name: store.profile.displayName, on: Date(), firstMet: store.statistics.firstLaunchedAt), seconds: 5)
+    }
+
+    private func beginBondWatching() {
+        celebrateBondLevelUp()
+        bondWatch = store.$statistics
+            .map(Bond.points(for:))
+            .removeDuplicates()
+            .debounce(for: .seconds(1), scheduler: DispatchQueue.main)
+            .sink { [weak self] _ in self?.celebrateBondLevelUp() }
+    }
+
+    /// A new friendship level: she celebrates and says what it unlocked.
+    private func celebrateBondLevelUp() {
+        guard let levelUp = store.claimBondLevelUp() else { return }
+        behaviorEngine.celebrate()
+        audioManager.play(.welcome)
+        var text = "We're \(levelUp.level.name) now!"
+        if !levelUp.newItems.isEmpty {
+            let names = levelUp.newItems.prefix(3).map(\.displayName).joined(separator: ", ")
+            let extra = levelUp.newItems.count - 3
+            text += " Unlocked: \(names)" + (extra > 0 ? " and \(extra) more" : "")
+        }
+        windows.say(text, seconds: 8)
+    }
+
+    /// Calls Cookie to the cursor and has her wave hello. It overrides full-screen hiding briefly.
+    func summonCookie() {
+        quietMode.grantOverride(seconds: 20)
+        if !store.profile.isCompanionVisible { store.profile.isCompanionVisible = true }
+        windows.showCompanion()
+        windows.moveCompanionNearCursor()
+        behaviorEngine.summon()
+        audioManager.play(.chirp)
     }
 
     /// Syncs settings that touch the system: launch-at-login state and
@@ -119,6 +220,7 @@ final class AppEnvironment: ObservableObject {
         windows.closeWelcome()
         windows.showCompanion()
         behaviorEngine.start()
+        startCompanionServices()
         audioManager.play(.welcome)
     }
 
@@ -129,6 +231,7 @@ final class AppEnvironment: ObservableObject {
         store.profile.hasCompletedWelcome = true
         windows.showCompanion()
         behaviorEngine.start()
+        startCompanionServices()
     }
 
     /// Full reset from Settings: back to a fresh first run.
@@ -161,6 +264,14 @@ final class AppEnvironment: ObservableObject {
     @discardableResult
     func triggerEmote(_ emote: Emote) -> Bool { behaviorEngine.triggerEmote(emote) }
     func showEmotePicker() { windows.showEmotePicker() }
+    func showPhotoMode() { windows.showPhotoMode() }
+
+    // Focus, cozy corner and friendship
+    func startFocus(minutes: Int? = nil) { focus.startFocus(minutes: minutes) }
+    func stopFocus() { focus.stop() }
+    func placeCozy(_ kind: CozyKind) { windows.placeCozy(kind) }
+    func removeCozy(_ kind: CozyKind) { windows.removeCozy(kind) }
+    func isUnlocked(_ item: BondItem) -> Bool { store.isUnlocked(item) }
 
     // Software updates
     func checkForUpdates(userInitiated: Bool = true) {

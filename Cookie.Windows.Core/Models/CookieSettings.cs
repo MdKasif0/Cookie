@@ -102,6 +102,26 @@ public class CookieSettings
     public bool AutonomousDockExploration { get; set; } = true;
     public DockExplorationFrequency DockExplorationFrequency { get; set; } = DockExplorationFrequency.Occasional;
 
+    // Daily rhythm
+    /// <summary>Cookie dresses for the season and the occasion, from the local date.</summary>
+    public bool SeasonalOutfits { get; set; } = true;
+
+    /// <summary>She says good morning, good evening and good night when she first appears.</summary>
+    public bool TimeGreetings { get; set; } = true;
+
+    // Focus
+    public int FocusMinutes { get; set; } = 25;
+    public int BreakMinutes { get; set; } = 5;
+
+    // Presence
+    /// <summary>Hide during full-screen apps, games and presentations.</summary>
+    public bool HideInFullscreen { get; set; } = true;
+
+    /// <summary>Keep her out of screen sharing and recordings.</summary>
+    public bool HideFromScreenSharing { get; set; } = true;
+
+    public SummonShortcut SummonShortcut { get; set; } = SummonShortcut.ControlAltC;
+
     // Updates
     public bool AutomaticallyCheckForUpdates { get; set; } = true;
 

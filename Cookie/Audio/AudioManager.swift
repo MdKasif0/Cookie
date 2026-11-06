@@ -84,6 +84,11 @@ final class AudioManager {
     private var purrFadeStartedAt: Date?
     private var purrTimer: Timer?
 
+    /// Set while Cookie is hidden for a full-screen app: nothing plays.
+    var isMuted = false {
+        didSet { if isMuted { stopPurring() } }
+    }
+
     /// True while the purr loop is audible.
     var isPurring: Bool { purrPlayer?.isPlaying == true }
 
@@ -93,7 +98,7 @@ final class AudioManager {
 
     func play(_ effect: SoundEffect) {
         let settings = store.profile.settings
-        guard settings.soundEnabled else { return }
+        guard settings.soundEnabled, !isMuted else { return }
         guard effect.isInteractionSound == false || settings.interactionSounds else { return }
         if effect == .purr || effect == .sleep {
             guard settings.purringSounds else { return }

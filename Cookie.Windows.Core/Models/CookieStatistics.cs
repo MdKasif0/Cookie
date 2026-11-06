@@ -18,11 +18,41 @@ public class CookieStatistics
     public int BoxVisits { get; set; }
     public Dictionary<ToyKind, int> ToyPlayCounts { get; set; } = new();
 
+    /// <summary>Distinct calendar days Cookie has been around. Each one adds to the bond.</summary>
+    public int VisitDays { get; set; }
+    public DateTime? LastVisitedAt { get; set; }
+    public int FocusSessions { get; set; }
+    public int FocusMinutes { get; set; }
+
+    /// <summary>The highest friendship level already celebrated, so each is announced once.</summary>
+    public int CelebratedBondLevel { get; set; }
+
     public void RecordLaunch(DateTime now)
     {
         FirstLaunchedAt ??= now;
         LastLaunchedAt = now;
         LaunchCount++;
+        RecordVisit(now);
+    }
+
+    /// <summary>Counts today as a visit, once. Returns whether it was new.</summary>
+    public bool RecordVisit(DateTime now, TimeZoneInfo? zone = null)
+    {
+        zone ??= TimeZoneInfo.Local;
+        if (LastVisitedAt is { } last && TimeZoneInfo.ConvertTime(last, zone).Date == TimeZoneInfo.ConvertTime(now, zone).Date)
+        {
+            return false;
+        }
+        LastVisitedAt = now;
+        VisitDays++;
+        return true;
+    }
+
+    public void RecordFocusSession(int minutes)
+    {
+        FocusSessions++;
+        FocusMinutes += minutes;
+        Affection += 5;
     }
 
     public void RecordPet()

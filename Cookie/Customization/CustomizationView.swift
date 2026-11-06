@@ -132,13 +132,20 @@ struct AppearancePane: View {
             }
 
             section("Fur Pattern") {
+                // Coats unlock as the friendship grows; the one in use always stays listed.
+                let coats = FurPattern.allCases.filter { $0 == config.furPattern || store.isUnlocked(.coat($0)) }
                 Picker("Fur Pattern", selection: bind(\.furPattern)) {
-                    ForEach(FurPattern.allCases) { pattern in
+                    ForEach(coats) { pattern in
                         Text(pattern.displayName).tag(pattern)
                     }
                 }
                 .pickerStyle(.segmented)
                 .labelsHidden()
+                if coats.count < FurPattern.allCases.count {
+                    Text("More coats unlock as your friendship with Cookie grows.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             }
 
             section("Eyes") {
@@ -253,10 +260,17 @@ struct AccessoriesPane: View {
 
     private func accessoryRow(_ kind: AccessoryKind) -> some View {
         let binding = accessoryBinding(kind)
+        let locked = !store.isUnlocked(.accessory(kind))
         return VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Toggle(kind.displayName, isOn: binding.isEnabled)
-                if kind.isSeasonal {
+                    .disabled(locked && !binding.isEnabled.wrappedValue)
+                if locked {
+                    Spacer()
+                    Label("Unlocks at \(Bond.requiredLevel(for: .accessory(kind))?.name ?? "a later level")", systemImage: "lock.fill")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                } else if kind.isSeasonal {
                     Spacer()
                     HStack(spacing: 4) {
                         Image(systemName: kind.theme.icon)

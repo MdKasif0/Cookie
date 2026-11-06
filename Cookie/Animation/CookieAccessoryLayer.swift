@@ -6,7 +6,7 @@ import SpriteKit
 /// Layer order: neck pieces first, then head pieces, glasses last.
 @MainActor
 final class CookieAccessoryLayer: SKNode {
-    private static let drawOrder: [AccessoryKind] = [
+    static let drawOrder: [AccessoryKind] = [
         .scarf, .bandana, .collar, .bow, .hat, .pumpkin, .santaHat, .crown, .glasses
     ]
 

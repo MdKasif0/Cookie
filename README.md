@@ -38,6 +38,12 @@
 | **🎨 Character Studio (⌘K)** | 10 fur palettes, coats, eye styles, body scaling, and layered accessories. |
 | **🎵 Designed Audio** | A formant-modeled voice and a continuous looping purr, with independent volume controls. |
 | **🔒 100% Private & Offline** | Zero analytics, zero cloud dependencies, and local JSON storage. |
+| **💞 Friendship & Unlocks** | Pets, treats, play and each new day grow your bond; hats, coats, toys and cozy spots unlock as it deepens. |
+| **⏲️ Focus Sessions** | Cookie naps beside you while you work, then stretches and nudges you to take a break. |
+| **🌙 Daily Rhythm** | Sleepy at night, a stretch in the morning, and seasonal outfits chosen from your local clock. |
+| **🛏️ Cozy Corner** | A cat bed, sunbeam spot and scratching post that she wanders back to on her own. |
+| **📸 Photo Mode** | Save Cookie as a transparent PNG or a looping GIF, or copy her to the clipboard. |
+| **🤫 Quiet Mode & Summon** | Steps aside for full-screen apps and screen sharing, and comes running when you press a shortcut. |
 | **🔄 Seamless Updates** | Secure in-app updates via Sparkle with cryptographic EdDSA verification. |
 
 ---
@@ -200,11 +206,12 @@ Cookie reacts to tactile cursor actions across anatomical touch zones:
 
 ## ⚙️ Native Settings (⌘,)
 
-Seven native preference tabs:
+Eight native preference tabs:
 * **General**: Login item (`SMAppService`), desktop visibility, and multi-display coordinate recall.
 * **Appearance**: Scale slider, 30/60 FPS toggle, and macOS Reduced Motion support.
 * **Sound**: Master, meow, and interaction volume controls with ambient purring toggles.
 * **Behavior**: Cadence (Calm / Balanced / Lively), window jumping, dock exploration, and cursor interactions.
+* **Presence**: Quiet mode, the summon shortcut, seasonal outfits, greetings, and focus session lengths.
 * **Stats**: Lifetime pets, favorite petting spots, jumps completed, and friendship progress.
 * **Privacy & About**: Local data residency confirmation, Sparkle update checks, and version info.
 

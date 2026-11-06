@@ -49,6 +49,24 @@ struct CookieSettings: Codable, Equatable {
     var autonomousDockExploration: Bool = true
     var dockExplorationFrequency: String = DockExplorationFrequency.occasional.rawValue
 
+    // Daily rhythm
+    /// Cookie dresses for the season and the occasion, from the local date.
+    var seasonalOutfits: Bool = true
+    /// She says good morning, good evening and good night when she first appears.
+    var timeGreetings: Bool = true
+
+    // Focus
+    var focusMinutes: Int = 25
+    var breakMinutes: Int = 5
+
+    // Presence
+    /// Hide during full-screen apps and presentations.
+    var hideInFullscreen: Bool = true
+    /// Ask macOS to leave her out of screen sharing and recordings.
+    var hideFromScreenSharing: Bool = true
+    /// A `SummonShortcut` raw value.
+    var summonShortcut: String = SummonShortcut.controlOptionC.rawValue
+
     // Updates
     var automaticallyCheckForUpdates: Bool = true
 
@@ -60,6 +78,8 @@ struct CookieSettings: Codable, Equatable {
         case soundEnabled, masterVolume, meowVolume, interactionSounds, purringSounds
         case activityLevel, randomInteractions, autonomousBehaviorEnabled, pauseAutonomousBehavior, cursorInteraction, cursorFollowingEnabled, cursorDodgingEnabled, cursorFollowingIntensity, windowInteraction, windowVerticalClimbing, windowExplorationFrequency, windowJumpingEnabled, jumpFrequency, jumpStyle, sleepBehavior
         case autonomousToys, dockInteraction, autonomousDockExploration, dockExplorationFrequency, automaticallyCheckForUpdates
+        case seasonalOutfits, timeGreetings, focusMinutes, breakMinutes
+        case hideInFullscreen, hideFromScreenSharing, summonShortcut
     }
 
     init(from decoder: Decoder) throws {
@@ -95,6 +115,17 @@ struct CookieSettings: Codable, Equatable {
         autonomousDockExploration = try container.decodeIfPresent(Bool.self, forKey: .autonomousDockExploration) ?? true
         dockExplorationFrequency = try container.decodeIfPresent(String.self, forKey: .dockExplorationFrequency) ?? DockExplorationFrequency.occasional.rawValue
         automaticallyCheckForUpdates = try container.decodeIfPresent(Bool.self, forKey: .automaticallyCheckForUpdates) ?? true
+        seasonalOutfits = try container.decodeIfPresent(Bool.self, forKey: .seasonalOutfits) ?? true
+        timeGreetings = try container.decodeIfPresent(Bool.self, forKey: .timeGreetings) ?? true
+        focusMinutes = min(max(try container.decodeIfPresent(Int.self, forKey: .focusMinutes) ?? 25, 5), 180)
+        breakMinutes = min(max(try container.decodeIfPresent(Int.self, forKey: .breakMinutes) ?? 5, 1), 60)
+        hideInFullscreen = try container.decodeIfPresent(Bool.self, forKey: .hideInFullscreen) ?? true
+        hideFromScreenSharing = try container.decodeIfPresent(Bool.self, forKey: .hideFromScreenSharing) ?? true
+        summonShortcut = try container.decodeIfPresent(String.self, forKey: .summonShortcut) ?? SummonShortcut.controlOptionC.rawValue
+    }
+
+    var summon: SummonShortcut {
+        SummonShortcut(rawValue: summonShortcut) ?? .controlOptionC
     }
 
     var reducedMotion: ReducedMotionMode {

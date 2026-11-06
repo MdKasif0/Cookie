@@ -79,6 +79,8 @@ REQUIRED_ASSETS=(
     "$WIN_X64_DIR/Resources/Sprites/Cookie/Emotes/Wave/wave.png"
     "$WIN_X64_DIR/Resources/Sprites/Cookie/Walk/walk.png"
     "$WIN_X64_DIR/Resources/Sprites/Cookie/Items/yarnBall.png"
+    "$WIN_X64_DIR/Resources/Sprites/Cookie/Items/cozy-bed.png"
+    "$WIN_X64_DIR/Resources/Sprites/Cookie/Emotes/wave.png"
     "$WIN_X64_DIR/Resources/Sprites/Cookie/Emotes/Sleepy/sleepy.png"
     "$WIN_X64_DIR/Resources/Sprites/Cookie/Emotes/Playful/playful.png"
 )

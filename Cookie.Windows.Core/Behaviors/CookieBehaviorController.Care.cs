@@ -26,6 +26,10 @@ public partial class CookieBehaviorController
     private double _careStepTimer;
 
     public CookieStatistics Statistics { get; set; } = new();
+
+    /// <summary>The cozy item she is heading for or settled at.</summary>
+    public CozyKind? CurrentCozyVisit { get; private set; }
+    private double _cozyTargetX;
     public WorldItem? CurrentWorldItem { get; private set; }
     public bool IsCareSequenceActive => _careStep != null;
 
@@ -185,6 +189,7 @@ public partial class CookieBehaviorController
     private void CancelCareSequence()
     {
         bool wasActive = _careStep != null;
+        CurrentCozyVisit = null;
         _careQueue.Clear();
         _careStep = null;
         _careStepTimer = 0;
@@ -202,6 +207,7 @@ public partial class CookieBehaviorController
         if (_careQueue.Count == 0)
         {
             _careStep = null;
+            CurrentCozyVisit = null;
             if (CurrentWorldItem != null) SetWorldItem(null);
             TransitionToState(CookieState.Idle);
             _animationController.ForceAnimation(CookieAnimationId.Idle);
@@ -213,9 +219,9 @@ public partial class CookieBehaviorController
         TransitionToState(_careStep.State);
         _careStep.OnEnter?.Invoke();
 
-        if (_careStep.IsWalkToItem && CurrentWorldItem != null)
+        if (_careStep.IsWalkToItem && TryGetWalkTarget(out double targetX, out _))
         {
-            FaceItemAndWalk(CurrentWorldItem);
+            FaceTargetAndWalk(targetX);
         }
         else
         {
@@ -223,9 +229,28 @@ public partial class CookieBehaviorController
         }
     }
 
-    private void FaceItemAndWalk(WorldItem item)
+    /// <summary>Where a walk step is headed: a cozy item, or the toy or treat on the desktop.</summary>
+    private bool TryGetWalkTarget(out double targetX, out double standOff)
     {
-        var direction = item.X >= CompanionCenterX ? CookieDirection.Right : CookieDirection.Left;
+        if (CurrentCozyVisit != null)
+        {
+            targetX = _cozyTargetX;
+            standOff = 0;
+            return true;
+        }
+        if (CurrentWorldItem is { } item)
+        {
+            targetX = item.X;
+            standOff = item.IsBox ? 0 : ItemStandOffDistance;
+            return true;
+        }
+        targetX = standOff = 0;
+        return false;
+    }
+
+    private void FaceTargetAndWalk(double targetX)
+    {
+        var direction = targetX >= CompanionCenterX ? CookieDirection.Right : CookieDirection.Left;
         SetFacing(direction);
         _animationController.ForceAnimation(direction == CookieDirection.Right ? CookieAnimationId.WalkRight : CookieAnimationId.WalkLeft);
     }
@@ -255,15 +280,14 @@ public partial class CookieBehaviorController
 
     private void UpdateWalkToItem(double deltaTimeSeconds)
     {
-        if (CurrentWorldItem is not { } item)
+        if (!TryGetWalkTarget(out double targetX, out double standOff))
         {
             AdvanceCareStep();
             return;
         }
 
-        // She stands beside food and toys, and walks right into a box.
-        double standOff = item.IsBox ? 0 : ItemStandOffDistance;
-        double toItem = item.X - CompanionCenterX;
+        // She stands beside food and toys, walks right into a box, and goes all the way to a cozy spot.
+        double toItem = targetX - CompanionCenterX;
         double remaining = Math.Abs(toItem) - standOff;
 
         if (remaining <= 0)
@@ -273,7 +297,7 @@ public partial class CookieBehaviorController
         }
 
         var direction = toItem >= 0 ? CookieDirection.Right : CookieDirection.Left;
-        if (direction != _facing) FaceItemAndWalk(item);
+        if (direction != _facing) FaceTargetAndWalk(targetX);
 
         double speed = Settings.ReducedMotion == ReducedMotionMode.Always ? BaseWalkSpeed * 0.65 : BaseWalkSpeed;
         double step = Math.Min(speed * deltaTimeSeconds, remaining);

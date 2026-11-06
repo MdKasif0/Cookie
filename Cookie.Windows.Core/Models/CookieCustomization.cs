@@ -287,6 +287,22 @@ public class CookieAppearanceConfig
         || EarVariation != EarVariation.Normal
         || TailVariation != TailVariation.Normal;
 
+    /// <summary>A deep copy, so a seasonal outfit can be layered on without touching the saved choices.</summary>
+    public CookieAppearanceConfig Clone() => new()
+    {
+        FurColor = FurColor,
+        Pattern = Pattern,
+        EyeColor = EyeColor,
+        EyeStyle = EyeStyle,
+        BodyVariation = BodyVariation,
+        EarVariation = EarVariation,
+        TailVariation = TailVariation,
+        SelectedAccessoryId = SelectedAccessoryId,
+        Accessories = Accessories
+            .Select(a => new AccessoryConfig(a.Kind, a.IsEnabled) { Scale = a.Scale, OffsetY = a.OffsetY })
+            .ToList()
+    };
+
     public AccessoryConfig Accessory(AccessoryKind kind)
     {
         var existing = Accessories.FirstOrDefault(a => a.Kind == kind);

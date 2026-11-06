@@ -11,6 +11,13 @@ struct CookieStatistics: Codable, Equatable {
     var toysPlayedWith: Int = 0
     var boxVisits: Int = 0
     var toyPlayCounts: [String: Int] = [:]
+    /// Distinct calendar days Cookie has been around. Each one adds to the bond.
+    var visitDays: Int = 0
+    var lastVisitedAt: Date?
+    var focusSessions: Int = 0
+    var focusMinutes: Int = 0
+    /// The highest friendship level already celebrated, so each is announced once.
+    var celebratedBondLevel: Int = 0
 
     init() {}
 
@@ -18,6 +25,22 @@ struct CookieStatistics: Codable, Equatable {
         if firstLaunchedAt == nil { firstLaunchedAt = now }
         lastLaunchedAt = now
         launchCount += 1
+        recordVisit(now: now)
+    }
+
+    /// Counts today as a visit, once. Returns whether it was new.
+    @discardableResult
+    mutating func recordVisit(now: Date = Date(), calendar: Calendar = .current) -> Bool {
+        if let last = lastVisitedAt, calendar.isDate(last, inSameDayAs: now) { return false }
+        lastVisitedAt = now
+        visitDays += 1
+        return true
+    }
+
+    mutating func recordFocusSession(minutes: Int) {
+        focusSessions += 1
+        focusMinutes += minutes
+        affection += 5
     }
 
     mutating func recordToyPlayed(_ toy: ToyKind) {
@@ -41,6 +64,7 @@ struct CookieStatistics: Codable, Equatable {
     private enum CodingKeys: String, CodingKey {
         case firstLaunchedAt, lastLaunchedAt, launchCount, petsReceived, affection
         case treatsGiven, toysPlayedWith, boxVisits, toyPlayCounts
+        case visitDays, lastVisitedAt, focusSessions, focusMinutes, celebratedBondLevel
     }
 
     init(from decoder: Decoder) throws {
@@ -54,5 +78,10 @@ struct CookieStatistics: Codable, Equatable {
         toysPlayedWith = try container.decodeIfPresent(Int.self, forKey: .toysPlayedWith) ?? 0
         boxVisits = try container.decodeIfPresent(Int.self, forKey: .boxVisits) ?? 0
         toyPlayCounts = try container.decodeIfPresent([String: Int].self, forKey: .toyPlayCounts) ?? [:]
+        visitDays = try container.decodeIfPresent(Int.self, forKey: .visitDays) ?? 0
+        lastVisitedAt = try container.decodeIfPresent(Date.self, forKey: .lastVisitedAt)
+        focusSessions = try container.decodeIfPresent(Int.self, forKey: .focusSessions) ?? 0
+        focusMinutes = try container.decodeIfPresent(Int.self, forKey: .focusMinutes) ?? 0
+        celebratedBondLevel = try container.decodeIfPresent(Int.self, forKey: .celebratedBondLevel) ?? 0
     }
 }

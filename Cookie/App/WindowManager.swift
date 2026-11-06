@@ -21,6 +21,12 @@ final class WindowManager: NSObject, NSWindowDelegate {
     private(set) var emotePickerWindow: NSWindow?
     private(set) var updatePromptWindow: NSWindow?
     weak var environment: AppEnvironment?
+    let bubbleController = BubblePanelController()
+    let cozyController = CozyPanelController()
+    /// True while a full-screen app has her stepping aside.
+    private(set) var isQuiet = false
+    private var sharingHidden = false
+    private var companionMoveObserver: NSObjectProtocol?
     private var onWelcomeDismissed: (() -> Void)?
     private var cancellables: Set<AnyCancellable> = []
 
@@ -38,7 +44,7 @@ final class WindowManager: NSObject, NSWindowDelegate {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] item, state in
                 guard let self else { return }
-                guard self.store.profile.isCompanionVisible else {
+                guard self.store.profile.isCompanionVisible, !self.isQuiet else {
                     itemController.hide()
                     return
                 }
@@ -49,6 +55,20 @@ final class WindowManager: NSObject, NSWindowDelegate {
                     isCookieInBox: state == .inBox
                 )
             }
+            .store(in: &cancellables)
+
+        cozyController.onMove = { [weak self] kind, position in self?.moveCozy(kind, to: position) }
+        cozyController.onRemove = { [weak self] kind in self?.removeCozy(kind) }
+
+        struct CozyKey: Equatable {
+            var items: [CozyPlacement]
+            var size: Double
+        }
+        store.$profile
+            .map { CozyKey(items: $0.cozyItems, size: $0.settings.cookieSize) }
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in self?.refreshCozy() }
             .store(in: &cancellables)
     }
 
@@ -67,8 +87,17 @@ final class WindowManager: NSObject, NSWindowDelegate {
                 }
             )
         }
-        if store.profile.isCompanionVisible {
+        companionController?.window?.sharingType = sharingHidden ? .none : .readOnly
+        if companionMoveObserver == nil, let window = companionController?.window {
+            companionMoveObserver = NotificationCenter.default.addObserver(
+                forName: NSWindow.didMoveNotification, object: window, queue: .main
+            ) { [weak self] _ in
+                MainActor.assumeIsolated { self?.updateCozyTargets() }
+            }
+        }
+        if store.profile.isCompanionVisible, !isQuiet {
             companionController?.show()
+            refreshCozy()
             if let item = behaviorEngine.worldItem,
                let frame = companionController?.window?.frame {
                 worldItemController?.update(
@@ -88,6 +117,132 @@ final class WindowManager: NSObject, NSWindowDelegate {
         } else {
             companionController?.hide()
             worldItemController?.hide()
+            bubbleController.hide()
+            refreshCozy()
+        }
+    }
+
+    // MARK: - Speech bubbles
+
+    /// Cookie says something, if she is on screen.
+    func say(_ text: String, seconds: TimeInterval = 4.5) {
+        guard store.profile.isCompanionVisible, !isQuiet else { return }
+        bubbleController.say(text, above: companionController?.window, seconds: seconds)
+    }
+
+    // MARK: - Quiet mode and screen sharing
+
+    /// Hides everything of hers while a full-screen app is up, and brings her back after.
+    func setQuiet(_ quiet: Bool) {
+        guard quiet != isQuiet else { return }
+        isQuiet = quiet
+        bubbleController.isSuppressed = quiet
+        if quiet {
+            companionController?.hide()
+            worldItemController?.hide()
+            cozyController.hideAll()
+        } else if store.profile.isCompanionVisible {
+            showCompanion()
+        }
+        updateCozyTargets()
+    }
+
+    /// Asks the system to leave her out of screen sharing and recordings. How far that holds depends
+    /// on the capture method: it is honored by most, but newer macOS capture APIs may ignore it.
+    func setSharingHidden(_ hidden: Bool) {
+        sharingHidden = hidden
+        let type: NSWindow.SharingType = hidden ? .none : .readOnly
+        companionController?.window?.sharingType = type
+        worldItemController?.window?.sharingType = type
+        bubbleController.window.sharingType = type
+        cozyController.setSharing(hidden: hidden)
+    }
+
+    // MARK: - Summoning
+
+    /// Where she appears when called: beside the cursor, kept on that screen.
+    static func summonOrigin(mouse: CGPoint, size: CGSize, visible: CGRect) -> CGPoint {
+        var x = mouse.x + 40
+        if x + size.width > visible.maxX - 8 { x = mouse.x - 40 - size.width }
+        x = min(max(x, visible.minX + 8), visible.maxX - size.width - 8)
+        let y = min(max(mouse.y - size.height / 2, visible.minY + 8), visible.maxY - size.height - 8)
+        return CGPoint(x: x, y: y)
+    }
+
+    func moveCompanionNearCursor() {
+        guard let window = companionController?.window else { return }
+        let mouse = NSEvent.mouseLocation
+        let screen = NSScreen.screens.first { $0.frame.contains(mouse) } ?? NSScreen.main
+        guard let visible = screen?.visibleFrame else { return }
+        window.setFrameOrigin(Self.summonOrigin(mouse: mouse, size: window.frame.size, visible: visible))
+        companionController?.savePosition()
+    }
+
+    // MARK: - Cozy items
+
+    /// Where a new cozy item goes: near `preferredX`, clear of the ones already there.
+    static func newCozyPosition(preferredX: CGFloat, primaryFrame: CGRect, existing: [CozyPlacement]) -> Double {
+        let preferred = CozyPanelController.position(forCenterX: preferredX, primaryFrame: primaryFrame)
+        let minimumGap = 0.11
+        for step in 0...12 {
+            let offsets = step == 0 ? [0.0] : [Double(step) * 0.06, -Double(step) * 0.06]
+            for offset in offsets {
+                let candidate = preferred + offset
+                guard (0.05...0.95).contains(candidate) else { continue }
+                if existing.allSatisfy({ abs($0.position - candidate) >= minimumGap }) { return candidate }
+            }
+        }
+        return min(max(preferred, 0.05), 0.95)
+    }
+
+    @discardableResult
+    func placeCozy(_ kind: CozyKind) -> Bool {
+        guard store.isUnlocked(.cozy(kind)), !store.profile.cozyItems.contains(where: { $0.kind == kind }),
+              let primary = NSScreen.screens.first else { return false }
+        let cookieX = companionController?.window?.frame.midX ?? primary.frame.midX
+        let direction: CGFloat = behaviorEngine.facing == .right ? 1 : -1
+        let position = Self.newCozyPosition(
+            preferredX: cookieX + direction * 190,
+            primaryFrame: primary.frame,
+            existing: store.profile.cozyItems
+        )
+        store.profile.cozyItems.append(CozyPlacement(kind: kind, position: position))
+        return true
+    }
+
+    func removeCozy(_ kind: CozyKind) {
+        store.profile.cozyItems.removeAll { $0.kind == kind }
+    }
+
+    func moveCozy(_ kind: CozyKind, to position: Double) {
+        guard let index = store.profile.cozyItems.firstIndex(where: { $0.kind == kind }) else { return }
+        store.profile.cozyItems[index] = CozyPlacement(kind: kind, position: position)
+    }
+
+    func refreshCozy() {
+        guard store.profile.isCompanionVisible, !isQuiet else {
+            cozyController.hideAll()
+            updateCozyTargets()
+            return
+        }
+        cozyController.update(
+            placements: store.profile.cozyItems,
+            companion: companionController?.window,
+            scale: CGFloat(store.profile.settings.cookieSize)
+        )
+        updateCozyTargets()
+    }
+
+    /// She can only visit when she is on the floor of the main screen, where the items are.
+    private func updateCozyTargets() {
+        guard !isQuiet, let primary = NSScreen.screens.first, let frame = companionController?.window?.frame,
+              primary.frame.contains(CGPoint(x: frame.midX, y: frame.midY)),
+              frame.minY <= CozyPanelController.floorY(primaryVisible: primary.visibleFrame) + 40 else {
+            if !behaviorEngine.cozyTargets.isEmpty { behaviorEngine.cozyTargets = [] }
+            return
+        }
+        behaviorEngine.cozyTargets = store.profile.cozyItems.map {
+            (kind: $0.kind, x: CozyPanelController.centerX(for: $0, primaryFrame: primary.frame))
         }
     }
 
@@ -156,6 +311,38 @@ final class WindowManager: NSObject, NSWindowDelegate {
         window.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
     }
+
+    // MARK: - Photo mode
+
+    private(set) var photoModeWindow: NSWindow?
+
+    func showPhotoMode() {
+        if let photoModeWindow {
+            if let model = photoModeModel { model.reload() }
+            photoModeWindow.makeKeyAndOrderFront(nil)
+            NSApp.activate(ignoringOtherApps: true)
+            return
+        }
+        let model = PhotoModeModel(store: store)
+        photoModeModel = model
+        let window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 520, height: 600),
+            styleMask: [.titled, .closable, .miniaturizable, .fullSizeContentView],
+            backing: .buffered,
+            defer: false
+        )
+        window.title = "Photo Mode"
+        window.titlebarAppearsTransparent = true
+        window.isReleasedWhenClosed = false
+        window.delegate = self
+        window.contentViewController = NSHostingController(rootView: PhotoModeView(model: model))
+        window.center()
+        photoModeWindow = window
+        window.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
+    private var photoModeModel: PhotoModeModel?
 
     // MARK: - Settings
 
@@ -321,6 +508,9 @@ final class WindowManager: NSObject, NSWindowDelegate {
             emotePickerWindow = nil
         } else if window === updatePromptWindow {
             updatePromptWindow = nil
+        } else if window === photoModeWindow {
+            photoModeWindow = nil
+            photoModeModel = nil
         }
     }
 }

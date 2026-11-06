@@ -15,6 +15,8 @@ public class SettingsViewModel : INotifyPropertyChanged
 {
     public CookieStatistics Statistics => _profile.Statistics;
 
+    private readonly BondTracker _bond;
+
     private readonly CookieProfile _profile;
     private readonly SettingsManager _settingsManager;
     private readonly AudioManagerBase _audioManager;
@@ -33,6 +35,7 @@ public class SettingsViewModel : INotifyPropertyChanged
         Action? onCheckForUpdates = null)
     {
         _profile = profile;
+        _bond = new BondTracker(profile);
         _settingsManager = settingsManager;
         _audioManager = audioManager;
         _onSettingsChanged = onSettingsChanged;
@@ -219,7 +222,52 @@ public class SettingsViewModel : INotifyPropertyChanged
             }
         }
     }
-    public IReadOnlyList<FurPattern> AvailableFurPatterns => Enum.GetValues<FurPattern>();
+    /// <summary>Coats unlock as the friendship grows; the one in use always stays listed.</summary>
+    public IReadOnlyList<FurPattern> AvailableFurPatterns => Enum.GetValues<FurPattern>()
+        .Where(pattern => pattern == _profile.Appearance.Pattern || _bond.IsUnlocked(BondItem.Coat(pattern)))
+        .ToList();
+
+    public bool HasLockedCoats => AvailableFurPatterns.Count < Enum.GetValues<FurPattern>().Length;
+
+    /// <summary>Every accessory with its lock state, for the accessories list.</summary>
+    public IReadOnlyList<AccessoryChoice> AccessoryChoices => Enum.GetValues<AccessoryKind>()
+        .Select(kind => new AccessoryChoice(this, kind))
+        .ToList();
+
+    public sealed class AccessoryChoice : INotifyPropertyChanged
+    {
+        private readonly SettingsViewModel _owner;
+        private readonly AccessoryKind _kind;
+
+        public AccessoryChoice(SettingsViewModel owner, AccessoryKind kind)
+        {
+            _owner = owner;
+            _kind = kind;
+        }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        public string Name => _kind.GetDisplayName();
+
+        public bool IsOn
+        {
+            get => _owner._profile.Appearance.Accessory(_kind).IsEnabled;
+            set
+            {
+                _owner.SetAccessory(_kind, value);
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsOn)));
+            }
+        }
+
+        public bool IsLocked => !_owner._bond.IsUnlocked(BondItem.Accessory(_kind));
+
+        /// <summary>A locked accessory can't be turned on, but one already on can always be turned off.</summary>
+        public bool CanToggle => !IsLocked || IsOn;
+
+        public string LockText => IsLocked && Bond.RequiredLevel(BondItem.Accessory(_kind)) is { } level
+            ? $"Unlocks at {level.Name}"
+            : string.Empty;
+    }
 
     public EyeColor SelectedEyeColor
     {
@@ -446,6 +494,102 @@ public class SettingsViewModel : INotifyPropertyChanged
         }
     }
     public IReadOnlyList<SleepBehavior> AvailableSleepBehaviors => Enum.GetValues<SleepBehavior>();
+
+    // Presence
+    public bool HideInFullscreen
+    {
+        get => _profile.Settings.HideInFullscreen;
+        set { if (_profile.Settings.HideInFullscreen != value) { _profile.Settings.HideInFullscreen = value; SaveAndNotify(); OnPropertyChanged(); } }
+    }
+
+    public bool HideFromScreenSharing
+    {
+        get => _profile.Settings.HideFromScreenSharing;
+        set { if (_profile.Settings.HideFromScreenSharing != value) { _profile.Settings.HideFromScreenSharing = value; SaveAndNotify(); OnPropertyChanged(); } }
+    }
+
+    public SummonShortcut SelectedSummonShortcut
+    {
+        get => _profile.Settings.SummonShortcut;
+        set
+        {
+            if (_profile.Settings.SummonShortcut == value) return;
+            _profile.Settings.SummonShortcut = value;
+            SaveAndNotify();
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(SummonShortcutMessage));
+        }
+    }
+    public IReadOnlyList<SummonShortcut> AvailableSummonShortcuts => Enum.GetValues<SummonShortcut>();
+
+    /// <summary>Shown when another app already owns the chosen shortcut.</summary>
+    public string SummonShortcutMessage =>
+        Cookie.Windows.Desktop.SummonHotKeyService.IsUnavailable ? "Another app is using this shortcut. Choose a different one." : string.Empty;
+
+    public bool SeasonalOutfits
+    {
+        get => _profile.Settings.SeasonalOutfits;
+        set { if (_profile.Settings.SeasonalOutfits != value) { _profile.Settings.SeasonalOutfits = value; SaveAndNotify(); OnPropertyChanged(); } }
+    }
+
+    public bool TimeGreetings
+    {
+        get => _profile.Settings.TimeGreetings;
+        set { if (_profile.Settings.TimeGreetings != value) { _profile.Settings.TimeGreetings = value; SaveAndNotify(); OnPropertyChanged(); } }
+    }
+
+    public int FocusMinutes
+    {
+        get => _profile.Settings.FocusMinutes;
+        set
+        {
+            int clamped = Math.Clamp(value, 5, 120);
+            if (_profile.Settings.FocusMinutes == clamped) return;
+            _profile.Settings.FocusMinutes = clamped;
+            SaveAndNotify();
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(FocusMinutesText));
+        }
+    }
+    public string FocusMinutesText => $"Focus length: {FocusMinutes} minutes";
+
+    public int BreakMinutes
+    {
+        get => _profile.Settings.BreakMinutes;
+        set
+        {
+            int clamped = Math.Clamp(value, 1, 30);
+            if (_profile.Settings.BreakMinutes == clamped) return;
+            _profile.Settings.BreakMinutes = clamped;
+            SaveAndNotify();
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(BreakMinutesText));
+        }
+    }
+    public string BreakMinutesText => $"Break length: {BreakMinutes} minutes";
+
+    // Friendship
+    public string BondLevelName => _bond.Progress.Level.Name;
+    public double BondFraction => _bond.Progress.Fraction;
+
+    public string BondSummary => _bond.Progress.Next is { } next
+        ? $"{_bond.Progress.PointsToNext} more points to reach {next.Name}. Pets, treats, play and focus sessions all count, and so does each new day together."
+        : "You and Cookie are as close as can be.";
+
+    public IReadOnlyList<BondLevelRow> BondUnlocks => Bond.Levels.Skip(1)
+        .Select(level => new BondLevelRow(
+            $"{level.Name} · {level.Points} points",
+            string.Join(", ", level.Unlocks.Select(item => item.DisplayName)),
+            _bond.Points >= level.Points))
+        .ToList();
+
+    public sealed record BondLevelRow(string Title, string Items, bool Reached)
+    {
+        public string Marker => Reached ? "Unlocked" : "Locked";
+    }
+
+    public string FocusSessionsText => Statistics.FocusSessions.ToString();
+    public string FocusMinutesTotalText => Statistics.FocusMinutes.ToString();
 
     // Cursor
     public bool CursorInteraction

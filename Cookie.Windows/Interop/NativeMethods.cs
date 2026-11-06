@@ -23,6 +23,13 @@ public static class NativeMethods
     public const uint SWP_FRAMECHANGED = 0x0020;
     public const uint SWP_SHOWWINDOW = 0x0040;
 
+    public const int WM_HOTKEY = 0x0312;
+    public const uint MOD_NOREPEAT = 0x4000;
+
+    /// <summary>Keeps a window out of screen sharing and recordings (Windows 10 version 2004 and later).</summary>
+    public const uint WDA_NONE = 0x0;
+    public const uint WDA_EXCLUDEFROMCAPTURE = 0x11;
+
     public const int WM_DISPLAYCHANGE = 0x007E;
     public const int WM_DPICHANGED = 0x02E0;
     public const int WM_SETTINGCHANGE = 0x001A;
@@ -142,6 +149,18 @@ public static class NativeMethods
 
     [DllImport("user32.dll")]
     public static extern IntPtr GetForegroundWindow();
+
+    [DllImport("shell32.dll")]
+    public static extern int SHQueryUserNotificationState(out int state);
+
+    [DllImport("user32.dll")]
+    public static extern bool SetWindowDisplayAffinity(IntPtr hWnd, uint affinity);
+
+    [DllImport("user32.dll")]
+    public static extern bool RegisterHotKey(IntPtr hWnd, int id, uint modifiers, uint virtualKey);
+
+    [DllImport("user32.dll")]
+    public static extern bool UnregisterHotKey(IntPtr hWnd, int id);
 
     [DllImport("dwmapi.dll")]
     public static extern int DwmSetWindowAttribute(IntPtr hwnd, int dwAttribute, ref int pvAttribute, int cbAttribute);

@@ -165,18 +165,22 @@
 
                         <GroupBox Header="Accessories">
                             <StackPanel>
-                                <TextBlock Text="Toggle cute accessories that layer over Cookie:" Foreground="{DynamicResource TextMuted}" FontSize="11" Margin="0,0,0,6"/>
-                                <UniformGrid Columns="3">
-                                    <CheckBox Content="Collar" IsChecked="{Binding AccessoryCollar}"/>
-                                    <CheckBox Content="Bow" IsChecked="{Binding AccessoryBow}"/>
-                                    <CheckBox Content="Party Hat" IsChecked="{Binding AccessoryHat}"/>
-                                    <CheckBox Content="Glasses" IsChecked="{Binding AccessoryGlasses}"/>
-                                    <CheckBox Content="Winter Scarf" IsChecked="{Binding AccessoryScarf}"/>
-                                    <CheckBox Content="Royal Crown" IsChecked="{Binding AccessoryCrown}"/>
-                                    <CheckBox Content="Bandana" IsChecked="{Binding AccessoryBandana}"/>
-                                    <CheckBox Content="Pumpkin" IsChecked="{Binding AccessoryPumpkin}"/>
-                                    <CheckBox Content="Santa Hat" IsChecked="{Binding AccessorySantaHat}"/>
-                                </UniformGrid>
+                                <TextBlock Text="Toggle cute accessories that layer over Cookie. More unlock as your friendship grows:" Foreground="{DynamicResource TextMuted}" FontSize="11" Margin="0,0,0,6" TextWrapping="Wrap"/>
+                                <ItemsControl ItemsSource="{Binding AccessoryChoices}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <UniformGrid Columns="2"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Margin="0,2,8,2">
+                                                <CheckBox Content="{Binding Name}" IsChecked="{Binding IsOn}" IsEnabled="{Binding CanToggle}"/>
+                                                <TextBlock Text="{Binding LockText}" Foreground="{DynamicResource TextMuted}" FontSize="10" Margin="24,-2,0,0"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
                             </StackPanel>
                         </GroupBox>
 
@@ -363,10 +367,102 @@
                 </ScrollViewer>
             </TabItem>
 
-            <!-- 7. STATS -->
+            <!-- 7. PRESENCE -->
+            <TabItem Header="Presence">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,12,0,0">
+                    <StackPanel>
+                        <GroupBox Header="Quiet Mode">
+                            <StackPanel>
+                                <CheckBox Content="Hide Cookie during full-screen apps and games" IsChecked="{Binding HideInFullscreen}"/>
+                                <CheckBox Content="Keep Cookie out of screen sharing and recordings" IsChecked="{Binding HideFromScreenSharing}"/>
+                                <TextBlock Text="Needs Windows 10 version 2004 or later. Cookie stays visible to you while others can't see her."
+                                           Foreground="{DynamicResource TextMuted}" FontSize="11" Margin="0,4,0,0" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </GroupBox>
+
+                        <GroupBox Header="Summon Shortcut">
+                            <StackPanel>
+                                <ComboBox ItemsSource="{Binding AvailableSummonShortcuts}" SelectedItem="{Binding SelectedSummonShortcut}" Margin="0,4" AutomationProperties.Name="Summon shortcut"/>
+                                <TextBlock Text="{Binding SummonShortcutMessage}" Foreground="{DynamicResource AccentCaramel}" FontSize="11" TextWrapping="Wrap"/>
+                                <TextBlock Text="Brings Cookie to your cursor, wherever you are, and she waves hello."
+                                           Foreground="{DynamicResource TextMuted}" FontSize="11" Margin="0,4,0,0" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </GroupBox>
+
+                        <GroupBox Header="Daily Rhythm">
+                            <StackPanel>
+                                <CheckBox Content="Seasonal outfits (Halloween, the holidays, winter and her birthday)" IsChecked="{Binding SeasonalOutfits}"/>
+                                <CheckBox Content="Greet me by time of day" IsChecked="{Binding TimeGreetings}"/>
+                            </StackPanel>
+                        </GroupBox>
+
+                        <GroupBox Header="Focus Sessions">
+                            <StackPanel>
+                                <TextBlock Text="{Binding FocusMinutesText}" Margin="0,2,0,0"/>
+                                <Slider Minimum="5" Maximum="120" TickFrequency="5" IsSnapToTickEnabled="True" Value="{Binding FocusMinutes}" AutomationProperties.Name="Focus length in minutes"/>
+                                <TextBlock Text="{Binding BreakMinutesText}" Margin="0,8,0,0"/>
+                                <Slider Minimum="1" Maximum="30" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding BreakMinutes}" AutomationProperties.Name="Break length in minutes"/>
+                                <TextBlock Text="Start a session from Cookie's menu. She naps beside you, then stretches when it is time for a break."
+                                           Foreground="{DynamicResource TextMuted}" FontSize="11" Margin="0,6,0,0" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </GroupBox>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- 8. STATS -->
             <TabItem Header="Stats">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,12,0,0">
                     <StackPanel>
+                        <GroupBox Header="Friendship">
+                            <StackPanel>
+                                <Grid Margin="0,4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Bond" Foreground="{DynamicResource TextMuted}"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding BondLevelName}" FontWeight="SemiBold"/>
+                                </Grid>
+                                <ProgressBar Minimum="0" Maximum="1" Value="{Binding BondFraction, Mode=OneWay}" Height="8" Margin="0,4,0,0" AutomationProperties.Name="Progress to the next friendship level"/>
+                                <TextBlock Text="{Binding BondSummary}" Foreground="{DynamicResource TextMuted}" FontSize="11" Margin="0,6,0,0" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox Header="Unlocks">
+                            <ItemsControl ItemsSource="{Binding BondUnlocks}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Margin="0,3">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding Title}" FontWeight="SemiBold"/>
+                                                <TextBlock Text="{Binding Marker}" Foreground="{DynamicResource AccentWarmOrange}" FontSize="11" Margin="8,2,0,0"/>
+                                            </StackPanel>
+                                            <TextBlock Text="{Binding Items}" Foreground="{DynamicResource TextMuted}" FontSize="11" TextWrapping="Wrap"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </GroupBox>
+                        <GroupBox Header="Focus">
+                            <StackPanel>
+                                <Grid Margin="0,4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Sessions completed" Foreground="{DynamicResource TextMuted}"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding FocusSessionsText}" FontWeight="SemiBold"/>
+                                </Grid>
+                                <Grid Margin="0,4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Minutes focused" Foreground="{DynamicResource TextMuted}"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding FocusMinutesTotalText}" FontWeight="SemiBold"/>
+                                </Grid>
+                            </StackPanel>
+                        </GroupBox>
                         <GroupBox Header="Time Together">
                             <StackPanel>
                                 <Grid Margin="0,4">

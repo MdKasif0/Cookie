@@ -853,13 +853,13 @@ SHEETS = {
     "fall": Sheet("Special", 9, False, fall_frames),
     "pickedUp": Sheet("Special", 7, True, picked_up_frames),
     "dropped": Sheet("Special", 10, False, dropped_frames),
-    # Emotes on Mac play whole-pose stickers with SpriteKit actions, so these are
-    # Windows-only. The frame orders repeat to fill each emote's on-screen time.
-    "wave": Sheet("Emotes", 9, False, wave_emote_frames, repeat(3, 10), windows_only=True),
-    "emote-happy": Sheet("Emotes", 10, False, lambda: hop_frames("eyes-close"), repeat(3, 8), windows_only=True),
-    "love": Sheet("Emotes", 7, False, love_frames, repeat(2, 10), windows_only=True),
-    "sleepy": Sheet("Emotes", 5, False, lambda: sleep_cycle(10), repeat(2, 10), windows_only=True),
-    "emote-playful": Sheet("Emotes", 9, False, lambda: rock_frames("mischievous", 8, 2.5, 20), repeat(3, 8), windows_only=True),
+    # Live emotes on Mac play whole-pose stickers with SpriteKit actions, so these sheets are used by
+    # Windows and by Photo Mode on both platforms. The frame orders repeat to fill each emote's time.
+    "wave": Sheet("Emotes", 9, False, wave_emote_frames, repeat(3, 10)),
+    "emote-happy": Sheet("Emotes", 10, False, lambda: hop_frames("eyes-close"), repeat(3, 8)),
+    "love": Sheet("Emotes", 7, False, love_frames, repeat(2, 10)),
+    "sleepy": Sheet("Emotes", 5, False, lambda: sleep_cycle(10), repeat(2, 10)),
+    "emote-playful": Sheet("Emotes", 9, False, lambda: rock_frames("mischievous", 8, 2.5, 20), repeat(3, 8)),
     # The Mac draws its own box around the cat, and it has no climb animation.
     "inBox": Sheet("Special", 4, True, in_box_frames, windows_only=True),
     "boxPeek": Sheet("Special", 6, False, box_peek_frames, windows_only=True),

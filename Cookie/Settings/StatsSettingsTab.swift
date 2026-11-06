@@ -7,6 +7,7 @@ struct StatsSettingsTab: View {
 
     var body: some View {
         Form {
+            friendshipSection
             Section("Time Together") {
                 LabeledContent("Days together", value: daysTogether)
                 LabeledContent("First met", value: firstMetDate)
@@ -15,6 +16,10 @@ struct StatsSettingsTab: View {
             Section("Affection") {
                 LabeledContent("Times petted", value: "\(store.statistics.petsReceived)")
                 LabeledContent("Affection", value: "\(store.statistics.affection)")
+            }
+            Section("Focus") {
+                LabeledContent("Sessions completed", value: "\(store.statistics.focusSessions)")
+                LabeledContent("Minutes focused", value: "\(store.statistics.focusMinutes)")
             }
             Section("Care & Play") {
                 LabeledContent("Total interactions", value: "\(store.statistics.totalInteractions)")
@@ -41,6 +46,38 @@ struct StatsSettingsTab: View {
             Button("Cancel", role: .cancel) {}
         } message: {
             Text("Cookie forgets everything and the welcome plays again.")
+        }
+    }
+
+    @ViewBuilder
+    private var friendshipSection: some View {
+        let progress = store.bondProgress
+        Section("Friendship") {
+            LabeledContent("Bond", value: progress.level.name)
+            ProgressView(value: progress.fraction)
+                .accessibilityLabel("Progress to the next friendship level")
+            if let next = progress.next {
+                Text("\(progress.pointsToNext) more points to reach \(next.name). Pets, treats, play and focus sessions all count, and so does each new day together.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            } else {
+                Text("You and Cookie are as close as can be.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        Section("Unlocks") {
+            ForEach(Bond.levels.dropFirst()) { level in
+                let reached = store.bondPoints >= level.points
+                VStack(alignment: .leading, spacing: 2) {
+                    Label("\(level.name) · \(level.points) points", systemImage: reached ? "checkmark.circle.fill" : "lock.fill")
+                        .foregroundStyle(reached ? Color.primary : Color.secondary)
+                    Text(level.unlocks.map(\.displayName).joined(separator: ", "))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .accessibilityElement(children: .combine)
+            }
         }
     }
 

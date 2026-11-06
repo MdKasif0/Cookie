@@ -307,6 +307,13 @@ public partial class CookieBehaviorController
             return;
         }
 
+        // A focus session keeps her napping: once whatever interrupted her is over, she settles again.
+        if (IsFocusing && _state == CookieState.Idle)
+        {
+            StartFocusNap();
+            return;
+        }
+
         var env = EnvironmentProvider.GetDesktopEnvironment(_currentPosition);
 
         switch (_state)
@@ -603,6 +610,8 @@ public partial class CookieBehaviorController
         };
         _nextBehaviorTime = baseInterval + _random.NextDouble() * 3.0;
 
+        if (TryStartAutonomousCozyVisit() || TryStartAutonomousNap()) return;
+
         var selectedBehavior = Scheduler.SelectNextAmbientBehavior(
             _state,
             _currentPosition,
@@ -700,6 +709,12 @@ public partial class CookieBehaviorController
     private void PlayQuietIdleAnimation()
     {
         int choice = _random.Next(0, 10);
+
+        // Late at night she yawns more; in the evening she grooms and sits.
+        var phase = TimeOfDayExtensions.At(LocalNow());
+        if (phase == TimeOfDay.LateNight && choice < 2) choice = 5;
+        else if (phase == TimeOfDay.Evening && choice < 2) choice = _random.Next(6, 8);
+
         if (choice < 4)
         {
             _animationController.PlayAnimation(CookieAnimationId.Idle);

@@ -21,6 +21,9 @@ public abstract class AudioManagerBase
     public bool InteractionSounds { get; set; } = true;
     public bool PurringSounds { get; set; } = true;
 
+    /// <summary>Set while Cookie is hidden for a full-screen app: nothing plays.</summary>
+    public bool IsMuted { get; set; }
+
     protected virtual bool ValidateFileExists => true;
 
     protected AudioManagerBase(string? customSoundsDirectory = null)
@@ -30,7 +33,7 @@ public abstract class AudioManagerBase
 
     public virtual bool Play(SoundEffect sound)
     {
-        if (!SoundEnabled) return false;
+        if (!SoundEnabled || IsMuted) return false;
 
         if (sound.IsInteractionSound() && !InteractionSounds) return false;
         if (sound == SoundEffect.Purr && !PurringSounds) return false;

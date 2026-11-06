@@ -68,6 +68,7 @@ public partial class CompanionWindow : Window
         _startupService = startupService ?? new WindowsStartupService();
         _updateService = updateService ?? new UpdateService();
 
+        InitializePresence();
         ApplyProfileAppearance();
 
         _animationController.OnFrameChanged += (pose, direction) =>
@@ -154,9 +155,11 @@ public partial class CompanionWindow : Window
             openSettingsAction: () => Dispatcher.InvokeAsync(OpenSettingsWindow),
             openEmotePickerAction: () => Dispatcher.InvokeAsync(OpenEmotePickerWindow),
             openAboutAction: () => Dispatcher.InvokeAsync(OpenAboutWindow),
-            checkForUpdatesAction: () => Dispatcher.InvokeAsync(OpenUpdateWindow));
+            checkForUpdatesAction: () => Dispatcher.InvokeAsync(OpenUpdateWindow),
+            menuSource: this);
 
         _audioManager.Play(SoundEffect.Welcome);
+        StartPresence(hWnd);
 
         // Gentle background update check 15 seconds after companion spawns
         _ = System.Threading.Tasks.Task.Run(async () =>
@@ -176,6 +179,13 @@ public partial class CompanionWindow : Window
 
     private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
     {
+        if (SummonHotKeyService.IsHotKeyMessage(msg, wParam))
+        {
+            Dispatcher.InvokeAsync(SummonCookie);
+            handled = true;
+            return IntPtr.Zero;
+        }
+
         if (_wmShowSettings != 0 && (uint)msg == _wmShowSettings)
         {
             Dispatcher.InvokeAsync(OpenSettingsWindow);
@@ -261,7 +271,7 @@ public partial class CompanionWindow : Window
 
     public void ApplyProfileAppearance()
     {
-        CatCanvas.UpdateAppearance(_profile.Appearance);
+        CatCanvas.UpdateAppearance(EffectiveAppearance());
 
         double sizeScale = _profile.Settings.CookieSize;
         Width = 180 * sizeScale;
@@ -281,6 +291,8 @@ public partial class CompanionWindow : Window
         _audioManager.MeowVolume = _profile.Settings.MeowVolume;
         _audioManager.InteractionSounds = _profile.Settings.InteractionSounds;
         _audioManager.PurringSounds = _profile.Settings.PurringSounds;
+
+        ApplyPresenceSettings();
     }
 
     private void ShowWorldItem(WorldItem? item)
@@ -300,6 +312,7 @@ public partial class CompanionWindow : Window
                 item,
                 onMoved: centerX => _behaviorController.MoveWorldItem(centerX),
                 onDismiss: () => _behaviorController.ClearWorldItem());
+            ScreenSharingGuard.Apply(_worldItemWindow, _profile.Settings.HideFromScreenSharing);
             _worldItemWindow.Show();
 
             // Cookie stands in front of items until she climbs into a box.
@@ -328,6 +341,7 @@ public partial class CompanionWindow : Window
                 onMoved: centerX => _behaviorController.MoveWorldItem(centerX),
                 onDismiss: () => _behaviorController.ClearWorldItem());
             _boxBackWindow.SetArt("box-back");
+            ScreenSharingGuard.Apply(_boxBackWindow, _profile.Settings.HideFromScreenSharing);
             _boxBackWindow.Show();
 
             Topmost = false;
@@ -430,7 +444,8 @@ public partial class CompanionWindow : Window
 
         menu.Items.Add(new Separator());
 
-        CareMenuBuilder.AddItems(menu, _behaviorController);
+        CareMenuBuilder.AddItems(menu, _behaviorController, _bond.IsUnlocked);
+        CompanionMenu.AddItems(menu, this);
 
         menu.Items.Add(new Separator());
 
@@ -546,6 +561,7 @@ public partial class CompanionWindow : Window
     protected override void OnClosed(EventArgs e)
     {
         _gameLoopTimer.Stop();
+        StopPresence();
         try
         {
             var helper = new WindowInteropHelper(this);

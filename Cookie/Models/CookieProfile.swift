@@ -9,7 +9,9 @@ struct CookieProfile: Codable, Equatable {
     var customization: CookieAppearanceConfig = CookieAppearanceConfig()
     var settings = CookieSettings()
     var accessories: [String] = []
+    /// Ids of unlocked items (see `BondItem.id`) that must stay available regardless of level.
     var unlockedAccessories: [String] = []
+    var cozyItems: [CozyPlacement] = []
     var isCompanionVisible: Bool = true
     var hasCompletedWelcome: Bool = false
     var companionPosition: CGPoint?
@@ -25,7 +27,7 @@ struct CookieProfile: Codable, Equatable {
 
     private enum CodingKeys: String, CodingKey {
         case name, personality, customization, settings, legacyAppearance = "appearance"
-        case accessories, unlockedAccessories
+        case accessories, unlockedAccessories, cozyItems
         case legacySoundEnabled = "soundEnabled"
         case legacySoundVolume = "soundVolume"
         case isCompanionVisible, hasCompletedWelcome, companionPosition, lastRestingState
@@ -41,6 +43,7 @@ struct CookieProfile: Codable, Equatable {
         try container.encode(settings, forKey: .settings)
         try container.encode(accessories, forKey: .accessories)
         try container.encode(unlockedAccessories, forKey: .unlockedAccessories)
+        try container.encode(cozyItems, forKey: .cozyItems)
         try container.encode(isCompanionVisible, forKey: .isCompanionVisible)
         try container.encode(hasCompletedWelcome, forKey: .hasCompletedWelcome)
         try container.encode(companionPosition, forKey: .companionPosition)
@@ -66,6 +69,7 @@ struct CookieProfile: Codable, Equatable {
         }
         accessories = try container.decodeIfPresent([String].self, forKey: .accessories) ?? []
         unlockedAccessories = try container.decodeIfPresent([String].self, forKey: .unlockedAccessories) ?? []
+        cozyItems = (try? container.decodeIfPresent([CozyPlacement].self, forKey: .cozyItems)) ?? []
         // Settings decode resiliently, migrating the old top-level sound
         // fields into the settings struct.
         if let storedSettings = try container.decodeIfPresent(CookieSettings.self, forKey: .settings) {

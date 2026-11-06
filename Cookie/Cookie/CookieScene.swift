@@ -109,13 +109,21 @@ final class CookieScene: SKScene {
     private func bindObservers() {
         guard let store else { return }
 
-        store.$profile
-            .map(\.customization)
-            .removeDuplicates()
-            .sink { [weak self] config in
-                self?.character.apply(config: config)
-            }
-            .store(in: &cancellables)
+        // What she wears: the user's choices plus the day's seasonal outfit, which is only ever an
+        // overlay and never written back to the profile.
+        Publishers.CombineLatest3(
+            store.$profile.map(\.customization).removeDuplicates(),
+            store.$profile.map(\.settings.seasonalOutfits).removeDuplicates(),
+            DailyClock.shared.$day
+        )
+        .map { [weak store] config, seasonal, day in
+            seasonal ? config.withDailyOutfit(on: day.addingTimeInterval(12 * 3600), firstMet: store?.statistics.firstLaunchedAt) : config
+        }
+        .removeDuplicates()
+        .sink { [weak self] config in
+            self?.character.apply(config: config)
+        }
+        .store(in: &cancellables)
 
         store.$profile
             .map(\.settings)

@@ -48,7 +48,7 @@ final class SpriteSheetSource: AnimationFrameSource {
     private var tintedCache: [String: [SKTexture]] = [:]
 
     /// Animations painted from the base artwork, which can show patterns and eye styles.
-    private static let baseArtAnimations: Set<CookieAnimationId> = [
+    static let baseArtAnimations: Set<CookieAnimationId> = [
         .idle, .idleBlink, .sit, .stretch, .yawn, .tired, .meow, .curious, .investigate, .jump, .pickedUp
     ]
 

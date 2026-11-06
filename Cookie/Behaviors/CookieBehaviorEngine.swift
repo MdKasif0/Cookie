@@ -129,6 +129,16 @@ final class CookieBehaviorEngine: ObservableObject {
     /// with a tiny chirp.
     @Published private(set) var noticeCount = 0
 
+    // MARK: Focus sessions and cozy spots
+
+    /// True while a focus session runs: she naps beside you and doesn't wander.
+    private(set) var isFocusing = false
+    /// Where each placed cozy item is, kept current by the window manager.
+    var cozyTargets: [(kind: CozyKind, x: CGFloat)] = []
+    /// The cozy item she is heading for or settled at.
+    @Published private(set) var cozyVisit: CozyKind?
+    private var cozyCooldownUntil = Date.distantPast
+
     // MARK: World interactions (toys, food, the box)
 
     /// The item currently on Cookie's desktop, if any. The presenter
@@ -271,7 +281,7 @@ final class CookieBehaviorEngine: ObservableObject {
         )
 
         // 2. Update intelligent Window interaction controller (Phase 3)
-        if store.profile.settings.windowInteraction, !isInterrupted {
+        if store.profile.settings.windowInteraction, !isInterrupted, !isFocusing {
             let charSize = CookieScreenGeometry.basePanelSize(for: store.profile.settings.cookieSize)
             windowController.tick(
                 dt: dt,
@@ -284,12 +294,12 @@ final class CookieBehaviorEngine: ObservableObject {
                 jumpStyle: store.profile.settings.jumpStyleSetting
             )
             handleWindowExploration(dt: dt, currentPosition: currentPosition)
-        } else if isInterrupted || !store.profile.settings.windowInteraction {
+        } else if isInterrupted || isFocusing || !store.profile.settings.windowInteraction {
             windowController.cancelExploration()
         }
 
         // 3. Update intelligent macOS Dock interaction controller (Phase 2)
-        if store.profile.settings.dockInteraction, !isInterrupted, !windowController.isExploringWindow {
+        if store.profile.settings.dockInteraction, !isInterrupted, !isFocusing, !windowController.isExploringWindow {
             let charSize = CookieScreenGeometry.basePanelSize(for: store.profile.settings.cookieSize)
             dockController.tick(
                 dt: dt,
@@ -308,12 +318,12 @@ final class CookieBehaviorEngine: ObservableObject {
             }
 
             handleDockExploration(dt: dt, currentPosition: currentPosition)
-        } else if isInterrupted || !store.profile.settings.dockInteraction || windowController.isExploringWindow {
+        } else if isInterrupted || isFocusing || !store.profile.settings.dockInteraction || windowController.isExploringWindow {
             dockController.cancelExploration()
         }
 
         // 4. Process reactions and following triggers if not interrupted
-        if !isInterrupted {
+        if !isInterrupted, !isFocusing {
             handleCursorReactions(dt: dt)
         }
 
@@ -362,7 +372,7 @@ final class CookieBehaviorEngine: ObservableObject {
         if (state == .walking || state == .running),
            let target = sessionTargetX {
             let isBox = worldItem?.kind.isBox ?? false
-            let threshold: CGFloat = isBox ? 16 : 42
+            let threshold: CGFloat = cozyVisit?.arrivalDistance ?? (isBox ? 16 : 42)
             if abs(lastKnownX - target) <= threshold {
                 sessionTargetX = nil
                 stateElapsed = currentDuration
@@ -808,7 +818,7 @@ final class CookieBehaviorEngine: ObservableObject {
         cursorController.resetInteractionState()
         movementInterpolator.stop()
         sequenceQueue = []
-        if worldItem != nil { clearSession() }
+        if worldItem != nil || cozyVisit != nil { clearSession() }
         enter(.beingDragged, duration: .infinity)
     }
 
@@ -934,6 +944,141 @@ final class CookieBehaviorEngine: ObservableObject {
         handleOfferToy(.yarnBall)
     }
 
+    // MARK: - Focus sessions
+
+    /// Starts a focus session: she yawns, settles and naps beside you.
+    func beginFocus() {
+        guard state != .beingDragged else { return }
+        isFocusing = true
+        clearSession()
+        cancelActiveEmote()
+        plan = nil
+        dockController.cancelExploration()
+        windowController.cancelExploration()
+        enter(.yawning, sequence: [(.sitting, 1.8), (.sleeping, 60)])
+    }
+
+    /// Ends the session. When it ran its course she stretches, meows to say it is time
+    /// for a break, and sits up; when it was cancelled she just wakes quietly.
+    func endFocus(completed: Bool) {
+        guard isFocusing else { return }
+        isFocusing = false
+        sequenceQueue = []
+        if completed {
+            reaction = .meow
+            enter(.stretching, sequence: [(.reacting, 1.6), (.sitting, 6)])
+        } else {
+            enter(.stretching, sequence: [(.sitting, 4)])
+        }
+    }
+
+    // MARK: - Summoning and celebrating
+
+    /// Calls her over: she waves hello.
+    func summon() {
+        guard state != .beingDragged else { return }
+        if !triggerEmote(Emote.find(.wave)) {
+            reaction = .happy
+            enter(.reacting)
+        }
+    }
+
+    /// Marks a happy occasion such as a new friendship level.
+    func celebrate() {
+        guard state != .beingDragged else { return }
+        if !triggerEmote(Emote.find(.love)) {
+            reaction = .happy
+            enter(.reacting)
+        }
+    }
+
+    // MARK: - Cozy spots
+
+    /// Now and then she wanders to a cozy item she has been given. The bed is favored at night,
+    /// the sunbeam only while the sun is up, the scratching post a little at any time.
+    private func maybeVisitCozy(date: Date) -> Bool {
+        let settings = store.profile.settings
+        guard !cozyTargets.isEmpty,
+              settings.randomInteractions,
+              settings.autonomousBehaviorEnabled,
+              !settings.pauseAutonomousBehavior,
+              date >= cozyCooldownUntil,
+              date >= sulksUntil,
+              state != .beingDragged,
+              worldItem == nil,
+              !isPressed else { return false }
+
+        let hour = Calendar.current.component(.hour, from: date)
+        let phase = timeOfDay(date)
+        var options: [(target: (kind: CozyKind, x: CGFloat), weight: Double)] = []
+        for target in cozyTargets {
+            let weight: Double
+            switch target.kind {
+            case .bed: weight = phase == .lateNight ? 3.0 : (phase == .evening ? 1.5 : 1.0)
+            case .sunbeam: weight = (9..<17).contains(hour) ? 1.5 : 0
+            case .scratchingPost: weight = 0.8
+            }
+            if weight > 0 { options.append((target, weight)) }
+        }
+        let total = options.reduce(0) { $0 + $1.weight }
+        guard total > 0, Double.random(in: 0...1) < 0.12 else {
+            cozyCooldownUntil = date.addingTimeInterval(Double.random(in: 20...45))
+            return false
+        }
+
+        cozyCooldownUntil = date.addingTimeInterval(Double.random(in: 150...300))
+        var roll = Double.random(in: 0..<total)
+        for option in options {
+            roll -= option.weight
+            if roll <= 0 {
+                visitCozy(option.target.kind, atX: option.target.x)
+                return true
+            }
+        }
+        return false
+    }
+
+    /// Walks to a cozy item and enjoys it. Internal so a menu command and tests can trigger it.
+    func visitCozy(_ kind: CozyKind, atX x: CGFloat) {
+        guard state != .beingDragged else { return }
+        clearSession()
+        dockController.cancelExploration()
+        windowController.cancelExploration()
+        sequenceQueue = []
+        let targetX = clampX(x)
+        cozyVisit = kind
+        sessionTargetX = targetX
+        setFacing(targetX >= lastKnownX ? .right : .left)
+
+        switch kind {
+        case .bed:
+            let nap = min(60, max(30, sampledSleepDuration() / 1.5))
+            enter(.curious, sequence: [
+                (.walking, nil),
+                (.sitting, 1.5),
+                (.yawning, 2.0),
+                (.sleeping, nap),
+                (.stretching, 2.2),
+                (.sitting, 4.0)
+            ], duration: 0.8)
+        case .sunbeam:
+            enter(.curious, sequence: [
+                (.walking, nil),
+                (.sitting, Double.random(in: 10...16)),
+                (.grooming, 2.5),
+                (.sitting, 4.0)
+            ], duration: 0.8)
+        case .scratchingPost:
+            enter(.curious, sequence: [
+                (.walking, nil),
+                (.stretching, 2.2),
+                (.grooming, 2.5),
+                (.stretching, 2.2),
+                (.sitting, 4.0)
+            ], duration: 0.8)
+        }
+    }
+
     // MARK: - Emotes Engine
 
     /// Remaining cooldown in seconds for the given emote.
@@ -1033,7 +1178,7 @@ final class CookieBehaviorEngine: ObservableObject {
 
         case .toyChase:
             let targetX = clampX(lastKnownX + (facing == .right ? 220 : -220))
-            let toy = [ToyKind.yarnBall, .ball, .toyMouse].randomElement() ?? .yarnBall
+            let toy = [ToyKind.yarnBall, .ball, .toyMouse].filter { store.isUnlocked(.toy($0)) }.randomElement() ?? .yarnBall
             worldItem = WorldItem(kind: .toy(toy), x: targetX)
             sessionTargetX = targetX
             setFacing(targetX >= lastKnownX ? .right : .left)
@@ -1110,7 +1255,8 @@ final class CookieBehaviorEngine: ObservableObject {
             return false
         }
         autonomousToyCooldownUntil = date.addingTimeInterval(Double.random(in: 400...800))
-        let randomToy = ToyKind.allCases.randomElement() ?? .yarnBall
+        let available = ToyKind.allCases.filter { store.isUnlocked(.toy($0)) }
+        let randomToy = available.randomElement() ?? .yarnBall
         handleOfferToy(randomToy)
         return true
     }
@@ -1209,12 +1355,13 @@ final class CookieBehaviorEngine: ObservableObject {
             return
         }
         // A finished session takes its item with it.
-        if worldItem != nil { clearSession() }
+        if worldItem != nil || cozyVisit != nil { clearSession() }
         pickNextState()
     }
 
     func clearSession() {
         worldItem = nil
+        cozyVisit = nil
         sessionTargetX = nil
         isPeeking = false
     }
@@ -1263,8 +1410,14 @@ final class CookieBehaviorEngine: ObservableObject {
 
     private func pickNextState() {
         let date = now()
+        // A focus session keeps her napping beside you until it ends.
+        if isFocusing {
+            enter(.sleeping, duration: 60)
+            return
+        }
         if maybeTriggerSpecialEvent(date: date) { return }
         if maybeTriggerAutonomousToy(date: date) { return }
+        if maybeVisitCozy(date: date) { return }
         if maybeTriggerWindowExploration(date: date) { return }
         if maybeTriggerDockExploration(date: date) { return }
 

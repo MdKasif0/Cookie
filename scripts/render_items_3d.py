@@ -572,7 +572,57 @@ def food_empty():
     return plate, 1.0
 
 
+def cozy_bed():
+    y0 = GROUND
+
+    def bowl(p):
+        outer = cylinder_y(p, (0, y0 + 0.19, 0), 0.92, 0.19, 0.12)
+        hollow = cylinder_y(p, (0, y0 + 0.34, 0), 0.70, 0.2, 0.1)
+        return np.maximum(outer, -hollow)
+
+    def bowl_color(p):
+        # Soft vertical quilting on the outside.
+        angle = np.arctan2(p[2], p[0])
+        quilt = (np.sin(angle * 18) > 0.55).astype(float)
+        return mix_by(quilt * 0.45, solid("#E39A78")(p), solid("#F0B59A")(p))
+
+    rim = lambda p: torus_y(p, (0, y0 + 0.36, 0), 0.81, 0.13) - 0.004 * bumps(p, 70)
+    cushion = lambda p: cylinder_y(p, (0, y0 + 0.30, 0), 0.68, 0.06, 0.05) - 0.005 * bumps(p, 38)
+    return [
+        Part(bowl, bowl_color),
+        Part(rim, solid("#EDAA89")),
+        Part(cushion, solid("#FBEBD8")),
+    ], 1.0
+
+
+def cozy_post():
+    y0 = GROUND
+    base = lambda p: round_box(p, (0, y0 + 0.08, 0), (0.50, 0.08, 0.32), 0.05)
+
+    def post(p):
+        return cylinder_y(p, (0, y0 + 0.78, 0), 0.115, 0.66, 0.02)
+
+    def post_color(p):
+        wrap = (np.sin(p[1] * 70 + p[0] * 8) > 0.2).astype(float)
+        return mix_by(wrap * 0.7, solid("#D7BA86")(p), solid("#B99A64")(p))
+
+    top = lambda p: round_box(p, (0, y0 + 1.46, 0), (0.42, 0.07, 0.28), 0.05)
+    pad = lambda p: round_box(p, (0, y0 + 1.55, 0), (0.34, 0.035, 0.22), 0.03)
+    string = lambda p: chain(p, [(0.3, y0 + 1.40, 0.18), (0.36, y0 + 1.08, 0.2)], 0.012)
+    toy = lambda p: sphere(p, (0.36, y0 + 0.98, 0.2), 0.085) - 0.004 * bumps(p, 90)
+    return [
+        Part(base, solid("#C5997A")),
+        Part(post, post_color),
+        Part(top, solid("#C5997A")),
+        Part(pad, solid("#F2D9BF")),
+        Part(string, solid("#EFE2C8")),
+        Part(toy, solid("#E96D5B"), gloss=0.4),
+    ], 1.02
+
+
 ITEMS = {
+    "cozy-bed": (cozy_bed, 0.98),
+    "cozy-scratchingPost": (cozy_post, 0.62),
     "yarnBall": (yarn_ball, 0.62),
     "feather": (feather, 0.72),
     "toyMouse": (toy_mouse, 0.78),
@@ -598,6 +648,42 @@ def render_item(name, make, shadow_width, out):
     canvas.alpha_composite(art)
     canvas.save(out / f"{name}.png", optimize=True)
     return canvas
+
+
+def render_sunbeam(out):
+    """A warm pool of window light on the floor, with the shadows of the window bars and drifting dust."""
+    size = ITEM_SIZE * 2
+    k = size / 320
+    mask = Image.new("L", (size, size), 0)
+    d = ImageDraw.Draw(mask)
+    pool = [(62, 228), (262, 228), (306, 290), (22, 290)]
+    d.polygon([(x * k, y * k) for x, y in pool], fill=255)
+    # Shadows of the window frame inside the light.
+    for a, b in (((142, 228), (164, 290)), ((46, 254), (284, 254)), ((66, 228), (28, 290)), ((258, 228), (300, 290))):
+        d.line([(a[0] * k, a[1] * k), (b[0] * k, b[1] * k)], fill=150, width=int(5 * k))
+    mask = mask.filter(ImageFilter.GaussianBlur(5 * k))
+
+    ramp = np.linspace(0.45, 1.0, size).reshape(-1, 1)
+    ramp = np.clip((np.arange(size).reshape(-1, 1) / k - 224) / 70, 0, 1) * 0.55 + 0.45
+    alpha = (np.array(mask).astype(np.float32) / 255) * ramp * 0.86
+    warm = np.zeros((size, size, 4), dtype=np.float32)
+    warm[..., 0] = 255
+    warm[..., 1] = 226 - 22 * (1 - ramp)
+    warm[..., 2] = 150 - 30 * (1 - ramp)
+    warm[..., 3] = alpha * 255
+    image = Image.fromarray(warm.astype(np.uint8))
+
+    motes = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    mote_draw = ImageDraw.Draw(motes)
+    rng = np.random.default_rng(7)
+    for _ in range(9):
+        x, y = rng.uniform(70, 250) * k, rng.uniform(150, 262) * k
+        r = rng.uniform(1.4, 2.8) * k
+        mote_draw.ellipse([x - r, y - r, x + r, y + r], fill=(255, 250, 230, int(rng.uniform(120, 220))))
+    image.alpha_composite(motes.filter(ImageFilter.GaussianBlur(0.7 * k)))
+    image = image.resize((ITEM_SIZE, ITEM_SIZE), Image.LANCZOS)
+    image.save(out / "cozy-sunbeam.png", optimize=True)
+    return image
 
 
 def render_box(out):
@@ -1011,7 +1097,7 @@ def make_icons():
     icons = OUT / "Icons"
     icons.mkdir(parents=True, exist_ok=True)
     items = OUT / "Items"
-    for name in list(ITEMS) + ["box"]:
+    for name in list(ITEMS) + ["box", "cozy-sunbeam"]:
         if name == "food-empty":
             continue
         image = Image.open(items / f"{name}.png").convert("RGBA")
@@ -1080,6 +1166,9 @@ def main():
     if not wanted or "box" in wanted:
         results["box"] = render_box(items_dir)
         print("item box")
+    if not wanted or "cozy-sunbeam" in wanted:
+        results["cozy-sunbeam"] = render_sunbeam(items_dir)
+        print("item cozy-sunbeam")
     for name, (make, tuck) in ACCESSORIES.items():
         if not wanted or name in wanted:
             results[name] = render_accessory(name, make, tuck, accessories_dir)

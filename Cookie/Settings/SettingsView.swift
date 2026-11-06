@@ -12,6 +12,8 @@ struct SettingsView: View {
                 .tabItem { Label("Sound", systemImage: "speaker.wave.2") }
             BehaviorSettingsTab()
                 .tabItem { Label("Behavior", systemImage: "figure.walk") }
+            PresenceSettingsTab()
+                .tabItem { Label("Presence", systemImage: "eye") }
             StatsSettingsTab()
                 .tabItem { Label("Stats", systemImage: "heart") }
             PrivacySettingsTab()
@@ -20,6 +22,79 @@ struct SettingsView: View {
                 .tabItem { Label("About", systemImage: "info.circle") }
         }
         .frame(width: 540, height: 440)
+    }
+}
+
+// MARK: - Presence
+
+/// When Cookie shows up and what she does around your day: quiet mode, the summon shortcut,
+/// seasonal outfits, greetings, and focus sessions.
+struct PresenceSettingsTab: View {
+    @EnvironmentObject private var store: CookieStore
+    @EnvironmentObject private var environment: AppEnvironment
+
+    var body: some View {
+        Form {
+            Section {
+                Toggle("Hide Cookie during full-screen apps", isOn: $store.profile.settings.hideInFullscreen)
+                    .accessibilityHint("Cookie steps aside while a game, video or slideshow fills the screen")
+                Toggle("Keep Cookie out of screen sharing and recordings", isOn: $store.profile.settings.hideFromScreenSharing)
+                    .accessibilityHint("Asks macOS not to include Cookie when your screen is shared or recorded")
+                Text("Most screen sharing respects this. Some newer capture methods in macOS 15 and later may still show her.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            } header: {
+                Text("Quiet Mode")
+            }
+
+            Section {
+                Picker("Call Cookie with", selection: $store.profile.settings.summonShortcut) {
+                    ForEach(SummonShortcut.allCases) { shortcut in
+                        Text(shortcut.displayName).tag(shortcut.rawValue)
+                    }
+                }
+                SummonShortcutStatus(hotKey: environment.summonHotKey)
+                Text("Brings Cookie to your cursor, wherever you are, and she waves hello.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            } header: {
+                Text("Summon Shortcut")
+            }
+
+            Section {
+                Toggle("Seasonal outfits", isOn: $store.profile.settings.seasonalOutfits)
+                    .accessibilityHint("Cookie dresses for Halloween, the holidays, winter and her birthday")
+                Toggle("Greet me by time of day", isOn: $store.profile.settings.timeGreetings)
+                    .accessibilityHint("Cookie says good morning or good evening when she first appears")
+            } header: {
+                Text("Daily Rhythm")
+            }
+
+            Section {
+                Stepper("Focus length: \(store.profile.settings.focusMinutes) minutes",
+                        value: $store.profile.settings.focusMinutes, in: 5...120, step: 5)
+                Stepper("Break length: \(store.profile.settings.breakMinutes) minutes",
+                        value: $store.profile.settings.breakMinutes, in: 1...30)
+                Text("Start a session from Cookie's menu. She naps beside you, then stretches when it is time for a break.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            } header: {
+                Text("Focus Sessions")
+            }
+        }
+        .formStyle(.grouped)
+    }
+}
+
+private struct SummonShortcutStatus: View {
+    @ObservedObject var hotKey: SummonHotKey
+
+    var body: some View {
+        if hotKey.isUnavailable {
+            Label("Another app is using this shortcut. Choose a different one.", systemImage: "exclamationmark.triangle")
+                .font(.caption)
+                .foregroundStyle(.orange)
+        }
     }
 }
 

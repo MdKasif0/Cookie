@@ -56,7 +56,9 @@ jobs:
             "dist/windows/win-x64/Resources/CookieTray.ico",
             "dist/windows/win-x64/Resources/Sprites/Cookie/Items/yarnBall.png",
             "dist/windows/win-x64/Resources/Sprites/Cookie/Accessories/hat.png",
-            "dist/windows/win-x64/Resources/Sprites/Cookie/Icons/glyph-paw.png"
+            "dist/windows/win-x64/Resources/Sprites/Cookie/Icons/glyph-paw.png",
+            "dist/windows/win-x64/Resources/Sprites/Cookie/Items/cozy-bed.png",
+            "dist/windows/win-x64/Resources/Sprites/Cookie/Emotes/wave.png"
           )
           foreach ($file in $required) {
             if (-not (Test-Path $file)) {

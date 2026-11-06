@@ -67,6 +67,7 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         let titleItem = NSMenuItem(title: store.profile.displayName, action: nil, keyEquivalent: "")
         titleItem.isEnabled = false
         menu.addItem(titleItem)
+        menu.addItem(bondMenuItem())
 
         menu.addItem(.separator())
 
@@ -140,6 +141,7 @@ final class MenuBarController: NSObject, NSMenuDelegate {
             toyItem.image = CookieArtwork.menuIcon(toy.iconName)
             toyItem.target = self
             toyItem.representedObject = toy
+            lockIfNeeded(toyItem, .toy(toy), name: toy.displayName)
             toysSubmenu.addItem(toyItem)
         }
         if environment.hasActiveWorldItem {
@@ -156,8 +158,16 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         toysMenuItem.image = CookieArtwork.menuIcon("item-ball")
         toysMenuItem.submenu = toysSubmenu
         menu.addItem(toysMenuItem)
+        menu.addItem(cozyMenuItem())
+        menu.addItem(focusMenuItem())
 
         menu.addItem(.separator())
+
+        // Photo Mode
+        let photoItem = NSMenuItem(title: "Photo Mode…", action: #selector(photoModeAction), keyEquivalent: "")
+        photoItem.image = CookieArtwork.menuIcon("emote-happy")
+        photoItem.target = self
+        menu.addItem(photoItem)
 
         // 7. Customize
         let customItem = NSMenuItem(title: "Customize Cookie…", action: #selector(customizeAction), keyEquivalent: "k")
@@ -278,6 +288,7 @@ final class MenuBarController: NSObject, NSMenuDelegate {
             toyItem.image = CookieArtwork.menuIcon(toy.iconName)
             toyItem.target = self
             toyItem.representedObject = toy
+            lockIfNeeded(toyItem, .toy(toy), name: toy.displayName)
             toysMenu.addItem(toyItem)
         }
         toysMenu.addItem(.separator())
@@ -300,7 +311,115 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         NSApp.mainMenu = mainMenu
     }
 
+    // MARK: - Friendship, focus and cozy corner
+
+    /// Items still locked can't be chosen; the title says which level opens them.
+    private func lockIfNeeded(_ item: NSMenuItem, _ unlock: BondItem, name: String) {
+        guard !store.isUnlocked(unlock), let level = Bond.requiredLevel(for: unlock) else { return }
+        item.title = "\(name) (\(level.name))"
+        item.action = nil
+        item.target = nil
+        item.representedObject = nil
+    }
+
+    private func bondMenuItem() -> NSMenuItem {
+        let progress = store.bondProgress
+        let title: String
+        if let next = progress.next {
+            title = "\(progress.level.name) · \(store.bondPoints) of \(next.points)"
+        } else {
+            title = "\(progress.level.name) · fully bonded"
+        }
+        let item = NSMenuItem(title: title, action: nil, keyEquivalent: "")
+        item.image = CookieArtwork.menuIcon("glyph-heart")
+        item.isEnabled = false
+        return item
+    }
+
+    private func focusMenuItem() -> NSMenuItem {
+        let item = NSMenuItem(title: "Focus Session", action: nil, keyEquivalent: "")
+        item.image = CookieArtwork.menuIcon("glyph-moon")
+        let submenu = NSMenu(title: "Focus Session")
+        let focus = environment.focus
+
+        if focus.timer.isActive {
+            let label = focus.isFocusing ? "Focusing: \(focus.timer.remainingLabel) left" : "On a break: \(focus.timer.remainingLabel) left"
+            submenu.addItem(NSMenuItem(title: label, action: nil, keyEquivalent: ""))
+            let stop = NSMenuItem(title: focus.isFocusing ? "Stop Session" : "Skip Break", action: #selector(stopFocusAction), keyEquivalent: "")
+            stop.target = self
+            submenu.addItem(stop)
+        } else {
+            var lengths = [15, 25, 50]
+            let custom = store.profile.settings.focusMinutes
+            if !lengths.contains(custom) { lengths.append(custom); lengths.sort() }
+            for minutes in lengths {
+                let entry = NSMenuItem(title: "Start \(minutes) Minutes", action: #selector(startFocusAction(_:)), keyEquivalent: "")
+                entry.target = self
+                entry.representedObject = minutes
+                submenu.addItem(entry)
+            }
+        }
+        item.submenu = submenu
+        return item
+    }
+
+    private func cozyMenuItem() -> NSMenuItem {
+        let item = NSMenuItem(title: "Cozy Corner", action: nil, keyEquivalent: "")
+        item.image = CookieArtwork.menuIcon("item-cozy-bed")
+        let submenu = NSMenu(title: "Cozy Corner")
+        for kind in CozyKind.allCases {
+            let placed = store.profile.cozyItems.contains { $0.kind == kind }
+            let entry = NSMenuItem(
+                title: placed ? "Put Away \(kind.displayName)" : "Place \(kind.displayName)",
+                action: placed ? #selector(removeCozyAction(_:)) : #selector(placeCozyAction(_:)),
+                keyEquivalent: ""
+            )
+            entry.image = CookieArtwork.menuIcon(kind.iconName)
+            entry.target = self
+            entry.representedObject = kind
+            if !placed { lockIfNeeded(entry, .cozy(kind), name: "Place \(kind.displayName)") }
+            submenu.addItem(entry)
+        }
+        item.submenu = submenu
+        return item
+    }
+
+    /// Shows the focus countdown beside the menu bar icon, or clears it.
+    func updateStatusTitle(_ text: String?) {
+        guard let button = statusItem?.button else { return }
+        if let text {
+            button.title = " \(text)"
+            button.imagePosition = .imageLeading
+            button.font = .monospacedDigitSystemFont(ofSize: NSFont.smallSystemFontSize, weight: .regular)
+        } else {
+            button.title = ""
+            button.imagePosition = .imageOnly
+        }
+    }
+
     // MARK: - Actions
+
+    @objc private func photoModeAction() {
+        environment.showPhotoMode()
+    }
+
+    @objc private func startFocusAction(_ sender: NSMenuItem) {
+        environment.startFocus(minutes: sender.representedObject as? Int)
+    }
+
+    @objc private func stopFocusAction() {
+        environment.stopFocus()
+    }
+
+    @objc private func placeCozyAction(_ sender: NSMenuItem) {
+        guard let kind = sender.representedObject as? CozyKind else { return }
+        environment.placeCozy(kind)
+    }
+
+    @objc private func removeCozyAction(_ sender: NSMenuItem) {
+        guard let kind = sender.representedObject as? CozyKind else { return }
+        environment.removeCozy(kind)
+    }
 
     @objc private func toggleCompanionAction() {
         environment.toggleCompanion()
