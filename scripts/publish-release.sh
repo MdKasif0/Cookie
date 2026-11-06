@@ -16,7 +16,8 @@
 # windows needs:  dist/windows/installer/Cookie-Setup.exe (INSTALLER)
 #                 release-notes/windows-<version>.md (NOTES)
 #                 optional dist/windows/Cookie-Windows-<version>-win-x64-Portable.zip (PORTABLE)
-# Override any path with the environment variable shown in brackets.
+# Override any path with the environment variable shown in brackets. TARGET is the commit the new tag
+# points at (default: the current commit, which must already be pushed).
 #
 # For Windows, the update manifest is created from the installer and signed with the update signing key:
 # COOKIE_UPDATE_SIGNING_KEY (the PEM text) or the file named by COOKIE_UPDATE_SIGNING_KEY_FILE
@@ -124,7 +125,8 @@ if gh release view "$TAG" -R "$REPO" >/dev/null 2>&1; then
     echo "==> Release ${TAG} exists; adding files to it"
 else
     echo "==> Creating release ${TAG}"
-    gh release create "$TAG" -R "$REPO" --title "$TITLE" --notes-file "$NOTES" "$LATEST_FLAG" --target "$(git rev-parse HEAD)"
+    # The tag points at TARGET (default: this commit), which must already be pushed to GitHub.
+    gh release create "$TAG" -R "$REPO" --title "$TITLE" --notes-file "$NOTES" "$LATEST_FLAG" --target "${TARGET:-$(git rev-parse HEAD)}"
 fi
 
 echo "==> Uploading the downloads"
