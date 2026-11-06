@@ -10,10 +10,10 @@ This document describes the distribution architecture, Apple Developer ID signin
 | :--- | :--- |
 | **Application Name** | Cookie |
 | **Bundle Identifier** | `com.cookie.mac` |
-| **Marketing Version** | `1.1.0` |
+| **Marketing Version** | `1.2.0` |
 | **Minimum System Version** | macOS 14.0 (Sonoma) or later |
 | **Architecture** | Universal 2 (Apple Silicon `arm64` + Intel `x86_64`) |
-| **Distribution Format** | Compressed Apple Disk Image (`Cookie-1.1.0.dmg`, UDZO) |
+| **Distribution Format** | Compressed Apple Disk Image (`Cookie-1.2.0.dmg`, UDZO) |
 | **Current Build Signature** | Ad-hoc signed (`-`), Hardened Runtime off, not notarized |
 
 ---
@@ -107,11 +107,28 @@ Update the website only after a signed build has been checked on a clean machine
 
 Binaries are never committed to this repository. `dist/` and `website/downloads/` are ignored, and every download is a **GitHub Release** asset. The website's `/download/...` addresses (`website/_redirects`) redirect to them.
 
-1. Write `release-notes/<version>.md`.
-2. **Mac:** `./scripts/release_update.sh <version> <build>` builds and Sparkle-signs the DMG into `dist/` and prints the appcast `<item>`.
-3. **Windows:** push a tag such as `v1.2.0`. The *Build Cookie for Windows* workflow builds, signs, creates the signed update manifest, and publishes the installer, the portable zip, the checksums and the update feed to the release. (Without a tag it only builds and keeps the files as a workflow artifact.)
-4. **Everything else:** `./scripts/publish-release.sh <version>` uploads the DMG and any local Windows files to the release. Run it with `--dry-run` first: it builds and verifies everything and publishes nothing.
-5. Update the version numbers in `website/_redirects`, `website/releases.js` and `website/appcast.xml`, then commit and push those text files.
+The two platforms release independently, with different tags:
+
+| | Tag | Marked "latest"? | Notes file |
+| :--- | :--- | :--- | :--- |
+| **Mac** | `v1.2.0` | No (`--latest=false`) | `release-notes/1.2.0.md` |
+| **Windows** | `windows-v1.2.0` | Yes | `release-notes/windows-1.2.0.md` |
+
+The website's Windows download and the Windows update feed follow `releases/latest`, so a Mac release must never become "latest". The Mac appcast and `/download/mac` name their release by tag.
+
+**Mac**
+
+1. Bump `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` in `project.yml`, and `VERSION` in `Packaging/build_dmg.sh`. Write the release notes.
+2. `./Packaging/build_dmg.sh` builds the DMG into `dist/`.
+3. `./scripts/release_update.sh <version> <build> dist/Cookie-<version>.dmg` Sparkle-signs it and prints the appcast `<item>`.
+4. `./scripts/publish-release.sh mac <version> --dry-run`, then without `--dry-run`, uploads it.
+5. Add the `<item>` to `website/appcast.xml`, set the new version in `website/_redirects` and `website/releases.js` (the size and SHA-256 come from the published file), then commit and push.
+
+**Windows**
+
+1. Write `release-notes/windows-<version>.md`, and set the version in `Cookie.Windows.csproj` and `CookieSetup.iss`.
+2. Push a tag such as `windows-v1.2.0`. The *Build Cookie for Windows* workflow builds, signs, creates the signed update manifest, and publishes the installer, the portable zip, the checksums and the update feed. (Pushes to `main` without a tag only build and keep the files as a workflow artifact.)
+3. Update the version text in `website/releases.js`, then commit and push.
 
 Publish the release **before** pushing website changes that redirect to it, or the download buttons point at files that do not exist yet.
 

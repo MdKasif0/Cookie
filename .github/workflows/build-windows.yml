@@ -5,9 +5,10 @@ on:
   push:
     branches:
       - main
-    # Pushing a version tag such as v1.2.0 also publishes the build to GitHub Releases.
+    # Pushing a tag such as windows-v1.2.0 also publishes the build to GitHub Releases.
+    # Plain v* tags are Mac releases and must not start a Windows release.
     tags:
-      - 'v*'
+      - 'windows-v*'
 
 jobs:
   build:
@@ -161,10 +162,10 @@ jobs:
             dist/windows/SHA256SUMS.txt
           if-no-files-found: error
 
-      # Everything below runs only for version tags (for example v1.2.0).
+      # Everything below runs only for Windows release tags (for example windows-v1.2.0).
 
       - name: Create and sign the update manifest
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(github.ref, 'refs/tags/windows-v')
         env:
           COOKIE_UPDATE_SIGNING_KEY: ${{ secrets.WINDOWS_UPDATE_SIGNING_KEY }}
           TAG: ${{ github.ref_name }}
@@ -173,8 +174,8 @@ jobs:
             Write-Error "The WINDOWS_UPDATE_SIGNING_KEY secret is not set. Refusing to publish an update feed that installed apps would reject. See DISTRIBUTION.md."
             exit 1
           }
-          $version = $env:TAG.TrimStart('v')
-          $notes = "release-notes/$version.md"
+          $version = $env:TAG -replace '^windows-v', ''
+          $notes = "release-notes/windows-$version.md"
           if (-not (Test-Path $notes)) {
             Write-Error "Missing $notes. Write the release notes before tagging."
             exit 1
@@ -190,15 +191,17 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit 1 }
 
       - name: Publish to GitHub Release
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(github.ref, 'refs/tags/windows-v')
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ github.ref_name }}
         run: |
-          $version = $env:TAG.TrimStart('v')
+          $version = $env:TAG -replace '^windows-v', ''
           gh release view $env:TAG *> $null
           if ($LASTEXITCODE -ne 0) {
-            gh release create $env:TAG --title "Cookie $version" --notes-file "release-notes/$version.md" --verify-tag
+            # The newest Windows release is "latest": the website's Windows download and the update
+            # feed follow releases/latest. Mac releases are created with --latest=false.
+            gh release create $env:TAG --title "Cookie for Windows $version" --notes-file "release-notes/windows-$version.md" --verify-tag --latest
             if ($LASTEXITCODE -ne 0) { exit 1 }
           }
 
