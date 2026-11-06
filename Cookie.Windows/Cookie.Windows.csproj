@@ -2,11 +2,13 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <!-- WPF's Fluent ThemeMode API is still flagged experimental. -->
+    <NoWarn>$(NoWarn);WPF0001</NoWarn>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Resources\Cookie.ico</ApplicationIcon>
     <RootNamespace>Cookie.Windows</RootNamespace>
@@ -45,11 +47,11 @@
     <Content Include="..\Cookie\Resources\Sounds\*.wav" Link="Resources\Sounds\%(Filename)%(Extension)">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <!-- Link Original Emote Sprites and Metadata -->
-    <Content Include="..\Cookie\Resources\Sprites\Cookie\Emotes\**\*.png" Link="Resources\Sprites\Cookie\Emotes\%(RecursiveDir)%(Filename)%(Extension)">
+    <!-- Sprite sheets shared with macOS, plus Windows-only sheets. See scripts/generate_sprites.py. -->
+    <Content Include="..\Cookie\Resources\Sprites\Cookie\**\*.png;..\Cookie\Resources\Sprites\Cookie\**\*.json" Link="Resources\Sprites\Cookie\%(RecursiveDir)%(Filename)%(Extension)">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\Cookie\Resources\Sprites\Cookie\Emotes\**\*.json" Link="Resources\Sprites\Cookie\Emotes\%(RecursiveDir)%(Filename)%(Extension)">
+    <Content Include="Resources\Sprites\Cookie\**\*.png;Resources\Sprites\Cookie\**\*.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <!-- Assets Manifest -->
@@ -57,6 +59,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Cookie.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\CookieTray.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

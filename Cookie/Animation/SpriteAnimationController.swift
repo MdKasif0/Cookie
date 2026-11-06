@@ -156,7 +156,7 @@ final class SpriteAnimationController {
 
     private func present(_ id: CookieAnimationId, completion: ((Bool) -> Void)? = nil) {
         let spec = id.spec
-        guard let textures = resolveTextures(id) else {
+        guard let (textures, sourceFps) = resolveFrames(id) else {
             // Even idle artwork is missing: keep the last frame visible
             // and treat the request as finished.
             log.error("No artwork at all for \(id.rawValue, privacy: .public)")
@@ -171,7 +171,7 @@ final class SpriteAnimationController {
         currentIsLoop = spec.isLooping
         currentCompletion = completion
 
-        let frameDuration = 1.0 / (spec.fps * animationIntensity)
+        let frameDuration = 1.0 / ((sourceFps ?? spec.fps) * animationIntensity)
         if MotionSettings.reduceMotion {
             sprite.texture = textures.first
             if !spec.isLooping {
@@ -230,10 +230,10 @@ final class SpriteAnimationController {
 
     // MARK: - Textures
 
-    private func resolveTextures(_ id: CookieAnimationId) -> [SKTexture]? {
+    private func resolveFrames(_ id: CookieAnimationId) -> (textures: [SKTexture], fps: Double?)? {
         for source in sources {
             if let textures = source.textures(for: id, config: config) {
-                return textures
+                return (textures, source.frameRate(for: id))
             }
         }
         if id == .idle {
@@ -243,7 +243,7 @@ final class SpriteAnimationController {
         if warnedMissing.insert(key).inserted {
             log.notice("No artwork for \(key, privacy: .public) — falling back to idle")
         }
-        return resolveTextures(.idle)
+        return resolveFrames(.idle)
     }
 
     // MARK: - Blinking

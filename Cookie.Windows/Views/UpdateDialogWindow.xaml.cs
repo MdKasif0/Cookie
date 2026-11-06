@@ -17,6 +17,7 @@ public partial class UpdateDialogWindow : Window
     public UpdateDialogWindow(IUpdateService updateService)
     {
         InitializeComponent();
+        Cookie.Windows.Desktop.CookieTheme.Attach(this);
         _updateService = updateService;
 
         Loaded += async (s, e) => await CheckForUpdatesAsync();

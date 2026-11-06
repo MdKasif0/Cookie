@@ -9,6 +9,11 @@ public abstract class AudioManagerBase
 {
     private readonly string _soundsDirectory;
     private readonly ConcurrentDictionary<SoundEffect, DateTime> _lastPlayTimes = new();
+    private readonly ConcurrentDictionary<SoundEffect, string> _lastTakes = new();
+    private readonly Random _random = new();
+
+    /// <summary>How long purring continues after the last thing that made her purr.</summary>
+    public const double PurrHoldSeconds = 5.0;
 
     public bool SoundEnabled { get; set; } = true;
     public double MasterVolume { get; set; } = 0.7;
@@ -30,6 +35,15 @@ public abstract class AudioManagerBase
         if (sound.IsInteractionSound() && !InteractionSounds) return false;
         if (sound == SoundEffect.Purr && !PurringSounds) return false;
 
+        if (sound == SoundEffect.Purr)
+        {
+            string purrFile = Path.Combine(_soundsDirectory, sound.GetFileName());
+            if (ValidateFileExists && !File.Exists(purrFile)) return false;
+            if (MasterVolume <= 0.001) return false;
+            StartOrExtendLoop(purrFile, MasterVolume, PurrHoldSeconds);
+            return true;
+        }
+
         var now = DateTime.UtcNow;
         double minInterval = sound.GetMinimumIntervalSeconds();
 
@@ -43,7 +57,7 @@ public abstract class AudioManagerBase
 
         _lastPlayTimes[sound] = now;
 
-        string soundFile = Path.Combine(_soundsDirectory, sound.GetFileName());
+        string soundFile = Path.Combine(_soundsDirectory, ChooseTake(sound));
         if (ValidateFileExists && !File.Exists(soundFile))
         {
             return false;
@@ -59,5 +73,29 @@ public abstract class AudioManagerBase
         return true;
     }
 
+    /// <summary>Picks a take at random, avoiding the one just heard.</summary>
+    private string ChooseTake(SoundEffect sound)
+    {
+        string[] takes = sound.GetFileNames();
+        if (takes.Length == 1) return takes[0];
+
+        _lastTakes.TryGetValue(sound, out string? last);
+        var choices = Array.FindAll(takes, take => take != last);
+        string chosen = choices[PickIndex(choices.Length)];
+        _lastTakes[sound] = chosen;
+        return chosen;
+    }
+
+    protected virtual int PickIndex(int count) => _random.Next(count);
+
     protected abstract void PlayInternal(string filePath, double volume);
+
+    /// <summary>
+    /// Starts a loop, or keeps it going if it's already playing, until holdSeconds pass
+    /// with no further calls. Platforms without looping can leave this as a single play.
+    /// </summary>
+    protected virtual void StartOrExtendLoop(string filePath, double volume, double holdSeconds)
+    {
+        PlayInternal(filePath, volume);
+    }
 }

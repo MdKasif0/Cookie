@@ -9,10 +9,13 @@ namespace Cookie.Windows.Tests;
 
 public class TestAudioManager : AudioManagerBase
 {
-    public string? LastPlayedSoundFile { get; private set; }
+    public string? LastPlayedSoundFile { get; set; }
     public double LastPlayedVolume { get; private set; }
 
     protected override bool ValidateFileExists => false;
+
+    /// <summary>Always the first remaining take, so tests are repeatable.</summary>
+    protected override int PickIndex(int count) => 0;
 
     protected override void PlayInternal(string filePath, double volume)
     {

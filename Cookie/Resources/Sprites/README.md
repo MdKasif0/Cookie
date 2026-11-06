@@ -2,7 +2,13 @@
 
 Final artwork for Cookie lives in this folder. The animation system
 discovers it automatically — drop files in and they take precedence over
-the built-in placeholder, with no code changes.
+the built-in placeholder, with no code changes. The Windows app reads these
+same sheets, plus a few of its own in `Cookie.Windows/Resources/Sprites`.
+
+The sheets here are generated from the shipped artwork by
+`scripts/generate_sprites.py`, which bends the paintings with a soft puppet
+rig. To use hand-made art for an animation, delete its entry from `SHEETS` in
+that script so it won't be overwritten, then replace the PNG and JSON.
 
 ## Layout
 
@@ -73,7 +79,8 @@ background plus an optional `<sheetName>.json` manifest:
   right, top to bottom, starting at 0.
 - `frames` — optional playback order (defaults to all frames in order);
   repeat indices to ping-pong.
-- `fps` and `loop` override the table above.
+- `fps` overrides the table above. Looping always follows the table, because
+  the behavior engine relies on it.
 
 **2. Numbered frames** — a folder named `<sheetName>/` containing
 `frame0.png`, `frame1.png`, … in frame order. A `manifest.json` inside
@@ -88,5 +95,7 @@ the folder works the same way (omit `grid`).
   `walkLeft` and `walkRight`.
 - Missing animations are not an error: the character falls back to idle
   until their artwork is added.
-- Sheets ignore `CharacterPalette` (coloring is baked in). The palette
-  only recolors the built-in placeholder.
+- Frames are 360×360 (the 180pt canvas at 2x), with the feet at the same height.
+- Fur color and body shape are applied to sheets at load time. Sheets painted
+  from the base pose step aside for coat patterns and eye customization, which
+  only line up with the reference source's frames.

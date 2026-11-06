@@ -1,0 +1,23 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Cookie's surfaces. Light and Dark must define the same keys; a test enforces it. -->
+    <SolidColorBrush x:Key="BgWarmCream" Color="#FDFBF7"/>
+    <SolidColorBrush x:Key="BgWarmWhite" Color="#FDFBF7"/>
+    <SolidColorBrush x:Key="BgCream" Color="#F7F2E8"/>
+    <SolidColorBrush x:Key="BgIvory" Color="#CCFFFFFF"/>
+    <SolidColorBrush x:Key="BorderBeige" Color="#E8DFD1"/>
+    <SolidColorBrush x:Key="BorderSubtle" Color="#E8DFD1"/>
+    <SolidColorBrush x:Key="AccentWarmOrange" Color="#E08744"/>
+    <SolidColorBrush x:Key="AccentCaramel" Color="#C67A38"/>
+    <SolidColorBrush x:Key="AccentPeach" Color="#F2BA8C"/>
+    <SolidColorBrush x:Key="TextCharcoal" Color="#2D2A26"/>
+    <SolidColorBrush x:Key="TextMuted" Color="#75726D"/>
+    <SolidColorBrush x:Key="MutedSage" Color="#6F8069"/>
+    <SolidColorBrush x:Key="CardSelected" Color="#40E08744"/>
+    <SolidColorBrush x:Key="StageFloor" Color="#22604028"/>
+    <LinearGradientBrush x:Key="StageBackground" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#FAF2E3" Offset="0"/>
+        <GradientStop Color="#F2E6CC" Offset="1"/>
+    </LinearGradientBrush>
+    <Color x:Key="PopupShadow">#4A3B32</Color>
+</ResourceDictionary>

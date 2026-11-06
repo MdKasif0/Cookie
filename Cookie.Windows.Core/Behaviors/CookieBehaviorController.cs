@@ -27,7 +27,7 @@ namespace Cookie.Windows.Core.Behaviors;
 /// 9. Autonomous activity (Walking, stretching, grooming, etc.)
 /// 10. Idle
 /// </summary>
-public class CookieBehaviorController
+public partial class CookieBehaviorController
 {
     private readonly CookieAnimationController _animationController;
     private readonly ScreenGeometryService _screenService;
@@ -142,6 +142,7 @@ public class CookieBehaviorController
     public void PauseForSessionLock()
     {
         _isSessionLocked = true;
+        CancelCareSequence();
         _walkTarget = null;
         _dodgeTarget = null;
         MovementInterpolator.Stop2D();
@@ -163,6 +164,7 @@ public class CookieBehaviorController
 
     public void HandleDisplayConfigurationChanged()
     {
+        CancelCareSequence();
         _walkTarget = null;
         _dodgeTarget = null;
         MovementInterpolator.Stop2D();
@@ -298,6 +300,12 @@ public class CookieBehaviorController
             Settings.CookieSize,
             Settings,
             isInterrupted);
+
+        if (_careStep != null)
+        {
+            UpdateCareSequence(deltaTimeSeconds);
+            return;
+        }
 
         var env = EnvironmentProvider.GetDesktopEnvironment(_currentPosition);
 
@@ -880,6 +888,7 @@ public class CookieBehaviorController
 
     public void MountOnWindow(ObservableWindow window, CorePoint landingPoint)
     {
+        CancelCareSequence();
         CancelActiveEmote();
         _walkTarget = null;
         _dodgeTarget = null;
@@ -894,6 +903,7 @@ public class CookieBehaviorController
 
     public void BeginDrag()
     {
+        CancelCareSequence();
         CancelActiveEmote();
         _walkTarget = null;
         _dodgeTarget = null;
@@ -928,6 +938,7 @@ public class CookieBehaviorController
     {
         if (_state == CookieState.BeingDragged) return;
 
+        CancelCareSequence();
         CancelActiveEmote();
         _walkTarget = null;
         _dodgeTarget = null;
@@ -937,6 +948,8 @@ public class CookieBehaviorController
         TaskbarController.CancelExploration();
 
         Memory.RecordDirectInteraction();
+        Statistics.RecordPet();
+        OnStatisticsChanged?.Invoke();
 
         TransitionToState(CookieState.Reacting);
         _audioManager.Play(SoundEffect.Purr);
@@ -947,6 +960,7 @@ public class CookieBehaviorController
     {
         if (!CanPerformEmote(emote, isAutonomous)) return false;
 
+        CancelCareSequence();
         _walkTarget = null;
         _dodgeTarget = null;
         MovementInterpolator.Stop2D();
@@ -995,6 +1009,8 @@ public class CookieBehaviorController
         {
             _currentEmote = null;
             OnEmoteChanged?.Invoke(null);
+            Statistics.Affection++;
+            OnStatisticsChanged?.Invoke();
             TransitionToState(CookieState.Idle);
             _animationController.PlayAnimation(CookieAnimationId.Idle);
         }
@@ -1002,7 +1018,7 @@ public class CookieBehaviorController
 
     private void HandleAnimationCompleted(CookieAnimationId completedId)
     {
-        if (_state is CookieState.Reacting && _dodgeTarget == null)
+        if (_careStep == null && _state is CookieState.Reacting && _dodgeTarget == null)
         {
             TransitionToState(CookieState.Idle);
             _animationController.PlayAnimation(CookieAnimationId.Idle);

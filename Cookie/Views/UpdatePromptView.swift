@@ -3,16 +3,16 @@ import SwiftUI
 /// Warm, cozy color palette matching Cookie's signature design system.
 /// Zero purple, zero blue.
 private enum UpdateColors {
-    static let warmWhite = Color(nsColor: NSColor(calibratedRed: 0.984, green: 0.976, blue: 0.961, alpha: 1.0))
-    static let cream = Color(nsColor: NSColor(calibratedRed: 0.961, green: 0.937, blue: 0.902, alpha: 1.0))
-    static let beige = Color(nsColor: NSColor(calibratedRed: 0.918, green: 0.863, blue: 0.788, alpha: 1.0))
-    static let warmPeach = Color(nsColor: NSColor(calibratedRed: 0.973, green: 0.886, blue: 0.820, alpha: 1.0))
-    static let softOrange = Color(nsColor: NSColor(calibratedRed: 0.878, green: 0.478, blue: 0.373, alpha: 1.0))
-    static let softOrangeHover = Color(nsColor: NSColor(calibratedRed: 0.918, green: 0.525, blue: 0.420, alpha: 1.0))
-    static let mutedSage = Color(nsColor: NSColor(calibratedRed: 0.459, green: 0.522, blue: 0.435, alpha: 1.0))
-    static let darkCharcoal = Color(nsColor: NSColor(calibratedRed: 0.169, green: 0.149, blue: 0.145, alpha: 1.0))
-    static let neutralGray = Color(nsColor: NSColor(calibratedRed: 0.541, green: 0.510, blue: 0.478, alpha: 1.0))
-    static let subtleBorder = Color(nsColor: NSColor(calibratedRed: 0.878, green: 0.835, blue: 0.776, alpha: 0.6))
+    static let warmWhite = Color.adaptive(light: (0.984, 0.976, 0.961, 1), dark: (0.15, 0.135, 0.125, 1))
+    static let cream = Color.adaptive(light: (0.961, 0.937, 0.902, 1), dark: (0.2, 0.18, 0.165, 1))
+    static let beige = Color.adaptive(light: (0.918, 0.863, 0.788, 1), dark: (0.31, 0.28, 0.255, 1))
+    static let warmPeach = Color.adaptive(light: (0.973, 0.886, 0.82, 1), dark: (0.4, 0.28, 0.21, 1))
+    static let softOrange = Color.adaptive(light: (0.878, 0.478, 0.373, 1), dark: (0.88, 0.5, 0.39, 1))
+    static let softOrangeHover = Color.adaptive(light: (0.918, 0.525, 0.42, 1), dark: (0.92, 0.56, 0.45, 1))
+    static let mutedSage = Color.adaptive(light: (0.459, 0.522, 0.435, 1), dark: (0.66, 0.74, 0.62, 1))
+    static let darkCharcoal = Color.adaptive(light: (0.169, 0.149, 0.145, 1), dark: (0.95, 0.92, 0.88, 1))
+    static let neutralGray = Color.adaptive(light: (0.541, 0.51, 0.478, 1), dark: (0.71, 0.68, 0.64, 1))
+    static let subtleBorder = Color.adaptive(light: (0.878, 0.835, 0.776, 0.6), dark: (1, 1, 1, 0.12))
 }
 
 /// Small, premium native macOS update interface designed specifically for Cookie.
@@ -29,7 +29,7 @@ struct UpdatePromptView: View {
             footerSection
         }
         .frame(width: 380)
-        .background(UpdateColors.warmWhite)
+        .cookieGlass(cornerRadius: 16)
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .overlay(
             RoundedRectangle(cornerRadius: 16)
@@ -84,7 +84,7 @@ struct UpdatePromptView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
-        .background(UpdateColors.cream)
+        .background(UpdateColors.cream.opacity(0.45))
     }
 
     // MARK: - Main Content
@@ -116,7 +116,7 @@ struct UpdatePromptView: View {
             }
         }
         .padding(16)
-        .background(UpdateColors.warmWhite)
+        .background(UpdateColors.warmWhite.opacity(0.35))
     }
 
     // MARK: - Subviews
@@ -355,6 +355,6 @@ struct UpdatePromptView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
-        .background(UpdateColors.cream)
+        .background(UpdateColors.cream.opacity(0.45))
     }
 }

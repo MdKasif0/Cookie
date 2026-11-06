@@ -13,4 +13,12 @@ import SpriteKit
 @MainActor
 protocol AnimationFrameSource {
     func textures(for animation: CookieAnimationId, config: CookieAppearanceConfig) -> [SKTexture]?
+
+    /// The frame rate this source's art was made for, when it differs from the
+    /// animation's default.
+    func frameRate(for animation: CookieAnimationId) -> Double?
+}
+
+extension AnimationFrameSource {
+    func frameRate(for animation: CookieAnimationId) -> Double? { nil }
 }

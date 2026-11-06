@@ -14,7 +14,7 @@ This document describes the distribution architecture, Apple Developer ID signin
 | **Minimum System Version** | macOS 14.0 (Sonoma) or later |
 | **Architecture** | Universal 2 (Apple Silicon `arm64` + Intel `x86_64`) |
 | **Distribution Format** | Compressed Apple Disk Image (`Cookie-1.1.0.dmg`, UDZO) |
-| **Current Build Signature** | Ad-hoc signed (`-`) with Hardened Runtime compatibility |
+| **Current Build Signature** | Ad-hoc signed (`-`), Hardened Runtime off, not notarized |
 
 ---
 
@@ -23,11 +23,10 @@ This document describes the distribution architecture, Apple Developer ID signin
 ### A. Ad-hoc Signed Development Builds (Current Status)
 When Cookie is downloaded from the web or shared without an Apple Developer ID signature and notarization ticket, macOS Gatekeeper attaches the `com.apple.quarantine` extended attribute:
 
-1. **Standard Double-Click**: macOS will present an alert stating:
-   > *"Cookie" cannot be opened because Apple cannot check it for malicious software.*
+1. **Standard Double-Click**: macOS blocks the app and offers no way to open it from the alert.
 2. **Standard User Resolution (No Insecure Bypasses)**:
-   - **Method 1**: Right-click (or Control-click) **Cookie.app** in Finder, choose **Open** from the contextual menu, and click **Open** in the dialog.
-   - **Method 2**: Open macOS **System Settings → Privacy & Security**, scroll to the **Security** section, and click **Open Anyway** next to the notification about Cookie.
+   - **macOS 15 Sequoia and later**: try to open Cookie once, then go to **System Settings → Privacy & Security**, scroll to the **Security** section, click **Open Anyway** next to the notice about Cookie, and authenticate. The right-click → **Open** shortcut no longer bypasses Gatekeeper on these versions.
+   - **macOS 14 Sonoma**: right-click (or Control-click) **Cookie.app** in Finder, choose **Open**, and click **Open** in the dialog. **Open Anyway** in System Settings also works.
 
 > [!NOTE]
 > Cookie does not implement insecure scripts or unauthorized background overrides to strip quarantine flags. Gatekeeper operates as Apple intended to protect user security until Developer ID signing and notarization are completed.
@@ -53,91 +52,63 @@ To sign Cookie for direct public distribution, an active **Apple Developer Progr
    ```
    *Expected output includes: `Developer ID Application: Your Name (TEAM_ID)`*
 
-### Step 2: Sign the Application Bundle
-Sign the application bundle with Hardened Runtime enabled (`--options runtime`) and secure timestamping (`--timestamp`):
+### Step 2: Store Notary Credentials Securely
+Store an app-specific password from [account.apple.com](https://account.apple.com) in your Keychain:
 
 ```bash
-DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild \
-  -scheme Cookie \
-  -configuration Release \
-  -derivedDataPath .build/DerivedData \
-  build \
-  CODE_SIGN_IDENTITY="Developer ID Application: Your Name (TEAM_ID)" \
-  ENABLE_HARDENED_RUNTIME="YES"
-
-# Manually verify or deep sign embedded binaries if needed:
-codesign --force --deep --options runtime --timestamp \
-  --sign "Developer ID Application: Your Name (TEAM_ID)" \
-  .build/DerivedData/Build/Products/Release/Cookie.app
-
-# Verify signing
-codesign --verify --deep --strict --verbose=2 .build/DerivedData/Build/Products/Release/Cookie.app
-spctl --assess --type execute --verbose .build/DerivedData/Build/Products/Release/Cookie.app
-```
-
----
-
-## 4. Packaging & Disk Image Signing
-
-Generate the distribution disk image using the automated packaging script:
-
-```bash
-./Packaging/build_dmg.sh
-```
-
-Sign the resulting `.dmg` with the Developer ID Application certificate:
-
-```bash
-codesign --timestamp \
-  --sign "Developer ID Application: Your Name (TEAM_ID)" \
-  dist/Cookie-1.1.0.dmg
-```
-
----
-
-## 5. Apple Notarization Workflow
-
-Notarization is Apple's automated malware scanning service for macOS software distributed outside the Mac App Store.
-
-### Step 1: Store Notary Credentials Securely
-Configure an App Store Connect API key or app-specific password:
-
-```bash
-# Using App-Specific Password:
 xcrun notarytool store-credentials "CookieNotary" \
   --apple-id "developer@example.com" \
   --team-id "TEAM_ID" \
   --password "xxxx-xxxx-xxxx-xxxx"
 ```
 
-### Step 2: Submit DMG for Notarization
-Submit the disk image to the Apple Notary Service and wait for the verdict:
+### Step 3: Build, Sign, Notarize and Staple
+`Packaging/build_dmg.sh` does all of this when these variables are set. It enables Hardened Runtime, signs Sparkle's nested helpers inside-out, signs the DMG, submits it to Apple, staples the ticket, and fails if Apple rejects the build.
 
 ```bash
-xcrun notarytool submit dist/Cookie-1.1.0.dmg \
-  --keychain-profile "CookieNotary" \
-  --wait
+COOKIE_SIGN_IDENTITY="Developer ID Application: Your Name (TEAM_ID)" \
+COOKIE_TEAM_ID="TEAM_ID" \
+COOKIE_NOTARY_PROFILE="CookieNotary" \
+./Packaging/build_dmg.sh
 ```
 
-### Step 3: Staple the Notarization Ticket
-Once notarization succeeds, staple the cryptographic ticket directly to the disk image and the application bundle:
+Without these variables the script produces an ad-hoc development DMG, and its last line of output says so. Hardened Runtime stays off in `project.yml` because ad-hoc builds cannot load Sparkle with it enabled.
 
-```bash
-# Staple the DMG
-xcrun stapler staple dist/Cookie-1.1.0.dmg
+### Step 4: Verify on a Clean Mac
+Download the DMG through a browser so it gets the quarantine flag, then open it on a Mac that has never run Cookie. If a build is rejected, read Apple's reason with `xcrun notarytool log <submission-id> --keychain-profile "CookieNotary"`.
 
-# Verify the staple
-spctl -a -t open --context context:primary-signature -v dist/Cookie-1.1.0.dmg
-```
+---
+
+## 4. Windows Code Signing
+
+An unsigned installer shows a blue SmartScreen warning. Choose one route, then add its secrets under **GitHub → Settings → Secrets and variables → Actions**. `.github/workflows/build-windows.yml` signs `Cookie.exe`, `Cookie.dll`, `Cookie.Windows.Core.dll` and the installer when the secrets exist, and otherwise builds unsigned.
+
+| Route | Secrets to add | Notes |
+| :--- | :--- | :--- |
+| **Azure Artifact Signing** | `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_CLIENT_SECRET`, `AZURE_SIGNING_ENDPOINT`, `AZURE_SIGNING_ACCOUNT`, `AZURE_SIGNING_PROFILE` | Monthly subscription with no hardware token. Check that your country and account type are eligible before relying on it. |
+| **PFX certificate** | `WINDOWS_CERT_PFX_BASE64`, `WINDOWS_CERT_PASSWORD` | Only for a certificate you can export as a PFX. Most public certificate authorities now keep keys on hardware tokens or in the cloud, so check before buying. |
+| **Microsoft Store** | None in this workflow | The Store signs the package for you, but it needs a separate MSIX package and listing, which this repo does not build yet. |
+
+A signature identifies the publisher, but SmartScreen also weighs download reputation. A new certificate can still show a warning until it builds up history.
+
+---
+
+## 5. After the First Trusted Release
+
+Update the website only after a signed build has been checked on a clean machine:
+
+1. In `website/releases.js`, remove the Gatekeeper step and security note from `mac`, and the SmartScreen wording from `windows`.
+2. Update each release's size and `sha256` in the same file.
+3. Update the status table at the top of this document.
 
 ---
 
 ## 6. Verification Checklist Before Release
 
-- [x] Bundle contains native `AppIcon.icns` with warm cream aesthetic.
-- [x] `CFBundleShortVersionString` is `1.0.0` and `CFBundleVersion` is `1`.
-- [x] No debug flags, test arguments, or absolute local file paths in Release build.
-- [x] Sprites and audio are cleanly bundled in `Contents/Resources`.
-- [x] DMG contains `Cookie.app` and `Applications` shortcut with custom warm background.
-- [x] All 19 unit tests pass in continuous integration.
-- [x] Zero purple and zero blue colors across the entire user experience.
+- [ ] Version numbers match in `project.yml`, `Cookie.Windows.csproj`, `CookieSetup.iss`, `website/releases.js` and the appcast.
+- [ ] macOS and Windows test suites pass.
+- [ ] `codesign --verify --deep --strict` passes and `xcrun stapler validate` succeeds on the DMG.
+- [ ] `signtool verify /pa` passes on `Cookie-Setup.exe`.
+- [ ] Both downloads open without a security warning on a clean machine.
+- [ ] No debug flags, test arguments, or absolute local file paths in the Release build.
+- [ ] Sprites and audio are bundled in the app.

@@ -5,79 +5,8 @@
         Title="Cookie Settings"
         Height="620" Width="680"
         WindowStartupLocation="CenterScreen"
-        Background="#FDFBF7"
-        Foreground="#2D2A26"
-        FontFamily="Segoe UI"
+        ThemeMode="System"
         FontSize="13">
-
-    <Window.Resources>
-        <!-- Palette Brushes -->
-        <SolidColorBrush x:Key="BgWarmCream" Color="#FDFBF7"/>
-        <SolidColorBrush x:Key="BgIvory" Color="#F5EFEB"/>
-        <SolidColorBrush x:Key="BorderBeige" Color="#E8DFD1"/>
-        <SolidColorBrush x:Key="AccentWarmOrange" Color="#E08744"/>
-        <SolidColorBrush x:Key="AccentCaramel" Color="#C67A38"/>
-        <SolidColorBrush x:Key="TextCharcoal" Color="#2D2A26"/>
-        <SolidColorBrush x:Key="TextMuted" Color="#75726D"/>
-        <SolidColorBrush x:Key="MutedSage" Color="#8A9A86"/>
-
-        <Style TargetType="TabItem">
-            <Setter Property="Padding" Value="14,8"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Foreground" Value="{StaticResource TextMuted}"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="TabItem">
-                        <Border x:Name="TabBorder" BorderThickness="0,0,0,2" BorderBrush="Transparent" Background="Transparent" Padding="{TemplateBinding Padding}">
-                            <ContentPresenter ContentSource="Header" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="TabBorder" Property="BorderBrush" Value="{StaticResource AccentWarmOrange}"/>
-                                <Setter Property="Foreground" Value="{StaticResource TextCharcoal}"/>
-                            </Trigger>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Foreground" Value="{StaticResource AccentCaramel}"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style TargetType="GroupBox">
-            <Setter Property="Margin" Value="0,0,0,12"/>
-            <Setter Property="BorderBrush" Value="{StaticResource BorderBeige}"/>
-            <Setter Property="Padding" Value="10"/>
-        </Style>
-
-        <Style TargetType="CheckBox">
-            <Setter Property="Foreground" Value="{StaticResource TextCharcoal}"/>
-            <Setter Property="Margin" Value="0,5"/>
-        </Style>
-
-        <Style TargetType="Slider">
-            <Setter Property="Margin" Value="8,0"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-        </Style>
-
-        <Style TargetType="Button">
-            <Setter Property="Background" Value="{StaticResource BgIvory}"/>
-            <Setter Property="Foreground" Value="{StaticResource TextCharcoal}"/>
-            <Setter Property="BorderBrush" Value="{StaticResource BorderBeige}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding" Value="12,6"/>
-            <Setter Property="Margin" Value="0,4"/>
-            <Setter Property="Cursor" Value="Hand"/>
-        </Style>
-
-        <Style TargetType="TextBox">
-            <Setter Property="Background" Value="{StaticResource BgWarmCream}"/>
-            <Setter Property="BorderBrush" Value="{StaticResource BorderBeige}"/>
-            <Setter Property="Padding" Value="6,4"/>
-            <Setter Property="Foreground" Value="{StaticResource TextCharcoal}"/>
-        </Style>
-    </Window.Resources>
 
     <Grid Margin="16">
         <TabControl Background="Transparent" BorderThickness="0">
@@ -125,7 +54,7 @@
                             <StackPanel>
                                 <CheckBox Content="Automatically check for updates" IsChecked="{Binding AutomaticallyCheckForUpdates}"/>
                                 <TextBlock Text="Cookie checks for updates securely. No personal data is sent." 
-                                           Foreground="{StaticResource TextMuted}" FontSize="11" Margin="0,4,0,8"/>
+                                           Foreground="{DynamicResource TextMuted}" FontSize="11" Margin="0,4,0,8"/>
                                 <Button Content="Check for Updates Now..." Command="{Binding CheckForUpdatesCommand}" HorizontalAlignment="Left" Padding="12,4"/>
                             </StackPanel>
                         </GroupBox>
@@ -138,12 +67,12 @@
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,12,0,0">
                     <StackPanel>
                         <!-- Live Character Preview Card -->
-                        <Border Background="{StaticResource BgIvory}" BorderBrush="{StaticResource BorderBeige}" 
+                        <Border Background="{DynamicResource BgIvory}" BorderBrush="{DynamicResource BorderBeige}" 
                                 BorderThickness="1" CornerRadius="18" Padding="14" HorizontalAlignment="Center" Margin="0,0,0,14">
                             <StackPanel HorizontalAlignment="Center">
                                 <rendering:CookieCanvas x:Name="PreviewCanvas" Width="140" Height="140" HorizontalAlignment="Center"/>
                                 <TextBlock Text="{Binding CharacterName}" FontSize="14" FontWeight="SemiBold" 
-                                           Foreground="{StaticResource TextCharcoal}" HorizontalAlignment="Center" Margin="0,6,0,0"/>
+                                           Foreground="{DynamicResource TextCharcoal}" HorizontalAlignment="Center" Margin="0,6,0,0"/>
                             </StackPanel>
                         </Border>
 
@@ -236,17 +165,17 @@
 
                         <GroupBox Header="Accessories">
                             <StackPanel>
-                                <TextBlock Text="Toggle cute accessories that layer over Cookie:" Foreground="{StaticResource TextMuted}" FontSize="11" Margin="0,0,0,6"/>
+                                <TextBlock Text="Toggle cute accessories that layer over Cookie:" Foreground="{DynamicResource TextMuted}" FontSize="11" Margin="0,0,0,6"/>
                                 <UniformGrid Columns="3">
-                                    <CheckBox Content="Collar 🔔" IsChecked="{Binding AccessoryCollar}"/>
-                                    <CheckBox Content="Bow 🎀" IsChecked="{Binding AccessoryBow}"/>
-                                    <CheckBox Content="Party Hat 🎉" IsChecked="{Binding AccessoryHat}"/>
-                                    <CheckBox Content="Glasses 👓" IsChecked="{Binding AccessoryGlasses}"/>
-                                    <CheckBox Content="Winter Scarf 🧣" IsChecked="{Binding AccessoryScarf}"/>
-                                    <CheckBox Content="Royal Crown 👑" IsChecked="{Binding AccessoryCrown}"/>
-                                    <CheckBox Content="Bandana 🐕" IsChecked="{Binding AccessoryBandana}"/>
-                                    <CheckBox Content="Pumpkin 🎃" IsChecked="{Binding AccessoryPumpkin}"/>
-                                    <CheckBox Content="Santa Hat 🎅" IsChecked="{Binding AccessorySantaHat}"/>
+                                    <CheckBox Content="Collar" IsChecked="{Binding AccessoryCollar}"/>
+                                    <CheckBox Content="Bow" IsChecked="{Binding AccessoryBow}"/>
+                                    <CheckBox Content="Party Hat" IsChecked="{Binding AccessoryHat}"/>
+                                    <CheckBox Content="Glasses" IsChecked="{Binding AccessoryGlasses}"/>
+                                    <CheckBox Content="Winter Scarf" IsChecked="{Binding AccessoryScarf}"/>
+                                    <CheckBox Content="Royal Crown" IsChecked="{Binding AccessoryCrown}"/>
+                                    <CheckBox Content="Bandana" IsChecked="{Binding AccessoryBandana}"/>
+                                    <CheckBox Content="Pumpkin" IsChecked="{Binding AccessoryPumpkin}"/>
+                                    <CheckBox Content="Santa Hat" IsChecked="{Binding AccessorySantaHat}"/>
                                 </UniformGrid>
                             </StackPanel>
                         </GroupBox>
@@ -266,14 +195,14 @@
                         <GroupBox Header="Temperament Preset">
                             <StackPanel>
                                 <ComboBox ItemsSource="{Binding AvailablePersonalities}" SelectedItem="{Binding SelectedPersonality}" Margin="0,4" AutomationProperties.Name="Temperament Preset"/>
-                                <Border Background="{StaticResource BgIvory}" BorderBrush="{StaticResource BorderBeige}" BorderThickness="1" CornerRadius="8" Padding="10" Margin="0,6">
+                                <Border Background="{DynamicResource BgIvory}" BorderBrush="{DynamicResource BorderBeige}" BorderThickness="1" CornerRadius="8" Padding="10" Margin="0,6">
                                     <StackPanel>
-                                        <TextBlock Text="{Binding PersonalitySummary}" FontWeight="Medium" Foreground="{StaticResource TextCharcoal}" TextWrapping="Wrap"/>
+                                        <TextBlock Text="{Binding PersonalitySummary}" FontWeight="Medium" Foreground="{DynamicResource TextCharcoal}" TextWrapping="Wrap"/>
                                         <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
-                                            <TextBlock Text="Strolling Speed: " Foreground="{StaticResource TextMuted}" FontSize="11"/>
-                                            <TextBlock Text="{Binding PersonalityWalkSpeed}" FontWeight="SemiBold" FontSize="11" Foreground="{StaticResource AccentWarmOrange}" Margin="0,0,16,0"/>
-                                            <TextBlock Text="Petting Tolerance: " Foreground="{StaticResource TextMuted}" FontSize="11"/>
-                                            <TextBlock Text="{Binding PersonalityPetTolerance}" FontWeight="SemiBold" FontSize="11" Foreground="{StaticResource AccentWarmOrange}"/>
+                                            <TextBlock Text="Strolling Speed: " Foreground="{DynamicResource TextMuted}" FontSize="11"/>
+                                            <TextBlock Text="{Binding PersonalityWalkSpeed}" FontWeight="SemiBold" FontSize="11" Foreground="{DynamicResource AccentWarmOrange}" Margin="0,0,16,0"/>
+                                            <TextBlock Text="Petting Tolerance: " Foreground="{DynamicResource TextMuted}" FontSize="11"/>
+                                            <TextBlock Text="{Binding PersonalityPetTolerance}" FontWeight="SemiBold" FontSize="11" Foreground="{DynamicResource AccentWarmOrange}"/>
                                         </StackPanel>
                                     </StackPanel>
                                 </Border>
@@ -284,7 +213,7 @@
                             <StackPanel>
                                 <ComboBox ItemsSource="{Binding AvailableActivities}" SelectedItem="{Binding SelectedActivity}" Margin="0,4" AutomationProperties.Name="Activity Level"/>
                                 <TextBlock Text="Controls how actively Cookie strolls or rests: Calm, Balanced, or Playful." 
-                                           Foreground="{StaticResource TextMuted}" FontSize="11" Margin="0,4,0,0"/>
+                                           Foreground="{DynamicResource TextMuted}" FontSize="11" Margin="0,4,0,0"/>
                             </StackPanel>
                         </GroupBox>
 
@@ -322,7 +251,7 @@
                                 <ComboBox ItemsSource="{Binding AvailableFollowingIntensities}" SelectedItem="{Binding SelectedFollowingIntensity}" 
                                            IsEnabled="{Binding CursorInteraction}" Margin="0,4" AutomationProperties.Name="Following Intensity"/>
                                 <TextBlock Text="Sets how closely and quickly Cookie glances toward or steps near the cursor." 
-                                           Foreground="{StaticResource TextMuted}" FontSize="11" Margin="0,4,0,0"/>
+                                           Foreground="{DynamicResource TextMuted}" FontSize="11" Margin="0,4,0,0"/>
                             </StackPanel>
                         </GroupBox>
 
@@ -429,7 +358,107 @@
                             </StackPanel>
                         </GroupBox>
 
-                        <Button Content="Test Sound 🔊" Command="{Binding TestSoundCommand}" HorizontalAlignment="Left" IsEnabled="{Binding SoundEnabled}"/>
+                        <Button Content="Test Sound" Command="{Binding TestSoundCommand}" HorizontalAlignment="Left" IsEnabled="{Binding SoundEnabled}"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- 7. STATS -->
+            <TabItem Header="Stats">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,12,0,0">
+                    <StackPanel>
+                        <GroupBox Header="Time Together">
+                            <StackPanel>
+                                <Grid Margin="0,4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Days together" Foreground="{DynamicResource TextMuted}"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding Statistics.DaysTogetherToday}" FontWeight="SemiBold"/>
+                                </Grid>
+                                <Grid Margin="0,4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="First met" Foreground="{DynamicResource TextMuted}"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding Statistics.FirstMetDisplay}" FontWeight="SemiBold"/>
+                                </Grid>
+                                <Grid Margin="0,4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Launches" Foreground="{DynamicResource TextMuted}"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding Statistics.LaunchCount}" FontWeight="SemiBold"/>
+                                </Grid>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox Header="Affection">
+                            <StackPanel>
+                                <Grid Margin="0,4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Times petted" Foreground="{DynamicResource TextMuted}"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding Statistics.PetsReceived}" FontWeight="SemiBold"/>
+                                </Grid>
+                                <Grid Margin="0,4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Affection" Foreground="{DynamicResource TextMuted}"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding Statistics.Affection}" FontWeight="SemiBold"/>
+                                </Grid>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox Header="Care &amp; Play">
+                            <StackPanel>
+                                <Grid Margin="0,4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Total interactions" Foreground="{DynamicResource TextMuted}"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding Statistics.TotalInteractions}" FontWeight="SemiBold"/>
+                                </Grid>
+                                <Grid Margin="0,4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Treats given" Foreground="{DynamicResource TextMuted}"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding Statistics.TreatsGiven}" FontWeight="SemiBold"/>
+                                </Grid>
+                                <Grid Margin="0,4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Toys played with" Foreground="{DynamicResource TextMuted}"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding Statistics.ToysPlayedWith}" FontWeight="SemiBold"/>
+                                </Grid>
+                                <Grid Margin="0,4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Cardboard box visits" Foreground="{DynamicResource TextMuted}"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding Statistics.BoxVisits}" FontWeight="SemiBold"/>
+                                </Grid>
+                                <Grid Margin="0,4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Favorite toy" Foreground="{DynamicResource TextMuted}"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding Statistics.FavoriteToyDisplay}" FontWeight="SemiBold"/>
+                                </Grid>
+                            </StackPanel>
+                        </GroupBox>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>

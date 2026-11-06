@@ -28,7 +28,7 @@ struct CustomizationView: View {
                 .scrollContentBackground(.hidden)
             }
             .frame(width: 176)
-            .background(Color(nsColor: .windowBackgroundColor))
+            .background(WindowBackdrop(material: .sidebar))
 
             Divider()
 
@@ -49,13 +49,7 @@ struct CustomizationView: View {
             ZStack {
                 RoundedRectangle(cornerRadius: 22)
                     .fill(
-                        LinearGradient(
-                            colors: [
-                                Color(.sRGB, red: 0.98, green: 0.95, blue: 0.89, opacity: 1),
-                                Color(.sRGB, red: 0.95, green: 0.90, blue: 0.80, opacity: 1)
-                            ],
-                            startPoint: .top, endPoint: .bottom
-                        )
+                        CookieStageColors.gradient
                     )
                 SpriteView(scene: previewScene, options: [.allowsTransparency])
                     .frame(width: 224, height: 224)

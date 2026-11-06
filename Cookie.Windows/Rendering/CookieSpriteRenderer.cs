@@ -609,7 +609,55 @@ public static class CookieSpriteRenderer
         double hcy,
         CookieAppearanceConfig appearance)
     {
-        // 1. Glasses
+        RenderGlasses(dc, hcx, hcy, appearance);
+        RenderHeadwear(dc, hcx, hcy, appearance);
+    }
+
+    /// <summary>Scale and nudge pivots on the 180pt canvas, as fractions. Matches the macOS app.</summary>
+    private static readonly (AccessoryKind Kind, double X, double Y)[] PaintedArtAccessories =
+    {
+        (AccessoryKind.Scarf, 0.47, 0.75),
+        (AccessoryKind.Bandana, 0.47, 0.73),
+        (AccessoryKind.Collar, 0.47, 0.72),
+        (AccessoryKind.Bow, 0.255, 0.215),
+        (AccessoryKind.Hat, 0.545, 0.17),
+        (AccessoryKind.Pumpkin, 0.535, 0.125),
+        (AccessoryKind.SantaHat, 0.53, 0.185),
+        (AccessoryKind.Crown, 0.53, 0.15),
+        (AccessoryKind.Glasses, 0.466, 0.428),
+    };
+
+    /// <summary>
+    /// Draws enabled accessories over the painted 3D art. Each image covers the whole
+    /// canvas and is already registered with the base pose.
+    /// </summary>
+    public static void RenderAccessoriesOnPaintedArt(DrawingContext dc, CookieAppearanceConfig appearance)
+    {
+        double size = CanvasSize.Width;
+        foreach (var (kind, x, y) in PaintedArtAccessories)
+        {
+            var accessory = appearance.Accessory(kind);
+            if (!accessory.IsEnabled) continue;
+
+            string name = kind.ToString();
+            var art = CookieIcons.Art("Accessories", char.ToLowerInvariant(name[0]) + name[1..]);
+            if (art == null) continue;
+
+            var placement = new TransformGroup();
+            placement.Children.Add(new ScaleTransform(accessory.Scale, accessory.Scale, x * size, y * size));
+            placement.Children.Add(new TranslateTransform(0, accessory.OffsetY * 20));
+            dc.PushTransform(placement);
+            dc.DrawImage(art, new Rect(0, 0, size, size));
+            dc.Pop();
+        }
+    }
+
+    private static void RenderGlasses(
+        DrawingContext dc,
+        double hcx,
+        double hcy,
+        CookieAppearanceConfig appearance)
+    {
         var glasses = appearance.Accessory(AccessoryKind.Glasses);
         if (glasses.IsEnabled)
         {
@@ -636,8 +684,15 @@ public static class CookieSpriteRenderer
             dc.DrawLine(framePen, new Point(hcx - 6, hcy - 3), new Point(hcx + 6, hcy - 3));
             dc.Pop();
         }
+    }
 
-        // 2. Crown
+    private static void RenderHeadwear(
+        DrawingContext dc,
+        double hcx,
+        double hcy,
+        CookieAppearanceConfig appearance)
+    {
+        // 1. Crown
         var crown = appearance.Accessory(AccessoryKind.Crown);
         if (crown.IsEnabled)
         {
@@ -665,7 +720,7 @@ public static class CookieSpriteRenderer
             dc.DrawEllipse(gemBrush, null, new Point(hcx, crownY - 5), 3, 3);
         }
 
-        // 3. Party Hat
+        // 2. Party Hat
         var hat = appearance.Accessory(AccessoryKind.Hat);
         if (hat.IsEnabled)
         {
@@ -689,7 +744,7 @@ public static class CookieSpriteRenderer
             dc.DrawEllipse(pompomBrush, hatPen, new Point(hcx + 2, hatY - 32), 4.5, 4.5);
         }
 
-        // 4. Pumpkin Hat
+        // 3. Pumpkin Hat
         var pumpkin = appearance.Accessory(AccessoryKind.Pumpkin);
         if (pumpkin.IsEnabled)
         {
@@ -709,7 +764,7 @@ public static class CookieSpriteRenderer
             dc.DrawLine(stemPen, new Point(hcx, py - 18), new Point(hcx + 3, py - 24));
         }
 
-        // 5. Santa Hat
+        // 4. Santa Hat
         var santa = appearance.Accessory(AccessoryKind.SantaHat);
         if (santa.IsEnabled)
         {

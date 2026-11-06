@@ -14,6 +14,7 @@ using Cookie.Windows.Core.Persistence;
 using Cookie.Windows.Core.Startup;
 using Cookie.Windows.Core.Updates;
 using Cookie.Windows.Interop;
+using Cookie.Windows.Rendering;
 using Cookie.Windows.Views;
 
 namespace Cookie.Windows.Desktop;
@@ -43,6 +44,8 @@ public partial class CompanionWindow : Window
     private EmotePickerWindow? _activeEmotePicker;
     private AboutWindow? _activeAboutWindow;
     private UpdateDialogWindow? _activeUpdateWindow;
+    private WorldItemWindow? _worldItemWindow;
+    private WorldItemWindow? _boxBackWindow;
 
     public CompanionWindow(
         CookieAnimationController animationController,
@@ -72,6 +75,12 @@ public partial class CompanionWindow : Window
             Dispatcher.InvokeAsync(() => CatCanvas.UpdatePose(pose, direction));
         };
 
+        _animationController.OnSpriteFrameChanged += frame =>
+        {
+            Dispatcher.InvokeAsync(() => CatCanvas.UpdateSpriteFrame(frame));
+        };
+        _animationController.RefreshFrame();
+
         _behaviorController.OnPositionChanged += position =>
         {
             Dispatcher.InvokeAsync(() =>
@@ -85,6 +94,21 @@ public partial class CompanionWindow : Window
         {
             Dispatcher.InvokeAsync(() => CatCanvas.SetActiveEmote(emote));
         };
+
+        _behaviorController.OnWorldItemChanged += item =>
+        {
+            Dispatcher.InvokeAsync(() => ShowWorldItem(item));
+        };
+
+        _behaviorController.OnStateChanged += state =>
+        {
+            Dispatcher.InvokeAsync(() => ApplyStateToWorldItem(state));
+        };
+
+        _behaviorController.Statistics = _profile.Statistics;
+        _behaviorController.OnStatisticsChanged += () => _settingsManager.DebouncedSave(_profile);
+        _profile.Statistics.RecordLaunch(DateTime.UtcNow);
+        _settingsManager.DebouncedSave(_profile);
 
         RestoreInitialPosition();
 
@@ -164,6 +188,11 @@ public partial class CompanionWindow : Window
             _trayService?.HandleTrayMessage(wParam, lParam);
             handled = true;
             return IntPtr.Zero;
+        }
+
+        if (msg == NativeMethods.WM_SETTINGCHANGE)
+        {
+            CookieTheme.Refresh();
         }
 
         if (msg is NativeMethods.WM_DISPLAYCHANGE or NativeMethods.WM_DPICHANGED or NativeMethods.WM_SETTINGCHANGE)
@@ -254,6 +283,59 @@ public partial class CompanionWindow : Window
         _audioManager.PurringSounds = _profile.Settings.PurringSounds;
     }
 
+    private void ShowWorldItem(WorldItem? item)
+    {
+        if (item == null)
+        {
+            _worldItemWindow?.Close();
+            _worldItemWindow = null;
+            _boxBackWindow?.Close();
+            _boxBackWindow = null;
+            return;
+        }
+
+        if (_worldItemWindow == null)
+        {
+            _worldItemWindow = new WorldItemWindow(
+                item,
+                onMoved: centerX => _behaviorController.MoveWorldItem(centerX),
+                onDismiss: () => _behaviorController.ClearWorldItem());
+            _worldItemWindow.Show();
+
+            // Cookie stands in front of items until she climbs into a box.
+            Topmost = false;
+            Topmost = true;
+        }
+        else
+        {
+            _worldItemWindow.Reposition(item);
+            _boxBackWindow?.Reposition(item);
+        }
+    }
+
+    private void ApplyStateToWorldItem(CookieState state)
+    {
+        if (_worldItemWindow == null) return;
+
+        _worldItemWindow.SetInteracting(state is CookieState.Playing or CookieState.Eating or CookieState.Drinking);
+
+        // She sits between the box's walls: back wall behind her, front wall hiding her legs.
+        if (state == CookieState.InBox && _boxBackWindow == null && _behaviorController.CurrentWorldItem is { } box)
+        {
+            _worldItemWindow.SetArt("box-front");
+            _boxBackWindow = new WorldItemWindow(
+                box,
+                onMoved: centerX => _behaviorController.MoveWorldItem(centerX),
+                onDismiss: () => _behaviorController.ClearWorldItem());
+            _boxBackWindow.SetArt("box-back");
+            _boxBackWindow.Show();
+
+            Topmost = false;
+            Topmost = true;
+            _worldItemWindow.BringToFront();
+        }
+    }
+
     private void RecoverPositionToVisibleScreen()
     {
         var current = new CorePoint(Left, Top);
@@ -328,23 +410,27 @@ public partial class CompanionWindow : Window
     {
         var menu = new ContextMenu();
 
-        var petItem = new MenuItem { Header = "Pet Cookie 🧡" };
+        var petItem = new MenuItem { Header = "Pet Cookie", Icon = CookieIcons.MenuIcon("glyph-paw") };
         petItem.Click += (s, e) => _behaviorController.Pet();
         menu.Items.Add(petItem);
 
-        var emotePickerItem = new MenuItem { Header = "Emotes... 🎨" };
+        var emotePickerItem = new MenuItem { Header = "Emotes...", Icon = CookieIcons.MenuIcon("emote-happy") };
         emotePickerItem.Click += (s, e) => OpenEmotePickerWindow();
         menu.Items.Add(emotePickerItem);
 
-        var quickEmotesMenu = new MenuItem { Header = "Quick Emote" };
+        var quickEmotesMenu = new MenuItem { Header = "Quick Emote", Icon = CookieIcons.MenuIcon("glyph-heart") };
         foreach (var emote in Emote.All)
         {
-            var item = new MenuItem { Header = $"{emote.Emoji} {emote.Name}" };
+            var item = new MenuItem { Header = emote.Name, Icon = CookieIcons.MenuIcon(emote.Id.IconName()) };
             var capturedEmote = emote;
             item.Click += (s, e) => _behaviorController.TriggerEmote(capturedEmote);
             quickEmotesMenu.Items.Add(item);
         }
         menu.Items.Add(quickEmotesMenu);
+
+        menu.Items.Add(new Separator());
+
+        CareMenuBuilder.AddItems(menu, _behaviorController);
 
         menu.Items.Add(new Separator());
 
@@ -472,6 +558,11 @@ public partial class CompanionWindow : Window
 
         _trayService?.Dispose();
         _trayService = null;
+
+        _worldItemWindow?.Close();
+        _worldItemWindow = null;
+        _boxBackWindow?.Close();
+        _boxBackWindow = null;
 
         if (_updateService is IDisposable dispUpdate)
         {

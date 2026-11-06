@@ -121,6 +121,28 @@ public static class AccessoryKindExtensions
     }
 }
 
+public static class FurColorExtensions
+{
+    /// <summary>
+    /// Multiply tint for the painted art, in sRGB channels 0..1, or null to leave
+    /// it untouched. Values match the macOS app so both show the same fur colors.
+    /// </summary>
+    public static (double R, double G, double B)? GetPaintedArtTint(this FurColor color) => color switch
+    {
+        FurColor.WarmWhite => null,
+        FurColor.Cream => (0.965, 0.895, 0.76),
+        FurColor.Ivory => (0.985, 0.955, 0.885),
+        FurColor.SoftBeige => (0.90, 0.81, 0.66),
+        FurColor.MutedSage => (0.72, 0.77, 0.62),
+        FurColor.SoftGreen => (0.66, 0.75, 0.62),
+        FurColor.WarmPeach => (0.95, 0.77, 0.62),
+        FurColor.SoftOrange => (0.92, 0.66, 0.44),
+        FurColor.MutedBrown => (0.48, 0.38, 0.27),
+        FurColor.Charcoal => (0.30, 0.28, 0.26),
+        _ => null
+    };
+}
+
 public class AccessoryConfig
 {
     public AccessoryKind Kind { get; set; }
@@ -252,6 +274,18 @@ public class CookieAppearanceConfig
     public List<AccessoryConfig> Accessories { get; set; } = Enum.GetValues<AccessoryKind>()
         .Select(k => new AccessoryConfig(k))
         .ToList();
+
+    /// <summary>
+    /// The painted 3D art carries fur color, body shape and accessories. Coat patterns,
+    /// eye changes, and ear or tail shapes are only drawn by the vector renderer.
+    /// </summary>
+    [JsonIgnore]
+    public bool RequiresVectorRenderer =>
+        Pattern != FurPattern.None
+        || EyeColor != EyeColor.Charcoal
+        || EyeStyle != EyeStyle.Round
+        || EarVariation != EarVariation.Normal
+        || TailVariation != TailVariation.Normal;
 
     public AccessoryConfig Accessory(AccessoryKind kind)
     {

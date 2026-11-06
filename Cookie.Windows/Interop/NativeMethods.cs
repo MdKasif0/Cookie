@@ -144,6 +144,12 @@ public static class NativeMethods
     public static extern IntPtr GetForegroundWindow();
 
     [DllImport("dwmapi.dll")]
+    public static extern int DwmSetWindowAttribute(IntPtr hwnd, int dwAttribute, ref int pvAttribute, int cbAttribute);
+
+    [DllImport("dwmapi.dll")]
+    public static extern int DwmExtendFrameIntoClientArea(IntPtr hwnd, ref DwmMargins margins);
+
+    [DllImport("dwmapi.dll")]
     public static extern int DwmGetWindowAttribute(IntPtr hwnd, int dwAttribute, out int pvAttribute, int cbAttribute);
 
     [DllImport("shell32.dll", CallingConvention = CallingConvention.StdCall)]

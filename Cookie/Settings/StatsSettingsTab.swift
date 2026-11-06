@@ -22,7 +22,7 @@ struct StatsSettingsTab: View {
                 LabeledContent("Toys played with", value: "\(store.statistics.toysPlayedWith)")
                 LabeledContent("Cardboard box visits", value: "\(store.statistics.boxVisits)")
                 if let favorite = store.statistics.favoriteToy {
-                    LabeledContent("Favorite toy", value: "\(favorite.displayName) \(favorite.emoji)")
+                    LabeledContent("Favorite toy", value: favorite.displayName)
                 }
             }
             Section {

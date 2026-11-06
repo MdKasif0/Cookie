@@ -3,6 +3,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Cookie.Windows.Core.Animation;
 using Cookie.Windows.Core.Models;
 
 namespace Cookie.Windows.Rendering;
@@ -16,18 +17,32 @@ public class CookieCanvas : FrameworkElement
     private double _scale = 1.0;
     private Emote? _activeEmote;
     private BitmapImage? _emoteImage;
+    private SpriteFrameRef? _spriteFrame;
 
     public CookieCanvas()
     {
         Width = CookieSpriteRenderer.CanvasSize.Width;
         Height = CookieSpriteRenderer.CanvasSize.Height;
+        RenderOptions.SetBitmapScalingMode(this, BitmapScalingMode.HighQuality);
+    }
+
+    public void UpdateSpriteFrame(SpriteFrameRef frame)
+    {
+        _spriteFrame = frame;
+        if (!_appearance.RequiresVectorRenderer)
+        {
+            InvalidateVisual();
+        }
     }
 
     public void UpdatePose(CookiePose pose, CookieDirection direction)
     {
         _currentPose = pose;
         _direction = direction;
-        InvalidateVisual();
+        if (_appearance.RequiresVectorRenderer || (_spriteFrame == null && SpriteFrameCache.RestingFrame == null))
+        {
+            InvalidateVisual();
+        }
     }
 
     public void UpdatePalette(CharacterPalette palette)
@@ -97,23 +112,72 @@ public class CookieCanvas : FrameworkElement
     {
         base.OnRender(dc);
 
-        if (Math.Abs(_scale - 1.0) > 0.001)
+        // Draw in the 180pt canvas space, whatever size this control is laid out at.
+        double canvasWidth = CookieSpriteRenderer.CanvasSize.Width;
+        double renderScale = ActualWidth > 0 ? ActualWidth / canvasWidth : _scale;
+        bool isScaled = Math.Abs(renderScale - 1.0) > 0.001;
+        if (isScaled)
         {
-            dc.PushTransform(new ScaleTransform(_scale, _scale));
+            dc.PushTransform(new ScaleTransform(renderScale, renderScale));
         }
 
-        var characterDrawing = CookieSpriteRenderer.Render(_currentPose, _palette, _appearance, _direction);
-        dc.DrawDrawing(characterDrawing);
+        if (!_appearance.RequiresVectorRenderer && TryDrawPaintedFrame(dc))
+        {
+            // The painted cat was drawn.
+        }
+        else
+        {
+            var characterDrawing = CookieSpriteRenderer.Render(_currentPose, _palette, _appearance, _direction);
+            dc.DrawDrawing(characterDrawing);
+        }
 
         if (_activeEmote != null)
         {
             DrawEmoteOverlay(dc);
         }
 
-        if (Math.Abs(_scale - 1.0) > 0.001)
+        if (isScaled)
         {
             dc.Pop();
         }
+    }
+
+    private bool TryDrawPaintedFrame(DrawingContext dc)
+    {
+        var frameRef = _spriteFrame ?? SpriteFrameCache.RestingFrame;
+        if (frameRef == null) return false;
+
+        var bitmap = SpriteFrameCache.GetFrame(frameRef.Sheet, frameRef.Cell, _appearance.FurColor);
+        if (bitmap == null) return false;
+
+        double size = CookieSpriteRenderer.CanvasSize.Width;
+        var transform = new TransformGroup();
+
+        var (bodyX, bodyY) = _appearance.BodyVariation switch
+        {
+            BodyVariation.Chubby => (1.05, 1.02),
+            BodyVariation.Petite => (0.94, 0.96),
+            _ => (1.0, 1.0)
+        };
+        transform.Children.Add(new ScaleTransform(bodyX, bodyY, size / 2, size));
+
+        if (Math.Abs(frameRef.HeadTilt) > 0.001)
+        {
+            transform.Children.Add(new RotateTransform(-frameRef.HeadTilt, size / 2, size * 0.94));
+        }
+        if (frameRef.Direction == CookieDirection.Left)
+        {
+            transform.Children.Add(new ScaleTransform(-1, 1, size / 2, size / 2));
+        }
+
+        dc.PushTransform(transform);
+        dc.DrawImage(bitmap, new Rect(0, 0, size, size));
+        if (SpriteSheetCatalog.IsDrawnFromBasePose(frameRef.Sheet.Name))
+        {
+            CookieSpriteRenderer.RenderAccessoriesOnPaintedArt(dc, _appearance);
+        }
+        dc.Pop();
+        return true;
     }
 
     private void DrawEmoteOverlay(DrawingContext dc)

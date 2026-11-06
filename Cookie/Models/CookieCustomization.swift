@@ -306,15 +306,15 @@ enum AccessoryKind: String, CaseIterable, Codable, Identifiable {
     /// Anchor in artwork-normalized coordinates (top-left origin).
     var anchor: CGPoint {
         switch self {
-        case .collar: return CGPoint(x: 0.47, y: 0.62)
-        case .bow: return CGPoint(x: 0.27, y: 0.10)
-        case .hat: return CGPoint(x: 0.46, y: 0.03)
-        case .glasses: return CGPoint(x: 0.46, y: 0.415)
-        case .scarf: return CGPoint(x: 0.47, y: 0.635)
-        case .crown: return CGPoint(x: 0.46, y: 0.045)
-        case .bandana: return CGPoint(x: 0.47, y: 0.60)
-        case .pumpkin: return CGPoint(x: 0.46, y: 0.04)
-        case .santaHat: return CGPoint(x: 0.46, y: 0.03)
+        case .collar: return CGPoint(x: 0.47, y: 0.72)
+        case .bow: return CGPoint(x: 0.255, y: 0.215)
+        case .hat: return CGPoint(x: 0.545, y: 0.17)
+        case .glasses: return CGPoint(x: 0.466, y: 0.428)
+        case .scarf: return CGPoint(x: 0.47, y: 0.75)
+        case .crown: return CGPoint(x: 0.53, y: 0.15)
+        case .bandana: return CGPoint(x: 0.47, y: 0.73)
+        case .pumpkin: return CGPoint(x: 0.535, y: 0.125)
+        case .santaHat: return CGPoint(x: 0.53, y: 0.185)
         }
     }
 }

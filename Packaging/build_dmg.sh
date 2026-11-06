@@ -2,6 +2,47 @@
 set -euo pipefail
 
 # Cookie macOS Production DMG Packaging Script
+#
+# With no environment set, this produces an ad-hoc signed development DMG that
+# Gatekeeper blocks on other Macs. For a release that opens without warnings:
+#
+#   COOKIE_SIGN_IDENTITY="Developer ID Application: Your Name (TEAMID)"
+#   COOKIE_TEAM_ID="TEAMID"
+#   COOKIE_NOTARY_PROFILE="CookieNotary"    # from: xcrun notarytool store-credentials
+#
+# See DISTRIBUTION.md for how to obtain these.
+SIGN_IDENTITY="${COOKIE_SIGN_IDENTITY:-}"
+TEAM_ID="${COOKIE_TEAM_ID:-}"
+NOTARY_PROFILE="${COOKIE_NOTARY_PROFILE:-}"
+
+if [[ -n "${SIGN_IDENTITY}" && -z "${TEAM_ID}" ]]; then
+    echo "error: COOKIE_TEAM_ID is required when COOKIE_SIGN_IDENTITY is set." >&2
+    exit 1
+fi
+if [[ -n "${NOTARY_PROFILE}" && -z "${SIGN_IDENTITY}" ]]; then
+    echo "error: notarization requires COOKIE_SIGN_IDENTITY." >&2
+    exit 1
+fi
+
+# Signs one path with Hardened Runtime and a secure timestamp.
+sign_path() {
+    codesign --force --options runtime --timestamp --sign "${SIGN_IDENTITY}" "$@"
+}
+
+# Signs inside-out, as Sparkle documents for Developer ID distribution.
+# `codesign --deep` is deliberately avoided: it can drop nested entitlements.
+sign_app_bundle() {
+    local app="$1"
+    local sparkle="${app}/Contents/Frameworks/Sparkle.framework"
+    sign_path "${sparkle}/Versions/B/XPCServices/Installer.xpc"
+    sign_path --preserve-metadata=entitlements "${sparkle}/Versions/B/XPCServices/Downloader.xpc"
+    sign_path "${sparkle}/Versions/B/Autoupdate"
+    sign_path "${sparkle}/Versions/B/Updater.app"
+    sign_path "${sparkle}"
+    sign_path "${app}"
+    codesign --verify --deep --strict --verbose=2 "${app}"
+}
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 DIST_DIR="${PROJECT_ROOT}/dist"
@@ -15,14 +56,29 @@ TEMP_DMG="${DIST_DIR}/temp.dmg"
 FINAL_DMG="${DIST_DIR}/${DMG_NAME}"
 
 echo "==> 1. Ensuring clean distribution directories..."
-rm -rf "${DIST_DIR}"
+# Only this script's own outputs: dist/windows belongs to the Windows build.
+rm -rf "${STAGING_DIR}" "${TEMP_DMG}" "${FINAL_DMG}"
 mkdir -p "${DIST_DIR}" "${STAGING_DIR}"
 
 echo "==> 2. Building fresh Release application bundle..."
-DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild -scheme Cookie -configuration Release -derivedDataPath "${PROJECT_ROOT}/.build/DerivedData" build
+BUILD_SETTINGS=()
+if [[ -n "${SIGN_IDENTITY}" ]]; then
+    BUILD_SETTINGS+=(
+        "CODE_SIGN_IDENTITY=${SIGN_IDENTITY}"
+        "DEVELOPMENT_TEAM=${TEAM_ID}"
+        "ENABLE_HARDENED_RUNTIME=YES"
+        "CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO"
+        "OTHER_CODE_SIGN_FLAGS=--timestamp"
+    )
+fi
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild -scheme Cookie -configuration Release -derivedDataPath "${PROJECT_ROOT}/.build/DerivedData" build ${BUILD_SETTINGS[@]+"${BUILD_SETTINGS[@]}"}
 
 echo "==> 3. Populating staging directory..."
 cp -R "${RELEASE_APP}" "${STAGING_DIR}/${APP_NAME}.app"
+if [[ -n "${SIGN_IDENTITY}" ]]; then
+    echo "    Signing with: ${SIGN_IDENTITY}"
+    sign_app_bundle "${STAGING_DIR}/${APP_NAME}.app"
+fi
 ln -s /Applications "${STAGING_DIR}/Applications"
 
 # Custom DMG Volume Icon
@@ -104,8 +160,28 @@ echo "==> 9. Cleaning up temporary artifacts..."
 rm -f "${TEMP_DMG}"
 rm -rf "${STAGING_DIR}"
 
+if [[ -n "${SIGN_IDENTITY}" ]]; then
+    echo "==> 10. Signing disk image..."
+    codesign --force --timestamp --sign "${SIGN_IDENTITY}" "${FINAL_DMG}"
+    RELEASE_STATUS="Developer ID signed, NOT notarized (set COOKIE_NOTARY_PROFILE)"
+else
+    RELEASE_STATUS="Ad-hoc development build: Gatekeeper will block this on other Macs"
+fi
+
+if [[ -n "${NOTARY_PROFILE}" ]]; then
+    echo "==> 11. Notarizing (this usually takes a few minutes)..."
+    xcrun notarytool submit "${FINAL_DMG}" --keychain-profile "${NOTARY_PROFILE}" --wait
+    # stapler fails unless Apple accepted the submission, so a rejected build
+    # stops here. Inspect it with: xcrun notarytool log <submission-id>
+    xcrun stapler staple "${FINAL_DMG}"
+    xcrun stapler validate "${FINAL_DMG}"
+    spctl --assess --type open --context context:primary-signature --verbose=2 "${FINAL_DMG}"
+    RELEASE_STATUS="Developer ID signed, notarized and stapled"
+fi
+
 echo "========================================================"
 echo " Cookie distribution DMG generated successfully!"
 echo " Path: ${FINAL_DMG}"
+echo " Trust: ${RELEASE_STATUS}"
 echo " Size: $(ls -lh "${FINAL_DMG}" | awk '{print $5}')"
 echo "========================================================"

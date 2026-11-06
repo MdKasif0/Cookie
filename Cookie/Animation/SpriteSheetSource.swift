@@ -16,6 +16,12 @@ import os
 ///
 /// Grid sheets are sliced with `SKTexture(rectIn:)`, so the whole sheet
 /// stays one GPU texture regardless of frame count. Results are cached.
+///
+/// Fur color and body shape are baked into a recolored copy of each sheet.
+/// Coat patterns and eye customization only line up with the unmoving base
+/// painting, so animations drawn from it step aside when those are in use and
+/// the reference source renders them instead. Whole-pose animations keep their
+/// own painted faces, matching how expression stickers behave.
 @MainActor
 final class SpriteSheetSource: AnimationFrameSource {
     private struct SheetManifest: Codable {
@@ -29,6 +35,9 @@ final class SpriteSheetSource: AnimationFrameSource {
     private struct LoadedAnimation {
         var textures: [SKTexture]
         var manifest: SheetManifest?
+        /// The source sheet, kept only for grid sheets so it can be recolored.
+        var sheetImage: CGImage?
+        var grid: (columns: Int, rows: Int)?
     }
 
     private static let log = Logger(subsystem: "com.cookie.mac", category: "Sprites")
@@ -36,6 +45,12 @@ final class SpriteSheetSource: AnimationFrameSource {
 
     private let bundle: Bundle
     private var cache: [String: LoadedAnimation?] = [:]
+    private var tintedCache: [String: [SKTexture]] = [:]
+
+    /// Animations painted from the base artwork, which can show patterns and eye styles.
+    private static let baseArtAnimations: Set<CookieAnimationId> = [
+        .idle, .idleBlink, .sit, .stretch, .yawn, .tired, .meow, .curious, .investigate, .jump, .pickedUp
+    ]
 
     init(bundle: Bundle = .main) {
         self.bundle = bundle
@@ -48,7 +63,76 @@ final class SpriteSheetSource: AnimationFrameSource {
     }
 
     func textures(for animation: CookieAnimationId, config: CookieAppearanceConfig) -> [SKTexture]? {
-        load(animation)?.textures
+        if Self.baseArtAnimations.contains(animation), Self.hasFaceOrCoatCustomization(config) {
+            return nil
+        }
+        guard let loaded = load(animation) else { return nil }
+        let bodyScale = config.bodyVariation.scale
+        guard config.furColor.multiplyColor != nil || bodyScale.x != 1 || bodyScale.y != 1 else {
+            return loaded.textures
+        }
+        guard let source = loaded.sheetImage, let grid = loaded.grid else { return loaded.textures }
+
+        let key = "\(animation.spec.category.rawValue)/\(animation.spec.sheetName)|\(config.furColor.rawValue)|\(config.bodyVariation.rawValue)"
+        if let cached = tintedCache[key] { return cached }
+        guard let tinted = Self.tint(source, grid: grid, config: config) else { return loaded.textures }
+        let textures = sliced(tinted, manifest: loaded.manifest).textures
+        tintedCache[key] = textures
+        return textures
+    }
+
+    func frameRate(for animation: CookieAnimationId) -> Double? {
+        load(animation)?.manifest?.fps
+    }
+
+    private static func hasFaceOrCoatCustomization(_ config: CookieAppearanceConfig) -> Bool {
+        config.furPattern != .none || config.eyeColor.renderColor != nil || config.eyeStyle != .round
+    }
+
+    /// Multiplies fur color over a sheet and scales each cell around its feet,
+    /// the same way the reference source treats its frames.
+    private static func tint(_ sheet: CGImage, grid: (columns: Int, rows: Int), config: CookieAppearanceConfig) -> CGImage? {
+        let width = sheet.width
+        let height = sheet.height
+        func makeContext() -> CGContext? {
+            CGContext(
+                data: nil, width: width, height: height,
+                bitsPerComponent: 8, bytesPerRow: 0,
+                space: CGColorSpace(name: CGColorSpace.sRGB)!,
+                bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+            )
+        }
+
+        guard let shaped = makeContext() else { return nil }
+        shaped.interpolationQuality = .high
+        let full = CGRect(x: 0, y: 0, width: width, height: height)
+        let scale = config.bodyVariation.scale
+        let cellWidth = CGFloat(width) / CGFloat(grid.columns)
+        let cellHeight = CGFloat(height) / CGFloat(grid.rows)
+        for row in 0..<grid.rows {
+            for column in 0..<grid.columns {
+                let cell = CGRect(x: CGFloat(column) * cellWidth, y: CGFloat(row) * cellHeight,
+                                  width: cellWidth, height: cellHeight)
+                shaped.saveGState()
+                shaped.clip(to: cell)
+                shaped.translateBy(x: cell.midX, y: cell.minY)
+                shaped.scaleBy(x: scale.x, y: scale.y)
+                shaped.translateBy(x: -cell.midX, y: -cell.minY)
+                shaped.draw(sheet, in: full)
+                shaped.restoreGState()
+            }
+        }
+        guard let shapedImage = shaped.makeImage() else { return nil }
+        guard let multiply = config.furColor.multiplyColor else { return shapedImage }
+
+        guard let tinted = makeContext() else { return nil }
+        tinted.draw(shapedImage, in: full)
+        tinted.setBlendMode(.multiply)
+        tinted.setFillColor(multiply)
+        tinted.fill(full)
+        tinted.setBlendMode(.destinationIn)
+        tinted.draw(shapedImage, in: full)
+        return tinted.makeImage()
     }
 
     /// Frame count sanity cap so a malformed manifest cannot exhaust
@@ -94,7 +178,11 @@ final class SpriteSheetSource: AnimationFrameSource {
                 if let sheetURL = bundle.url(forResource: name, withExtension: "png", subdirectory: directory),
                    let image = NSImage(contentsOf: sheetURL),
                    let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) {
-                    return sliceSheet(cgImage, manifest: manifest, name: "\(spec.category.rawValue)/\(spec.sheetName)")
+                    var loaded = sliced(cgImage, manifest: manifest)
+                    loaded.sheetImage = cgImage
+                    loaded.grid = (max(1, manifest?.grid?.first ?? 1), max(1, manifest?.grid?.last ?? 1))
+                    Self.log.info("Loaded sheet \(spec.category.rawValue, privacy: .public)/\(spec.sheetName, privacy: .public): \(loaded.textures.count) frames")
+                    return loaded
                 }
             }
         }
@@ -117,7 +205,7 @@ final class SpriteSheetSource: AnimationFrameSource {
         return nil
     }
 
-    private func sliceSheet(_ cgImage: CGImage, manifest: SheetManifest?, name: String) -> LoadedAnimation {
+    private func sliced(_ cgImage: CGImage, manifest: SheetManifest?) -> LoadedAnimation {
         let sheet = SKTexture(cgImage: cgImage)
         let columns = manifest?.grid?.first ?? 1
         let rows = manifest?.grid?.last ?? 1
@@ -142,7 +230,6 @@ final class SpriteSheetSource: AnimationFrameSource {
             )
             textures.append(SKTexture(rect: rect, in: sheet))
         }
-        Self.log.info("Loaded sheet \(name, privacy: .public): \(textures.count) frames")
         return LoadedAnimation(textures: textures, manifest: manifest)
     }
 }

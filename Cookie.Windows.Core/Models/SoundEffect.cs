@@ -20,6 +20,18 @@ public enum SoundEffect
 
 public static class SoundEffectExtensions
 {
+    /// <summary>Alternate takes, so repeated sounds don't feel mechanical. The first is the default.</summary>
+    public static string[] GetFileNames(this SoundEffect sound)
+    {
+        return sound switch
+        {
+            SoundEffect.Meow => new[] { "cookie-meow.wav", "cookie-meow-2.wav", "cookie-meow-3.wav" },
+            SoundEffect.Mew => new[] { "cookie-mew.wav", "cookie-mew-2.wav" },
+            SoundEffect.Happy => new[] { "cookie-happy.wav", "cookie-happy-2.wav" },
+            _ => new[] { sound.GetFileName() }
+        };
+    }
+
     public static string GetFileName(this SoundEffect sound)
     {
         return sound switch

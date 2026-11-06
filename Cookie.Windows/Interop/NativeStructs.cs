@@ -80,3 +80,12 @@ public struct NOTIFYICONDATA
     public Guid guidItem;
     public IntPtr hBalloonIcon;
 }
+
+[StructLayout(LayoutKind.Sequential)]
+public struct DwmMargins
+{
+    public int Left;
+    public int Right;
+    public int Top;
+    public int Bottom;
+}

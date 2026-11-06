@@ -52,6 +52,35 @@ public static class CookiePersonalityExtensions
     /// <summary>
     /// Desktop strolling speed in points per second.
     /// </summary>
+    /// <summary>The animation that shows this personality off during first-run setup.</summary>
+    public static CookieAnimationId GetShowcaseAnimation(this CookiePersonality personality)
+    {
+        return personality switch
+        {
+            CookiePersonality.Sleepy => CookieAnimationId.Sleep,
+            CookiePersonality.Playful => CookieAnimationId.Playful,
+            CookiePersonality.Affectionate => CookieAnimationId.Pet,
+            CookiePersonality.Energetic => CookieAnimationId.RunRight,
+            CookiePersonality.Curious => CookieAnimationId.Curious,
+            CookiePersonality.Grumpy => CookieAnimationId.Annoyed,
+            _ => CookieAnimationId.Idle
+        };
+    }
+
+    public static SoundEffect GetGreetingSound(this CookiePersonality personality)
+    {
+        return personality switch
+        {
+            CookiePersonality.Sleepy => SoundEffect.Sleep,
+            CookiePersonality.Playful => SoundEffect.Toy,
+            CookiePersonality.Affectionate => SoundEffect.Purr,
+            CookiePersonality.Energetic => SoundEffect.Happy,
+            CookiePersonality.Curious => SoundEffect.Chirp,
+            CookiePersonality.Grumpy => SoundEffect.Meow,
+            _ => SoundEffect.Chirp
+        };
+    }
+
     public static double GetWalkSpeed(this CookiePersonality personality)
     {
         return personality switch

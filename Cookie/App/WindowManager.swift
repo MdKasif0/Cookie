@@ -106,15 +106,18 @@ final class WindowManager: NSObject, NSWindowDelegate {
         }
 
         let panel = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 420, height: 560),
-            styleMask: [.titled, .closable, .miniaturizable],
+            contentRect: NSRect(x: 0, y: 0, width: 480, height: 720),
+            styleMask: [.titled, .closable, .miniaturizable, .fullSizeContentView],
             backing: .buffered,
             defer: false
         )
         panel.title = "Welcome to Cookie"
+        panel.titlebarAppearsTransparent = true
+        panel.titleVisibility = .hidden
+        panel.isMovableByWindowBackground = true
         panel.isReleasedWhenClosed = false
         panel.delegate = self
-        let model = WelcomeViewModel(store: store, onContinue: onContinue)
+        let model = WelcomeViewModel(store: store, audioManager: audioManager, onContinue: onContinue)
         let content = WelcomeView(model: model).environmentObject(store)
         panel.contentViewController = NSHostingController(rootView: content)
         panel.center()

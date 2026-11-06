@@ -44,9 +44,11 @@ public class AudioVolumeAndThrottlingTests
         var manager = new TestAudioManager();
         manager.SoundEnabled = true;
 
-        manager.Play(SoundEffect.Purr);
-        bool secondPlay = manager.Play(SoundEffect.Purr);
+        // Purring is exempt: repeat calls extend its loop instead.
+        bool firstPlay = manager.Play(SoundEffect.Meow);
+        bool secondPlay = manager.Play(SoundEffect.Meow);
 
+        Assert.True(firstPlay);
         Assert.False(secondPlay);
     }
 }

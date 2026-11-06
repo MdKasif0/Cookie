@@ -13,6 +13,8 @@ namespace Cookie.Windows.ViewModels;
 
 public class SettingsViewModel : INotifyPropertyChanged
 {
+    public CookieStatistics Statistics => _profile.Statistics;
+
     private readonly CookieProfile _profile;
     private readonly SettingsManager _settingsManager;
     private readonly AudioManagerBase _audioManager;

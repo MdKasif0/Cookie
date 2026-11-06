@@ -65,7 +65,7 @@ const CookieReleases = {
       {
         step: 4,
         title: "Launch Cookie",
-        desc: "Open Cookie from Applications or Spotlight (Cmd + Space). Cookie will spawn directly onto your desktop."
+        desc: "Open Cookie from Applications. If macOS blocks it, go to System Settings → Privacy & Security and click Open Anyway. Cookie then appears on your desktop."
       },
       {
         step: 5,
@@ -75,7 +75,7 @@ const CookieReleases = {
     ],
     securityNotes: {
       title: "macOS Security & Integrity",
-      desc: "Built with native Swift and SpriteKit. Includes Sparkle automatic updates protected by cryptographic EdDSA signature verification. Free and MIT open source."
+      desc: "This independent build is not yet signed with an Apple Developer ID, so macOS asks you to approve it once under System Settings → Privacy & Security → Open Anyway. Updates through Sparkle are verified with EdDSA signatures. Free and MIT open source."
     }
   },
 
@@ -94,7 +94,7 @@ const CookieReleases = {
     sha256: "1b9990805306716a7a6720105580be40586f1aab4aaf96e9c04a892bde05e534",
     isInstallerAvailable: true,
     installerStatusText: "Official Windows Setup (.exe)",
-    installerNote: "Compiled with Inno Setup 6 on GitHub Actions Windows runner. Fully self-contained .NET 8 desktop companion.",
+    installerNote: "Compiled with Inno Setup 6 on GitHub Actions Windows runner. Fully self-contained .NET 10 desktop companion.",
     
     // Verified portable release built on Windows CI
     portable: {
@@ -116,7 +116,7 @@ const CookieReleases = {
     specs: [
       {
         title: "64-bit Architecture",
-        desc: "Native x64 WPF application built on .NET 8 for modern Windows desktops and laptops.",
+        desc: "Native x64 WPF application built on .NET 10 for modern Windows desktops and laptops.",
         pill: "Windows x64"
       },
       {

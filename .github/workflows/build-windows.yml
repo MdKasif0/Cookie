@@ -13,6 +13,10 @@ jobs:
     defaults:
       run:
         shell: pwsh
+    env:
+      # Signing runs only when its secrets exist. See DISTRIBUTION.md.
+      SIGN_WITH_AZURE: ${{ secrets.AZURE_CLIENT_ID != '' }}
+      SIGN_WITH_PFX: ${{ secrets.WINDOWS_CERT_PFX_BASE64 != '' }}
 
     steps:
       - name: Checkout Repository
@@ -21,7 +25,7 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: '10.0.x'
 
       - name: Restore Dependencies
         run: dotnet restore Cookie.Windows.sln
@@ -45,7 +49,14 @@ jobs:
             "dist/windows/win-x64/Resources/Sprites/Cookie/Emotes/Love/love.png",
             "dist/windows/win-x64/Resources/Sprites/Cookie/Emotes/Wave/wave.png",
             "dist/windows/win-x64/Resources/Sprites/Cookie/Emotes/Sleepy/sleepy.png",
-            "dist/windows/win-x64/Resources/Sprites/Cookie/Emotes/Playful/playful.png"
+            "dist/windows/win-x64/Resources/Sprites/Cookie/Emotes/Playful/playful.png",
+            "dist/windows/win-x64/Resources/Sprites/Cookie/Idle/idle.png",
+            "dist/windows/win-x64/Resources/Sprites/Cookie/Walk/walk.png",
+            "dist/windows/win-x64/Resources/Sprites/Cookie/Sleep/sleep.png",
+            "dist/windows/win-x64/Resources/CookieTray.ico",
+            "dist/windows/win-x64/Resources/Sprites/Cookie/Items/yarnBall.png",
+            "dist/windows/win-x64/Resources/Sprites/Cookie/Accessories/hat.png",
+            "dist/windows/win-x64/Resources/Sprites/Cookie/Icons/glyph-paw.png"
           )
           foreach ($file in $required) {
             if (-not (Test-Path $file)) {
@@ -54,6 +65,32 @@ jobs:
             }
           }
           Write-Host "All required assets verified successfully."
+
+      - name: Sign Application Binaries (Azure Artifact Signing)
+        if: env.SIGN_WITH_AZURE == 'true'
+        uses: azure/artifact-signing-action@v2.0.0
+        with:
+          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure-client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+          endpoint: ${{ secrets.AZURE_SIGNING_ENDPOINT }}
+          signing-account-name: ${{ secrets.AZURE_SIGNING_ACCOUNT }}
+          certificate-profile-name: ${{ secrets.AZURE_SIGNING_PROFILE }}
+          files: |
+            ${{ github.workspace }}\dist\windows\win-x64\Cookie.exe
+            ${{ github.workspace }}\dist\windows\win-x64\Cookie.dll
+            ${{ github.workspace }}\dist\windows\win-x64\Cookie.Windows.Core.dll
+          file-digest: SHA256
+          timestamp-rfc3161: http://timestamp.acs.microsoft.com
+          timestamp-digest: SHA256
+
+      - name: Sign Application Binaries (PFX)
+        if: env.SIGN_WITH_PFX == 'true' && env.SIGN_WITH_AZURE != 'true'
+        env:
+          WINDOWS_CERT_PFX_BASE64: ${{ secrets.WINDOWS_CERT_PFX_BASE64 }}
+          WINDOWS_CERT_PASSWORD: ${{ secrets.WINDOWS_CERT_PASSWORD }}
+        run: |
+          ./Packaging/windows/sign.ps1 -Files dist/windows/win-x64/Cookie.exe,dist/windows/win-x64/Cookie.dll,dist/windows/win-x64/Cookie.Windows.Core.dll
 
       - name: Install Inno Setup
         run: |
@@ -66,6 +103,31 @@ jobs:
           & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" Packaging/windows/CookieSetup.iss
           Copy-Item dist/windows/installer/CookieSetup-1.1.0.exe dist/windows/installer/Cookie-Setup.exe -Force
           Write-Host "Inno Setup installer compiled successfully."
+
+      - name: Sign Installer (Azure Artifact Signing)
+        if: env.SIGN_WITH_AZURE == 'true'
+        uses: azure/artifact-signing-action@v2.0.0
+        with:
+          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure-client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+          endpoint: ${{ secrets.AZURE_SIGNING_ENDPOINT }}
+          signing-account-name: ${{ secrets.AZURE_SIGNING_ACCOUNT }}
+          certificate-profile-name: ${{ secrets.AZURE_SIGNING_PROFILE }}
+          files: |
+            ${{ github.workspace }}\dist\windows\installer\Cookie-Setup.exe
+            ${{ github.workspace }}\dist\windows\installer\CookieSetup-1.1.0.exe
+          file-digest: SHA256
+          timestamp-rfc3161: http://timestamp.acs.microsoft.com
+          timestamp-digest: SHA256
+
+      - name: Sign Installer (PFX)
+        if: env.SIGN_WITH_PFX == 'true' && env.SIGN_WITH_AZURE != 'true'
+        env:
+          WINDOWS_CERT_PFX_BASE64: ${{ secrets.WINDOWS_CERT_PFX_BASE64 }}
+          WINDOWS_CERT_PASSWORD: ${{ secrets.WINDOWS_CERT_PASSWORD }}
+        run: |
+          ./Packaging/windows/sign.ps1 -Files dist/windows/installer/Cookie-Setup.exe,dist/windows/installer/CookieSetup-1.1.0.exe
 
       - name: Package Portable Zip
         run: |

@@ -12,6 +12,7 @@ public partial class AboutWindow : Window
     public AboutWindow(CookieAppearanceConfig? appearance = null, Action? onCheckUpdates = null)
     {
         InitializeComponent();
+        Cookie.Windows.Desktop.CookieTheme.Attach(this);
         _onCheckUpdates = onCheckUpdates;
 
         if (appearance != null)

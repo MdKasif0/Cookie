@@ -28,12 +28,13 @@ final class MenuBarController: NSObject, NSMenuDelegate {
     private func setupStatusItem() {
         let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         if let button = item.button {
-            if let image = NSImage(systemSymbolName: "cat.fill", accessibilityDescription: "Cookie") {
+            if let image = NSImage(named: "CookieMenuBar") {
                 image.isTemplate = true
+                image.accessibilityDescription = "Cookie"
                 button.image = image
                 button.imagePosition = .imageOnly
             } else {
-                button.title = "🐱 Cookie"
+                button.title = "Cookie"
             }
             button.toolTip = "Cookie"
             button.setAccessibilityLabel("Cookie")
@@ -72,10 +73,12 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         // 2. Hide / Show Cookie
         if store.profile.isCompanionVisible {
             let hideItem = NSMenuItem(title: "Hide Cookie", action: #selector(toggleCompanionAction), keyEquivalent: "")
+            hideItem.image = CookieArtwork.menuIcon("glyph-moon")
             hideItem.target = self
             menu.addItem(hideItem)
         } else {
             let showItem = NSMenuItem(title: "Show Cookie", action: #selector(toggleCompanionAction), keyEquivalent: "")
+            showItem.image = CookieArtwork.menuIcon("glyph-moon")
             showItem.target = self
             menu.addItem(showItem)
         }
@@ -84,11 +87,13 @@ final class MenuBarController: NSObject, NSMenuDelegate {
 
         // 3. Pet Cookie
         let petItem = NSMenuItem(title: "Pet Cookie", action: #selector(petAction), keyEquivalent: "")
+        petItem.image = CookieArtwork.menuIcon("glyph-paw")
         petItem.target = self
         menu.addItem(petItem)
 
         // 4. Play With Cookie
         let playItem = NSMenuItem(title: "Play", action: #selector(playAction), keyEquivalent: "")
+        playItem.image = CookieArtwork.menuIcon("item-yarnBall")
         playItem.target = self
         menu.addItem(playItem)
 
@@ -99,6 +104,7 @@ final class MenuBarController: NSObject, NSMenuDelegate {
             keyEquivalent: "e"
         )
         emotesItem.keyEquivalentModifierMask = [.command]
+        emotesItem.image = CookieArtwork.menuIcon("emote-happy")
         emotesItem.target = self
         menu.addItem(emotesItem)
 
@@ -109,14 +115,16 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         let feedSubmenu = NSMenu(title: "Feed Cookie")
         for food in FoodKind.allCases {
             let foodItem = NSMenuItem(
-                title: "\(food.displayName) \(food.emoji)",
+                title: food.displayName,
                 action: #selector(feedAction(_:)),
                 keyEquivalent: ""
             )
+            foodItem.image = CookieArtwork.menuIcon(food.iconName)
             foodItem.target = self
             foodItem.representedObject = food
             feedSubmenu.addItem(foodItem)
         }
+        feedMenuItem.image = CookieArtwork.menuIcon("item-food-fish")
         feedMenuItem.submenu = feedSubmenu
         menu.addItem(feedMenuItem)
 
@@ -125,10 +133,11 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         let toysSubmenu = NSMenu(title: "Toys")
         for toy in ToyKind.allCases {
             let toyItem = NSMenuItem(
-                title: "\(toy.displayName) \(toy.emoji)",
+                title: toy.displayName,
                 action: #selector(offerToyAction(_:)),
                 keyEquivalent: ""
             )
+            toyItem.image = CookieArtwork.menuIcon(toy.iconName)
             toyItem.target = self
             toyItem.representedObject = toy
             toysSubmenu.addItem(toyItem)
@@ -136,13 +145,15 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         if environment.hasActiveWorldItem {
             toysSubmenu.addItem(.separator())
             let clearItem = NSMenuItem(
-                title: "Put Toys Away 🧹",
+                title: "Put Toys Away",
                 action: #selector(clearWorldItemAction),
                 keyEquivalent: ""
             )
+            clearItem.image = CookieArtwork.menuIcon("item-box")
             clearItem.target = self
             toysSubmenu.addItem(clearItem)
         }
+        toysMenuItem.image = CookieArtwork.menuIcon("item-ball")
         toysMenuItem.submenu = toysSubmenu
         menu.addItem(toysMenuItem)
 
@@ -151,6 +162,7 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         // 7. Customize
         let customItem = NSMenuItem(title: "Customize Cookie…", action: #selector(customizeAction), keyEquivalent: "k")
         customItem.keyEquivalentModifierMask = .command
+        customItem.image = CookieArtwork.menuIcon("glyph-palette")
         customItem.target = self
         menu.addItem(customItem)
 
@@ -190,6 +202,7 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         settingsItem.target = self
         appMenu.addItem(settingsItem)
         let customItem = NSMenuItem(title: "Customize Cookie…", action: #selector(customizeAction), keyEquivalent: "k")
+        customItem.image = CookieArtwork.menuIcon("glyph-palette")
         customItem.target = self
         appMenu.addItem(customItem)
         let updateItem = NSMenuItem(title: "Check for Updates…", action: #selector(checkForUpdatesAction), keyEquivalent: "")
@@ -197,6 +210,7 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         appMenu.addItem(updateItem)
         appMenu.addItem(.separator())
         let hideItem = NSMenuItem(title: "Hide Cookie", action: #selector(toggleCompanionAction), keyEquivalent: "h")
+        hideItem.image = CookieArtwork.menuIcon("glyph-moon")
         hideItem.target = self
         appMenu.addItem(hideItem)
         appMenu.addItem(.separator())
@@ -210,9 +224,11 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         let careMenuItem = NSMenuItem()
         let careMenu = NSMenu(title: "Care & Play")
         let petItem = NSMenuItem(title: "Pet Cookie", action: #selector(petAction), keyEquivalent: "p")
+        petItem.image = CookieArtwork.menuIcon("glyph-paw")
         petItem.target = self
         careMenu.addItem(petItem)
         let playItem = NSMenuItem(title: "Play With Cookie", action: #selector(playAction), keyEquivalent: "l")
+        playItem.image = CookieArtwork.menuIcon("item-yarnBall")
         playItem.target = self
         careMenu.addItem(playItem)
         careMenuItem.submenu = careMenu
@@ -223,15 +239,17 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         let emotesMenu = NSMenu(title: "Emotes")
         let openPickerItem = NSMenuItem(title: "Open Emotes…", action: #selector(openEmotesPickerAction), keyEquivalent: "e")
         openPickerItem.keyEquivalentModifierMask = [.command]
+        openPickerItem.image = CookieArtwork.menuIcon("emote-happy")
         openPickerItem.target = self
         emotesMenu.addItem(openPickerItem)
         emotesMenu.addItem(.separator())
         for emote in Emote.allEmotes {
             let item = NSMenuItem(
-                title: "\(emote.name) \(emote.emoji)",
+                title: emote.name,
                 action: #selector(emoteAction(_:)),
                 keyEquivalent: ""
             )
+            item.image = CookieArtwork.menuIcon("emote-\(emote.id.rawValue)")
             item.target = self
             item.representedObject = emote
             emotesMenu.addItem(item)
@@ -243,7 +261,8 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         let feedMenuItem = NSMenuItem()
         let feedMenu = NSMenu(title: "Feed Cookie")
         for food in FoodKind.allCases {
-            let foodItem = NSMenuItem(title: "\(food.displayName) \(food.emoji)", action: #selector(feedAction(_:)), keyEquivalent: "")
+            let foodItem = NSMenuItem(title: food.displayName, action: #selector(feedAction(_:)), keyEquivalent: "")
+            foodItem.image = CookieArtwork.menuIcon(food.iconName)
             foodItem.target = self
             foodItem.representedObject = food
             feedMenu.addItem(foodItem)
@@ -255,7 +274,8 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         let toysMenuItem = NSMenuItem()
         let toysMenu = NSMenu(title: "Toys")
         for toy in ToyKind.allCases {
-            let toyItem = NSMenuItem(title: "\(toy.displayName) \(toy.emoji)", action: #selector(offerToyAction(_:)), keyEquivalent: "")
+            let toyItem = NSMenuItem(title: toy.displayName, action: #selector(offerToyAction(_:)), keyEquivalent: "")
+            toyItem.image = CookieArtwork.menuIcon(toy.iconName)
             toyItem.target = self
             toyItem.representedObject = toy
             toysMenu.addItem(toyItem)
@@ -297,10 +317,6 @@ final class MenuBarController: NSObject, NSMenuDelegate {
 
     @objc private func openEmotesPickerAction() {
         environment.showEmotePicker()
-    }
-
-    private static func emoteEmoji(for id: EmoteId) -> String {
-        id.emoji
     }
 
     @objc private func feedAction(_ sender: NSMenuItem) {

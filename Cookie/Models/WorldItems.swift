@@ -36,6 +36,9 @@ enum ToyKind: String, CaseIterable, Codable, Identifiable {
     }
 
     var isBox: Bool { self == .box }
+
+    var assetName: String { rawValue == "box" ? "box" : rawValue }
+    var iconName: String { "item-\(assetName)" }
 }
 
 /// The foods the user can offer Cookie from the menu bar.
@@ -75,6 +78,9 @@ enum FoodKind: String, CaseIterable, Codable, Identifiable {
     }
 
     var isLiquid: Bool { self == .milk }
+
+    var assetName: String { "food-\(rawValue)" }
+    var iconName: String { "item-\(assetName)" }
 }
 
 /// Anything placed on Cookie's desktop for a while.
@@ -115,6 +121,15 @@ enum WorldItemKind: Equatable, Codable {
         case .toy(let toy): return toy.displayName
         case .food(let food): return food.displayName
         case .box: return "Cardboard Box"
+        }
+    }
+
+    /// File name of the item's art under Sprites/Cookie/Items.
+    var assetName: String {
+        switch self {
+        case .toy(let toy): return toy.assetName
+        case .food(let food): return food.assetName
+        case .box: return "box"
         }
     }
 

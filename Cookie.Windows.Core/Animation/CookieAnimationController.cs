@@ -13,10 +13,14 @@ public class CookieAnimationController
     private CookieDirection _facingDirection = CookieDirection.Right;
     private double _animationIntensity = 1.0;
 
+    private readonly SpriteSheetCatalog? _spriteCatalog;
+    private SpriteSheet? _currentSheet;
+
     private double _dynamicGazeX = 0.0;
     private double _dynamicHeadTilt = 0.0;
 
     public event Action<CookiePose, CookieDirection>? OnFrameChanged;
+    public event Action<SpriteFrameRef>? OnSpriteFrameChanged;
     public event Action<CookieAnimationId>? OnAnimationCompleted;
 
     public CookieAnimationId CurrentAnimationId => _currentAnimationId;
@@ -28,8 +32,9 @@ public class CookieAnimationController
         set => _animationIntensity = Math.Clamp(value, 0.5, 1.5);
     }
 
-    public CookieAnimationController()
+    public CookieAnimationController(SpriteSheetCatalog? spriteCatalog = null)
     {
+        _spriteCatalog = spriteCatalog;
         SetAnimation(CookieAnimationId.Idle, force: true);
     }
 
@@ -49,6 +54,15 @@ public class CookieAnimationController
 
         SetAnimation(animationId);
         return true;
+    }
+
+    /// <summary>
+    /// Plays an animation regardless of priority, for scripted sequences that
+    /// own the character and step from a looping animation to a lower-priority one.
+    /// </summary>
+    public void ForceAnimation(CookieAnimationId animationId)
+    {
+        SetAnimation(animationId, force: true);
     }
 
     public void SetFacing(CookieDirection direction)
@@ -74,11 +88,18 @@ public class CookieAnimationController
         NotifyCurrentFrame();
     }
 
+    /// <summary>Re-sends the current frame, for listeners attached after construction.</summary>
+    public void RefreshFrame() => NotifyCurrentFrame();
+
+    /// <summary>Sprite sheets set their own timing; pose animations use the animation's defaults.</summary>
+    private int FrameCount => _currentSheet?.Frames.Count ?? _currentFrames.Length;
+    private double BaseFps => _currentSheet?.Fps ?? _currentSpec.Fps;
+
     public void Update(double deltaTimeSeconds)
     {
-        if (_currentFrames.Length == 0) return;
+        if (FrameCount == 0) return;
 
-        double effectiveFps = _currentSpec.Fps * _animationIntensity;
+        double effectiveFps = BaseFps * _animationIntensity;
         double frameDuration = 1.0 / Math.Max(effectiveFps, 1.0);
 
         _frameTimer += deltaTimeSeconds;
@@ -90,16 +111,16 @@ public class CookieAnimationController
 
             int nextIndex = _currentFrameIndex + framesToAdvance;
 
-            if (nextIndex >= _currentFrames.Length)
+            if (nextIndex >= FrameCount)
             {
                 if (_currentSpec.IsLooping)
                 {
-                    _currentFrameIndex = nextIndex % _currentFrames.Length;
+                    _currentFrameIndex = nextIndex % FrameCount;
                 }
                 else
                 {
                     var completedId = _currentAnimationId;
-                    _currentFrameIndex = _currentFrames.Length - 1;
+                    _currentFrameIndex = FrameCount - 1;
                     OnAnimationCompleted?.Invoke(completedId);
 
                     SetAnimation(CookieAnimationId.Idle, force: true);
@@ -132,6 +153,7 @@ public class CookieAnimationController
 
         var frames = CookiePoseCatalog.GetFrames(_currentSpec.SheetName);
         _currentFrames = frames ?? CookiePoseCatalog.GetFrames("idle") ?? new[] { new CookiePose() };
+        _currentSheet = _spriteCatalog?.Find(_currentSpec);
         _currentFrameIndex = 0;
         _frameTimer = 0.0;
 
@@ -142,7 +164,14 @@ public class CookieAnimationController
     {
         if (_currentFrames.Length == 0) return;
 
-        var basePose = _currentFrames[Math.Clamp(_currentFrameIndex, 0, _currentFrames.Length - 1)];
+        if (_currentSheet != null)
+        {
+            int cell = _currentSheet.Frames[Math.Clamp(_currentFrameIndex, 0, _currentSheet.Frames.Count - 1)];
+            OnSpriteFrameChanged?.Invoke(new SpriteFrameRef(_currentSheet, cell, _facingDirection, _dynamicHeadTilt));
+        }
+
+        // Keeps the vector fallback in step when frame counts differ.
+        var basePose = _currentFrames[_currentFrameIndex % _currentFrames.Length];
 
         if (Math.Abs(_dynamicGazeX) > 0.001 || Math.Abs(_dynamicHeadTilt) > 0.001)
         {

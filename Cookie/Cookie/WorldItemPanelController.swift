@@ -8,6 +8,7 @@ import os
 @MainActor
 final class WorldItemPanelController: NSWindowController {
     static let panelSize = CGSize(width: 80, height: 80)
+    static let boxDimension: CGFloat = 170
 
     private let behaviorEngine: CookieBehaviorEngine
     private let log = Logger(subsystem: "com.cookie.mac", category: "WorldItemPanel")
@@ -39,15 +40,19 @@ final class WorldItemPanelController: NSWindowController {
             return
         }
 
-        // Align the item's baseline with Cookie's feet
-        let itemX = item.x - Self.panelSize.width / 2
-        let itemY = companionFrame.minY + 8 // rests comfortably on the floor next to Cookie
-        let frame = NSRect(x: itemX, y: itemY, width: Self.panelSize.width, height: Self.panelSize.height)
+        // Items scale with Cookie. The box is large enough for her to climb into.
+        let companionScale = companionFrame.width / CookieScreenGeometry.basePanelDimension
+        let side = (item.kind.isBox ? Self.boxDimension : Self.panelSize.width) * companionScale
+
+        // Each image's ground line is 10% up from its bottom edge. Rest it where her shadow sits.
+        let groundY = companionFrame.minY + 8 * companionScale
+        let frame = NSRect(x: item.x - side / 2, y: groundY - side * 0.1, width: side, height: side)
 
         let rootView = WorldItemView(
             item: item,
             isInteracting: item.isInteracting || behaviorEngine.state == .playing,
             isEating: behaviorEngine.state == .eating || behaviorEngine.state == .drinking,
+            size: side,
             onDismiss: { [weak self] in
                 self?.behaviorEngine.clearWorldItem()
             },

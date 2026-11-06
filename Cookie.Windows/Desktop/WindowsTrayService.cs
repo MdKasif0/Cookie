@@ -8,6 +8,7 @@ using Cookie.Windows.Core.Models;
 using Cookie.Windows.Core.Persistence;
 using Cookie.Windows.Core.Startup;
 using Cookie.Windows.Interop;
+using Cookie.Windows.Rendering;
 using Cookie.Windows.Views;
 
 namespace Cookie.Windows.Desktop;
@@ -28,6 +29,9 @@ public class WindowsTrayService : IDisposable
     private readonly Action _openEmotePickerAction;
     private readonly Action _openAboutAction;
     private readonly Action _checkForUpdatesAction;
+
+    private const int SmallIconWidthMetric = 49;
+    private const int SmallIconHeightMetric = 50;
 
     private NOTIFYICONDATA _nid;
     private IntPtr _hIcon = IntPtr.Zero;
@@ -63,7 +67,7 @@ public class WindowsTrayService : IDisposable
     private void InitializeTrayIcon()
     {
         string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-        string icoPath = Path.Combine(baseDir, "Resources", "Cookie.ico");
+        string icoPath = Path.Combine(baseDir, "Resources", "CookieTray.ico");
 
         if (File.Exists(icoPath))
         {
@@ -71,8 +75,8 @@ public class WindowsTrayService : IDisposable
                 IntPtr.Zero,
                 icoPath,
                 1 /* IMAGE_ICON */,
-                16,
-                16,
+                NativeMethods.GetSystemMetrics(SmallIconWidthMetric),
+                NativeMethods.GetSystemMetrics(SmallIconHeightMetric),
                 0x00000010 /* LR_LOADFROMFILE */);
         }
 
@@ -113,7 +117,7 @@ public class WindowsTrayService : IDisposable
         // 1. Header item
         var headerItem = new MenuItem
         {
-            Header = "Cookie 🍪",
+            Header = "Cookie",
             FontWeight = FontWeights.Bold,
             IsEnabled = false
         };
@@ -127,9 +131,14 @@ public class WindowsTrayService : IDisposable
         menu.Items.Add(settingsItem);
 
         // 3. Open Emotes
-        var emotesItem = new MenuItem { Header = "Emotes..." };
+        var emotesItem = new MenuItem { Header = "Emotes...", Icon = CookieIcons.MenuIcon("emote-happy") };
         emotesItem.Click += (s, e) => _openEmotePickerAction();
         menu.Items.Add(emotesItem);
+
+        menu.Items.Add(new Separator());
+
+        // Feeding and toys
+        CareMenuBuilder.AddItems(menu, _behaviorController);
 
         menu.Items.Add(new Separator());
 

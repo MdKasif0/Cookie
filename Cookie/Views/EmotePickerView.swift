@@ -4,20 +4,20 @@ import Combine
 /// Warm, elegant color palette strictly adhering to Cookie's design aesthetic.
 /// Zero purple, zero blue.
 private enum EmoteColors {
-    static let warmWhite = Color(nsColor: NSColor(calibratedRed: 0.99, green: 0.98, blue: 0.96, alpha: 1.0))
-    static let cream = Color(nsColor: NSColor(calibratedRed: 0.97, green: 0.95, blue: 0.91, alpha: 1.0))
-    static let ivory = Color(nsColor: NSColor(calibratedRed: 0.95, green: 0.92, blue: 0.87, alpha: 1.0))
-    static let softBeige = Color(nsColor: NSColor(calibratedRed: 0.92, green: 0.88, blue: 0.82, alpha: 1.0))
-    static let warmPeach = Color(nsColor: NSColor(calibratedRed: 0.95, green: 0.86, blue: 0.79, alpha: 1.0))
-    static let warmPeachHighlight = Color(nsColor: NSColor(calibratedRed: 0.98, green: 0.91, blue: 0.85, alpha: 1.0))
-    static let mutedSage = Color(nsColor: NSColor(calibratedRed: 0.74, green: 0.78, blue: 0.72, alpha: 1.0))
-    static let softOrange = Color(nsColor: NSColor(calibratedRed: 0.91, green: 0.61, blue: 0.41, alpha: 1.0))
-    static let softOrangePressed = Color(nsColor: NSColor(calibratedRed: 0.85, green: 0.55, blue: 0.36, alpha: 1.0))
-    static let warmBrown = Color(nsColor: NSColor(calibratedRed: 0.44, green: 0.31, blue: 0.22, alpha: 1.0))
-    static let darkCharcoal = Color(nsColor: NSColor(calibratedRed: 0.22, green: 0.20, blue: 0.19, alpha: 1.0))
-    static let neutralGray = Color(nsColor: NSColor(calibratedRed: 0.54, green: 0.51, blue: 0.48, alpha: 1.0))
-    static let subtleBorder = Color(nsColor: NSColor(calibratedRed: 0.84, green: 0.79, blue: 0.72, alpha: 0.55))
-    static let focusRing = Color(nsColor: NSColor(calibratedRed: 0.88, green: 0.58, blue: 0.38, alpha: 0.9))
+    static let warmWhite = Color.adaptive(light: (0.99, 0.98, 0.96, 1), dark: (0.15, 0.135, 0.125, 1))
+    static let cream = Color.adaptive(light: (0.97, 0.95, 0.91, 1), dark: (0.2, 0.18, 0.165, 1))
+    static let ivory = Color.adaptive(light: (0.95, 0.92, 0.87, 1), dark: (0.25, 0.225, 0.205, 1))
+    static let softBeige = Color.adaptive(light: (0.92, 0.88, 0.82, 1), dark: (0.31, 0.28, 0.255, 1))
+    static let warmPeach = Color.adaptive(light: (0.95, 0.86, 0.79, 1), dark: (0.4, 0.28, 0.21, 1))
+    static let warmPeachHighlight = Color.adaptive(light: (0.98, 0.91, 0.85, 1), dark: (0.33, 0.25, 0.2, 1))
+    static let mutedSage = Color.adaptive(light: (0.74, 0.78, 0.72, 1), dark: (0.56, 0.63, 0.53, 1))
+    static let softOrange = Color.adaptive(light: (0.91, 0.61, 0.41, 1), dark: (0.94, 0.66, 0.47, 1))
+    static let softOrangePressed = Color.adaptive(light: (0.85, 0.55, 0.36, 1), dark: (0.86, 0.58, 0.4, 1))
+    static let warmBrown = Color.adaptive(light: (0.44, 0.31, 0.22, 1), dark: (0.86, 0.72, 0.6, 1))
+    static let darkCharcoal = Color.adaptive(light: (0.22, 0.2, 0.19, 1), dark: (0.95, 0.92, 0.88, 1))
+    static let neutralGray = Color.adaptive(light: (0.54, 0.51, 0.48, 1), dark: (0.71, 0.68, 0.64, 1))
+    static let subtleBorder = Color.adaptive(light: (0.84, 0.79, 0.72, 0.55), dark: (1, 1, 1, 0.12))
+    static let focusRing = Color.adaptive(light: (0.88, 0.58, 0.38, 0.9), dark: (0.95, 0.68, 0.48, 0.9))
 }
 
 /// Helper mapping each predefined emote to its authentic character artwork in the asset catalog.
@@ -69,13 +69,10 @@ struct EmotePickerView: View {
             footer
         }
         .frame(width: 300)
-        .background(
+        .cookieGlass(cornerRadius: 16)
+        .overlay(
             RoundedRectangle(cornerRadius: 16)
-                .fill(EmoteColors.warmWhite)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(EmoteColors.subtleBorder, lineWidth: 1)
-                )
+                .stroke(EmoteColors.subtleBorder, lineWidth: 1)
         )
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .onReceive(timer) { date in
@@ -157,7 +154,7 @@ struct EmotePickerView: View {
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
-        .background(EmoteColors.cream)
+        .background(EmoteColors.cream.opacity(0.45))
     }
 
     // MARK: - Emote Grid
@@ -179,7 +176,7 @@ struct EmotePickerView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
-        .background(EmoteColors.warmWhite)
+        .background(EmoteColors.warmWhite.opacity(0.35))
     }
 
     // MARK: - Emote Tile
@@ -199,7 +196,7 @@ struct EmotePickerView: View {
             selectEmote(emote)
         } label: {
             VStack(spacing: 3) {
-                // Character Artwork Preview + Prominent Emoji Badge
+                // Character artwork preview
                 ZStack(alignment: .topTrailing) {
                     RoundedRectangle(cornerRadius: 12)
                         .fill(
@@ -225,16 +222,6 @@ struct EmotePickerView: View {
                             )
                     }
 
-                    // Prominent Emoji Badge
-                    Text(emote.emoji)
-                        .font(.system(size: 13))
-                        .padding(2.5)
-                        .background(
-                            Circle()
-                                .fill(EmoteColors.warmWhite.opacity(0.96))
-                                .shadow(color: Color.black.opacity(0.12), radius: 1.5, x: 0, y: 1)
-                        )
-                        .offset(x: 5, y: -5)
                 }
 
                 // Short Name
@@ -292,7 +279,7 @@ struct EmotePickerView: View {
             hoveredEmoteId = inside ? emote.id : nil
         }
         .keyboardShortcut(KeyEquivalent(Character("\(index)")), modifiers: [])
-        .accessibilityLabel("\(emote.name) \(emote.emoji) emote")
+        .accessibilityLabel("\(emote.name) emote")
         .accessibilityHint("\(emote.description). Shortcut key \(index).")
         .accessibilityAddTraits(.isButton)
     }
@@ -385,7 +372,7 @@ struct EmotePickerView: View {
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 7)
-        .background(EmoteColors.cream)
+        .background(EmoteColors.cream.opacity(0.45))
     }
 }
 

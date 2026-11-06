@@ -21,6 +21,7 @@ public partial class SettingsWindow : Window
         Action? onCheckForUpdates = null)
     {
         InitializeComponent();
+        Cookie.Windows.Desktop.CookieTheme.Attach(this);
         _profile = profile;
 
         var vm = new SettingsViewModel(

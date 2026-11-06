@@ -12,6 +12,7 @@ using Cookie.Windows.Core.Models;
 using Cookie.Windows.Core.Persistence;
 using Cookie.Windows.Desktop;
 using Cookie.Windows.Interop;
+using Cookie.Windows.Rendering;
 using Cookie.Windows.Views;
 
 namespace Cookie.Windows;
@@ -55,6 +56,8 @@ public partial class App : Application
             args.Handled = true;
         };
 
+        CookieTheme.Initialize();
+
         _settingsManager = new SettingsManager();
         _profile = _settingsManager.LoadProfile();
 
@@ -62,7 +65,7 @@ public partial class App : Application
         var screenService = new ScreenGeometryService(new WindowsScreenGeometryProvider());
         var envProvider = new WindowsDesktopEnvironmentProvider();
         _contextDetector = new WindowsApplicationContextDetector();
-        var animationController = new CookieAnimationController();
+        var animationController = new CookieAnimationController(SpriteFrameCache.Catalog);
         var behaviorController = new CookieBehaviorController(
             animationController,
             screenService,
@@ -78,19 +81,24 @@ public partial class App : Application
             audioManager,
             _profile);
 
-        if (_profile.Settings.ShowOnStartup)
-        {
-            _companionWindow.Show();
-        }
-
         if (!_profile.Settings.HasCompletedOnboarding)
         {
-            var onboardingWindow = new OnboardingWindow(_profile, _settingsManager, () =>
-            {
-                _companionWindow.ApplyProfileAppearance();
-                _companionWindow.OpenSettingsWindow();
-            });
+            // She makes her entrance in the welcome window, then comes out onto the desktop.
+            var onboardingWindow = new OnboardingWindow(
+                _profile,
+                _settingsManager,
+                audioManager,
+                onFinished: openCustomization =>
+                {
+                    _companionWindow.ApplyProfileAppearance();
+                    _companionWindow.Show();
+                    if (openCustomization) _companionWindow.OpenSettingsWindow();
+                });
             onboardingWindow.Show();
+        }
+        else if (_profile.Settings.ShowOnStartup)
+        {
+            _companionWindow.Show();
         }
     }
 

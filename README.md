@@ -36,7 +36,7 @@
 | **🫳 Tactile Interactions** | Zone-aware petting, physics dragging, and transparent click-through hit testing. |
 | **🧶 Toys & Treats** | Interactive desktop items (yarn, mouse, cardboard box) and snack rewards. |
 | **🎨 Character Studio (⌘K)** | 10 fur palettes, coats, eye styles, body scaling, and layered accessories. |
-| **🎵 Synthesized Audio** | Procedural purrs, chirps, and meows with independent volume buses. |
+| **🎵 Designed Audio** | A formant-modeled voice and a continuous looping purr, with independent volume controls. |
 | **🔒 100% Private & Offline** | Zero analytics, zero cloud dependencies, and local JSON storage. |
 | **🔄 Seamless Updates** | Secure in-app updates via Sparkle with cryptographic EdDSA verification. |
 
@@ -238,7 +238,7 @@ Cookie/
 │   ├── Updates/         # UpdateManager (Sparkle 2.6+), UpdatePromptView
 │   └── Window/          # JumpPlanner, WindowInteractionController
 ├── Packaging/           # Production DMG packaging script, HiDPI artwork, volume icon
-├── scripts/             # Asset generators, sound synthesizer, update signing
+├── scripts/             # Sprite, 3D item and sound generators, update signing
 └── website/             # Product showcase site and appcast feed
 ```
 
