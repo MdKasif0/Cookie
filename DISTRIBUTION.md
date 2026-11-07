@@ -10,10 +10,10 @@ This document describes the distribution architecture, Apple Developer ID signin
 | :--- | :--- |
 | **Application Name** | Cookie |
 | **Bundle Identifier** | `com.cookie.mac` |
-| **Marketing Version** | `1.2.0` |
+| **Marketing Version** | `1.3.0` |
 | **Minimum System Version** | macOS 14.0 (Sonoma) or later |
 | **Architecture** | Universal 2 (Apple Silicon `arm64` + Intel `x86_64`) |
-| **Distribution Format** | Compressed Apple Disk Image (`Cookie-1.2.0.dmg`, UDZO) |
+| **Distribution Format** | Compressed Apple Disk Image (`Cookie-1.3.0.dmg`, UDZO) |
 | **Current Build Signature** | Ad-hoc signed (`-`), Hardened Runtime off, not notarized |
 
 ---
