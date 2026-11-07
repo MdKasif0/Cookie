@@ -115,7 +115,7 @@ final class AutonomousBehaviorTests: XCTestCase {
         engine.start()
 
         // Place Cookie on the left (x: 200)
-        engine.tick(dt: 0.1, currentPosition: CGPoint(x: 200, y: 100), cursorPosition: nil)
+        engine.tick(dt: 0.1, currentPosition: CGPoint(x: 200, y: 100), cursorPosition: CGPoint(x: -50_000, y: -50_000))
 
         // Simulate app switch to Xcode (window bounds midX = 1000 > 200)
         let context = ApplicationContext(
@@ -386,7 +386,7 @@ final class AutonomousBehaviorTests: XCTestCase {
         XCTAssertEqual(engine.state, .emoting)
 
         // Ticking during emote advances emote phase without interrupting
-        engine.tick(dt: 1.0, currentPosition: CGPoint(x: 200, y: 100), cursorPosition: nil)
+        engine.tick(dt: 1.0, currentPosition: CGPoint(x: 200, y: 100), cursorPosition: CGPoint(x: -50_000, y: -50_000))
         XCTAssertEqual(engine.state, .emoting)
     }
 

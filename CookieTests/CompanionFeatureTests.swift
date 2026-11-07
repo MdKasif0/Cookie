@@ -289,12 +289,17 @@ final class FocusAndCozyEngineTests: XCTestCase {
         engine.start()
     }
 
+    /// Where the test pointer is parked. With no cursor given, the engine reads the real mouse, so a
+    /// test could be knocked off course (a "head tilt" turns a sitting Cookie curious) whenever the
+    /// person running it happened to have their pointer near the pretend Cookie.
+    static let pointerOffScreen: CGFloat = -50_000
+
     private func advance(_ seconds: TimeInterval, x: CGFloat = 500) {
         var remaining = seconds
         while remaining > 0 {
             let dt = min(remaining, 0.1)
             date = date.addingTimeInterval(dt)
-            engine.tick(dt: dt, currentX: x, cursorX: nil)
+            engine.tick(dt: dt, currentX: x, cursorX: Self.pointerOffScreen)
             remaining -= dt
         }
     }
