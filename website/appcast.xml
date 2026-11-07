@@ -6,6 +6,30 @@
     <description>Most recent updates and cozy improvements for Cookie.</description>
     <language>en</language>
     <item>
+      <title>Cookie 1.3.0</title>
+      <pubDate>Sat, 07 Nov 2026 17:47:59 +0000</pubDate>
+      <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+      <description><![CDATA[
+        <p>Cookie becomes a companion you grow with: a friendship that unlocks things, a helper for focused work, and a few cozy places of her own.</p>
+        <ul>
+          <li>Friendship: your bond grows from the affection you give her and the days you come back, through five levels. Each level unlocks new accessories, coats, toys and cozy spots.</li>
+          <li>Focus sessions: Cookie naps beside you while you work, then stretches and nudges you to take a break.</li>
+          <li>A daily rhythm: she greets you by time of day and dresses for Halloween, the holidays, winter and her birthday.</li>
+          <li>A cozy corner: a cat bed, a sunbeam spot and a scratching post that she visits on her own.</li>
+          <li>Photo mode: save Cookie as a PNG or a looping GIF, or copy her.</li>
+          <li>Presence settings: she hides while a full-screen app is in front, and Control-Option-C calls her to your cursor.</li>
+          <li>Some toys, coats and accessories now unlock as your bond grows. Anything you already use stays available.</li>
+        </ul>
+      ]]></description>
+      <enclosure
+        url="https://github.com/MdKasif0/Cookie/releases/download/v1.3.0/Cookie-1.3.0.dmg"
+        sparkle:version="4"
+        sparkle:shortVersionString="1.3.0"
+        length="49308309"
+        type="application/octet-stream"
+        sparkle:edSignature="ClJa1ov+gCx9u/oI7ViOce2JHdfQJU+Ob+sTbF2mmAvZLlkuIDOmGuYRHDUnCSLhH6TCszFA7NGzr7c5Pn9ZCw=="/>
+    </item>
+    <item>
       <title>Cookie 1.2.0</title>
       <pubDate>Fri, 06 Nov 2026 16:29:10 +0000</pubDate>
       <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>

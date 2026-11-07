@@ -8,22 +8,22 @@ const CookieReleases = {
     id: "mac",
     name: "macOS",
     displayName: "macOS",
-    version: "1.2.0",
-    releaseDate: "2026-11-06",
-    formattedReleaseDate: "November 6, 2026",
+    version: "1.3.0",
+    releaseDate: "2026-11-07",
+    formattedReleaseDate: "November 7, 2026",
     installerType: "Mac Disk Image (.dmg)",
-    artifactName: "Cookie-1.2.0.dmg",
+    artifactName: "Cookie-1.3.0.dmg",
     downloadUrl: "download/mac",
-    fileSizeBytes: 43674860,
-    formattedSize: "41.7 MB",
+    fileSizeBytes: 49308309,
+    formattedSize: "47.0 MB",
     architecture: "Universal Binary (Apple Silicon & Intel 64-bit)",
     minimumOS: "macOS 14 Sonoma, macOS 15 Sequoia or later",
     isAvailable: true,
-    sha256: "ccffd768aabf4bd5bd8b77a438fd15d17b851c6a6e90544fbf4644de2092d440",
+    sha256: "d5dd4d2ff389ea84f86d41d18e1371b00bee5a9c25a8f78ddd3413ba4c5a6c7e",
     signatureStatus: "Cryptographically verified via Sparkle EdDSA signature",
     heroButtonLabel: "Download for macOS",
-    heroReleaseTag: "Version 1.2.0 · 42 MB Disk Image · Apple Silicon & Intel",
-    cardMeta: "Version 1.2.0 · macOS 14 Sonoma & later",
+    heroReleaseTag: "Version 1.3.0 · 47 MB Disk Image · Apple Silicon & Intel",
+    cardMeta: "Version 1.3.0 · macOS 14 Sonoma & later",
     specs: [
       {
         title: "Apple Silicon",
@@ -42,15 +42,15 @@ const CookieReleases = {
       },
       {
         title: "Download Size",
-        desc: "Compact ~42 MB disk image. 100% offline with zero background daemons.",
-        pill: "42 MB DMG"
+        desc: "Compact ~47 MB disk image. 100% offline with zero background daemons.",
+        pill: "47 MB DMG"
       }
     ],
     installSteps: [
       {
         step: 1,
         title: "Download the Disk Image",
-        desc: "Click the download button to save Cookie-1.2.0.dmg directly from our official site."
+        desc: "Click the download button to save Cookie-1.3.0.dmg directly from our official site."
       },
       {
         step: 2,

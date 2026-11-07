@@ -8,13 +8,13 @@
   *No subscriptions. No cloud accounts. No telemetry. Just a delightful companion right on your desktop.*
 
   [![Platform](https://img.shields.io/badge/Platform-macOS%2014.0%2B%20(Sonoma%20%7C%20Sequoia)-262421?style=flat-square&logo=apple&logoColor=white)](https://apple.com)
-  [![Version](https://img.shields.io/badge/Version-v1.2.0-e87920?style=flat-square)](https://github.com/MdKasif0/Cookie/releases)
+  [![Version](https://img.shields.io/badge/Version-v1.3.0-e87920?style=flat-square)](https://github.com/MdKasif0/Cookie/releases)
   [![Architecture](https://img.shields.io/badge/Architecture-Universal%20(Apple%20Silicon%20%2B%20Intel)-5d4d40?style=flat-square)](https://github.com/MdKasif0/Cookie)
   [![Tech Stack](https://img.shields.io/badge/UI-SwiftUI%20%7C%20SpriteKit-75856f?style=flat-square&logo=swift&logoColor=white)](https://developer.apple.com/swift/)
   [![Updates](https://img.shields.io/badge/Updates-Sparkle%202.6%20(EdDSA)-262421?style=flat-square)](website/appcast.xml)
   [![License](https://img.shields.io/badge/License-MIT-5d4d40?style=flat-square)](LICENSE)
   [![Privacy](https://img.shields.io/badge/Privacy-100%25%20Offline%20%7C%20Zero%20Telemetry-262421?style=flat-square)](website/#privacy)
-  [![Disk Image](https://img.shields.io/badge/Download-~42%20MB%20DMG-e87920?style=flat-square)](https://github.com/MdKasif0/Cookie/releases)
+  [![Disk Image](https://img.shields.io/badge/Download-~47%20MB%20DMG-e87920?style=flat-square)](https://github.com/MdKasif0/Cookie/releases)
 
 </div>
 
@@ -273,7 +273,7 @@ xcodebuild -scheme Cookie -configuration Release -derivedDataPath .build/Derived
 ## 📦 Distribution
 
 * **Binary**: Universal 2 (`arm64` + `x86_64`)
-* **DMG**: Self-contained ~42 MB image (`Cookie-1.2.0.dmg`, UDZO) with custom HiDPI artwork and `.VolumeIcon.icns`.
+* **DMG**: Self-contained ~47 MB image (`Cookie-1.3.0.dmg`, UDZO) with custom HiDPI artwork and `.VolumeIcon.icns`.
 * **Data Path**: `~/Library/Application Support/Cookie/cookie-store.json`
 
 For signing and notarization workflows, see [DISTRIBUTION.md](DISTRIBUTION.md).
