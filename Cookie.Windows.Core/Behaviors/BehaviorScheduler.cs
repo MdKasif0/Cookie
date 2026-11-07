@@ -97,8 +97,10 @@ public class BehaviorScheduler
         // 6. Build weighted candidate options based on desktop context & anti-repetition rules
         var candidates = new List<(AmbientBehaviorKind Behavior, double Weight)>();
 
-        // A. Return to Rest / Sitting
-        if (currentState != CookieState.Sitting && currentState != CookieState.Sleeping)
+        // A. Return to Rest / Sitting. Like every other behavior it is skipped when it was just chosen,
+        // otherwise she could pick the same thing twice in a row.
+        if (currentState != CookieState.Sitting && currentState != CookieState.Sleeping
+            && !Memory.IsActionRepetitive(nameof(AmbientBehaviorKind.ReturnToRest)))
         {
             candidates.Add((AmbientBehaviorKind.ReturnToRest, 30.0));
         }

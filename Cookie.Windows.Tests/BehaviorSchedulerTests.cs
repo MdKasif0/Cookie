@@ -258,4 +258,38 @@ public class BehaviorSchedulerTests
         Assert.NotNull(second);
         Assert.NotEqual(first, second);
     }
+
+    /// <summary>
+    /// The same behavior must never be chosen twice in a row. ReturnToRest used to be exempt from the
+    /// check, so the single-roll test above failed on roughly one run in ten. Rolling many times makes
+    /// that a certainty instead of a flake.
+    /// </summary>
+    [Fact]
+    public void ConsecutiveSelections_NeverRepeat_AcrossManyRolls()
+    {
+        var env = CreateTestEnvironment();
+        var settings = new CookieSettings { Activity = ActivityLevel.Playful };
+
+        for (int roll = 0; roll < 500; roll++)
+        {
+            DateTime clock = new DateTime(2026, 10, 15, 12, 0, 0, DateTimeKind.Utc);
+            var scheduler = new BehaviorScheduler { Now = () => clock };
+
+            var first = scheduler.SelectNextAmbientBehavior(
+                CookieState.Idle, new CorePoint(100, 900), null, 0,
+                CursorProximityZone.Departure, ApplicationContext.Unknown, env, settings,
+                isBeingDragged: false, isEmoting: false);
+
+            clock = clock.AddSeconds(8.0);
+
+            var second = scheduler.SelectNextAmbientBehavior(
+                CookieState.Idle, new CorePoint(100, 900), null, 0,
+                CursorProximityZone.Departure, ApplicationContext.Unknown, env, settings,
+                isBeingDragged: false, isEmoting: false);
+
+            Assert.NotNull(first);
+            Assert.NotNull(second);
+            Assert.True(first != second, $"Roll {roll}: {first} was chosen twice in a row.");
+        }
+    }
 }
