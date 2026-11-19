@@ -18,6 +18,15 @@ struct CookieStatistics: Codable, Equatable {
     var focusMinutes: Int = 0
     /// The highest friendship level already celebrated, so each is announced once.
     var celebratedBondLevel: Int = 0
+    /// To-do items you've ticked off.
+    var tasksCompleted: Int = 0
+    /// The day the task rewards below were counted for.
+    var taskRewardDay: Date?
+    var taskRewardsToday: Int = 0
+
+    /// Affection a finished task earns, and how many tasks a day earn it, so the bond can't be farmed.
+    static let taskAffection = 3
+    static let rewardedTasksPerDay = 5
 
     init() {}
 
@@ -43,6 +52,21 @@ struct CookieStatistics: Codable, Equatable {
         affection += 5
     }
 
+    /// Counts a finished task. Returns true when it earned bond points.
+    @discardableResult
+    mutating func recordTaskCompleted(now: Date = Date(), calendar: Calendar = .current) -> Bool {
+        tasksCompleted += 1
+        if let day = taskRewardDay, calendar.isDate(day, inSameDayAs: now) {
+            guard taskRewardsToday < Self.rewardedTasksPerDay else { return false }
+        } else {
+            taskRewardDay = now
+            taskRewardsToday = 0
+        }
+        taskRewardsToday += 1
+        affection += Self.taskAffection
+        return true
+    }
+
     mutating func recordToyPlayed(_ toy: ToyKind) {
         toysPlayedWith += 1
         toyPlayCounts[toy.rawValue, default: 0] += 1
@@ -65,6 +89,7 @@ struct CookieStatistics: Codable, Equatable {
         case firstLaunchedAt, lastLaunchedAt, launchCount, petsReceived, affection
         case treatsGiven, toysPlayedWith, boxVisits, toyPlayCounts
         case visitDays, lastVisitedAt, focusSessions, focusMinutes, celebratedBondLevel
+        case tasksCompleted, taskRewardDay, taskRewardsToday
     }
 
     init(from decoder: Decoder) throws {
@@ -83,5 +108,8 @@ struct CookieStatistics: Codable, Equatable {
         focusSessions = try container.decodeIfPresent(Int.self, forKey: .focusSessions) ?? 0
         focusMinutes = try container.decodeIfPresent(Int.self, forKey: .focusMinutes) ?? 0
         celebratedBondLevel = try container.decodeIfPresent(Int.self, forKey: .celebratedBondLevel) ?? 0
+        tasksCompleted = try container.decodeIfPresent(Int.self, forKey: .tasksCompleted) ?? 0
+        taskRewardDay = try container.decodeIfPresent(Date.self, forKey: .taskRewardDay)
+        taskRewardsToday = try container.decodeIfPresent(Int.self, forKey: .taskRewardsToday) ?? 0
     }
 }

@@ -52,6 +52,13 @@ targets:
         SUPublicEDKey: "K/cA2KeUVBekRx1d1+DA0Fnhaj20UWK0DG7Ij8mPiBU="
         SUEnableAutomaticChecks: false
         SUScheduledCheckInterval: 86400
+        CFBundleURLTypes:
+          - CFBundleURLName: com.cookie.mac.commands
+            CFBundleURLSchemes: [cookie]
+        NSCalendarsFullAccessUsageDescription: "Cookie reads the start time and title of your upcoming events so she can give you a heads-up before they begin. Nothing leaves your Mac."
+        NSCalendarsUsageDescription: "Cookie reads the start time and title of your upcoming events so she can give you a heads-up before they begin. Nothing leaves your Mac."
+        NSDesktopFolderUsageDescription: "Cookie looks for old screenshots on your Desktop so she can offer to tidy them into a folder."
+        NSDownloadsFolderUsageDescription: "Cookie watches your Downloads folder so she can tell you when a download finishes."
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.cookie.mac

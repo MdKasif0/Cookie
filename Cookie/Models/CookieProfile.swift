@@ -16,6 +16,14 @@ struct CookieProfile: Codable, Equatable {
     var hasCompletedWelcome: Bool = false
     var companionPosition: CGPoint?
     var lastRestingState: CookieState?
+    /// Reminders and timers still to come.
+    var reminders: [CookieReminder] = []
+    /// When she last suggested going to bed, so she says it once a night.
+    var lastBedtimeWindDown: Date?
+    var stickyNotes: [StickyNote] = []
+    var todos: [TodoItem] = []
+    /// When she last offered to tidy screenshots, so she asks at most once a day.
+    var lastScreenshotOffer: Date?
 
     init() {}
 
@@ -31,6 +39,7 @@ struct CookieProfile: Codable, Equatable {
         case legacySoundEnabled = "soundEnabled"
         case legacySoundVolume = "soundVolume"
         case isCompanionVisible, hasCompletedWelcome, companionPosition, lastRestingState
+        case reminders, lastBedtimeWindDown, stickyNotes, todos, lastScreenshotOffer
     }
 
     /// Encodes everything except the legacy key, which only exists for
@@ -48,6 +57,11 @@ struct CookieProfile: Codable, Equatable {
         try container.encode(hasCompletedWelcome, forKey: .hasCompletedWelcome)
         try container.encode(companionPosition, forKey: .companionPosition)
         try container.encodeIfPresent(lastRestingState, forKey: .lastRestingState)
+        try container.encode(reminders, forKey: .reminders)
+        try container.encodeIfPresent(lastBedtimeWindDown, forKey: .lastBedtimeWindDown)
+        try container.encode(stickyNotes, forKey: .stickyNotes)
+        try container.encode(todos, forKey: .todos)
+        try container.encodeIfPresent(lastScreenshotOffer, forKey: .lastScreenshotOffer)
     }
 
     init(from decoder: Decoder) throws {
@@ -84,5 +98,10 @@ struct CookieProfile: Codable, Equatable {
         hasCompletedWelcome = try container.decodeIfPresent(Bool.self, forKey: .hasCompletedWelcome) ?? false
         companionPosition = try container.decodeIfPresent(CGPoint?.self, forKey: .companionPosition) ?? nil
         lastRestingState = try? container.decodeIfPresent(CookieState.self, forKey: .lastRestingState)
+        reminders = (try? container.decodeIfPresent([CookieReminder].self, forKey: .reminders)) ?? []
+        lastBedtimeWindDown = try? container.decodeIfPresent(Date.self, forKey: .lastBedtimeWindDown)
+        stickyNotes = (try? container.decodeIfPresent([StickyNote].self, forKey: .stickyNotes)) ?? []
+        todos = (try? container.decodeIfPresent([TodoItem].self, forKey: .todos)) ?? []
+        lastScreenshotOffer = try? container.decodeIfPresent(Date.self, forKey: .lastScreenshotOffer)
     }
 }

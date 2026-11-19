@@ -10,10 +10,42 @@ final class CompanionSKView: SKView {
     private var hitTester: CookieHitTester?
     private let menuProvider: (() -> NSMenu?)?
 
+    /// Files dropped on Cookie go here. Returns whether they were taken.
+    static var dropHandler: (([URL], NSView, NSPoint) -> Bool)?
+    static var acceptsFileDrops: () -> Bool = { false }
+
     init(hitTester: CookieHitTester?, menuProvider: (() -> NSMenu?)? = nil) {
         self.hitTester = hitTester
         self.menuProvider = menuProvider
         super.init(frame: NSRect(x: 0, y: 0, width: 180, height: 180))
+        registerForDraggedTypes([.fileURL])
+    }
+
+    // MARK: File drops
+
+    private func droppedFiles(_ sender: NSDraggingInfo) -> [URL] {
+        (sender.draggingPasteboard.readObjects(forClasses: [NSURL.self], options: [.urlReadingFileURLsOnly: true]) as? [URL]) ?? []
+    }
+
+    override func draggingEntered(_ sender: NSDraggingInfo) -> NSDragOperation {
+        guard Self.acceptsFileDrops(), !droppedFiles(sender).isEmpty else { return [] }
+        return .copy
+    }
+
+    override func draggingUpdated(_ sender: NSDraggingInfo) -> NSDragOperation {
+        draggingEntered(sender)
+    }
+
+    override func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
+        let files = droppedFiles(sender)
+        guard !files.isEmpty else { return false }
+        let point = convert(sender.draggingLocation, from: nil)
+        // Let the drag finish before the menu opens.
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            _ = Self.dropHandler?(files, self, point)
+        }
+        return Self.dropHandler != nil
     }
 
     /// Rebuilds the silhouette for a new panel size (Cookie size changes

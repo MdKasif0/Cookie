@@ -160,6 +160,43 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         menu.addItem(toysMenuItem)
         menu.addItem(cozyMenuItem())
         menu.addItem(focusMenuItem())
+        menu.addItem(remindersMenuItem())
+        menu.addItem(todoMenuItem())
+        menu.addItem(notesMenuItem())
+        if store.profile.settings.clipboardHistory {
+            menu.addItem(clipboardMenuItem())
+        }
+        if store.profile.settings.askCookieEnabled {
+            let ask = NSMenuItem(title: "Ask \(store.profile.displayName)…", action: #selector(askCookieAction), keyEquivalent: "")
+            ask.image = NSImage(systemSymbolName: "bubble.left.and.text.bubble.right", accessibilityDescription: nil)
+            ask.target = self
+            menu.addItem(ask)
+        }
+        let quiet = environment.quietMode.isManuallyQuiet
+        let quietItem = NSMenuItem(title: quiet ? "Quiet Mode: On" : "Quiet Mode", action: nil, keyEquivalent: "")
+        quietItem.image = NSImage(systemSymbolName: quiet ? "speaker.slash.fill" : "speaker.slash", accessibilityDescription: nil)
+        let quietMenu = NSMenu(title: "Quiet Mode")
+        if quiet {
+            let off = NSMenuItem(title: "Turn Off Quiet Mode", action: #selector(quietOffAction), keyEquivalent: "")
+            off.target = self
+            quietMenu.addItem(off)
+        } else {
+            for (title, minutes) in [("For 30 Minutes", 30), ("For 1 Hour", 60), ("For 2 Hours", 120), ("Until I Turn It Off", 0)] {
+                let entry = NSMenuItem(title: title, action: #selector(quietOnAction(_:)), keyEquivalent: "")
+                entry.target = self
+                entry.representedObject = minutes
+                quietMenu.addItem(entry)
+            }
+        }
+        quietItem.submenu = quietMenu
+        menu.addItem(quietItem)
+        let tidyCount = environment.desk.tidyableScreenshotCount()
+        if tidyCount > 0 {
+            let tidy = NSMenuItem(title: "Tidy Up \(tidyCount) Screenshot\(tidyCount == 1 ? "" : "s")…", action: #selector(tidyScreenshotsAction), keyEquivalent: "")
+            tidy.image = NSImage(systemSymbolName: "sparkles", accessibilityDescription: nil)
+            tidy.target = self
+            menu.addItem(tidy)
+        }
 
         menu.addItem(.separator())
 
@@ -363,6 +400,122 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         return item
     }
 
+    private func remindersMenuItem() -> NSMenuItem {
+        let reminders = environment.helpers.reminders
+        let title = reminders.isEmpty ? "Reminders" : "Reminders (\(reminders.count))"
+        let item = NSMenuItem(title: title, action: nil, keyEquivalent: "")
+        item.image = NSImage(systemSymbolName: "bell", accessibilityDescription: nil)
+        let submenu = NSMenu(title: "Reminders")
+
+        let new = NSMenuItem(title: "New Reminder…", action: #selector(newReminderAction), keyEquivalent: "")
+        new.target = self
+        submenu.addItem(new)
+
+        let timer = NSMenuItem(title: "Quick Timer", action: nil, keyEquivalent: "")
+        let timerMenu = NSMenu(title: "Quick Timer")
+        for minutes in [1, 5, 10, 15, 30, 60] {
+            let entry = NSMenuItem(title: CookieReminder.label(forMinutes: minutes), action: #selector(quickTimerAction(_:)), keyEquivalent: "")
+            entry.target = self
+            entry.representedObject = minutes
+            timerMenu.addItem(entry)
+        }
+        timer.submenu = timerMenu
+        submenu.addItem(timer)
+
+        if !reminders.isEmpty {
+            submenu.addItem(.separator())
+            let now = Date()
+            for reminder in reminders {
+                let entry = NSMenuItem(title: "\(reminder.message) · \(reminder.remainingLabel(from: now))", action: nil, keyEquivalent: "")
+                let cancelMenu = NSMenu()
+                let cancel = NSMenuItem(title: "Cancel Reminder", action: #selector(cancelReminderAction(_:)), keyEquivalent: "")
+                cancel.target = self
+                cancel.representedObject = reminder.id
+                cancelMenu.addItem(cancel)
+                entry.submenu = cancelMenu
+                submenu.addItem(entry)
+            }
+        }
+        item.submenu = submenu
+        return item
+    }
+
+    private func todoMenuItem() -> NSMenuItem {
+        let todos = environment.desk.todos
+        let open = todos.filter { !$0.isDone }.count
+        let item = NSMenuItem(title: open == 0 ? "To-Do" : "To-Do (\(open))", action: nil, keyEquivalent: "")
+        item.image = NSImage(systemSymbolName: "checklist", accessibilityDescription: nil)
+        let submenu = NSMenu(title: "To-Do")
+
+        let add = NSMenuItem(title: "Add Task…", action: #selector(addTodoAction), keyEquivalent: "")
+        add.target = self
+        submenu.addItem(add)
+
+        if !todos.isEmpty {
+            submenu.addItem(.separator())
+            for todo in todos {
+                let entry = NSMenuItem(title: todo.text, action: #selector(toggleTodoAction(_:)), keyEquivalent: "")
+                entry.state = todo.isDone ? .on : .off
+                entry.target = self
+                entry.representedObject = todo.id
+                entry.toolTip = todo.isDone ? "Click to mark as not done" : "Click to tick it off"
+                submenu.addItem(entry)
+            }
+            if todos.contains(where: \.isDone) {
+                submenu.addItem(.separator())
+                let clear = NSMenuItem(title: "Clear Finished Tasks", action: #selector(clearTodosAction), keyEquivalent: "")
+                clear.target = self
+                submenu.addItem(clear)
+            }
+        }
+        item.submenu = submenu
+        return item
+    }
+
+    private func clipboardMenuItem() -> NSMenuItem {
+        let items = environment.clipboard.history.items
+        let item = NSMenuItem(title: "Clipboard", action: nil, keyEquivalent: "")
+        item.image = NSImage(systemSymbolName: "doc.on.clipboard", accessibilityDescription: nil)
+        let submenu = NSMenu(title: "Clipboard")
+        if items.isEmpty {
+            let empty = NSMenuItem(title: "Nothing copied yet", action: nil, keyEquivalent: "")
+            empty.isEnabled = false
+            submenu.addItem(empty)
+        } else {
+            for text in items {
+                let entry = NSMenuItem(title: ClipboardHistory.preview(text), action: #selector(copyBackAction(_:)), keyEquivalent: "")
+                entry.target = self
+                entry.representedObject = text
+                entry.toolTip = "Copy this again"
+                submenu.addItem(entry)
+            }
+            submenu.addItem(.separator())
+            let clear = NSMenuItem(title: "Clear History", action: #selector(clearClipboardAction), keyEquivalent: "")
+            clear.target = self
+            submenu.addItem(clear)
+        }
+        item.submenu = submenu
+        return item
+    }
+
+    private func notesMenuItem() -> NSMenuItem {
+        let notes = store.profile.stickyNotes
+        let item = NSMenuItem(title: notes.isEmpty ? "Sticky Notes" : "Sticky Notes (\(notes.count))", action: nil, keyEquivalent: "")
+        item.image = NSImage(systemSymbolName: "note.text", accessibilityDescription: nil)
+        let submenu = NSMenu(title: "Sticky Notes")
+        let new = NSMenuItem(title: "New Note…", action: #selector(newNoteAction), keyEquivalent: "")
+        new.target = self
+        submenu.addItem(new)
+        if !notes.isEmpty {
+            let showing = store.profile.settings.showStickyNotes
+            let toggle = NSMenuItem(title: showing ? "Hide Notes" : "Show Notes", action: #selector(toggleNotesAction), keyEquivalent: "")
+            toggle.target = self
+            submenu.addItem(toggle)
+        }
+        item.submenu = submenu
+        return item
+    }
+
     private func cozyMenuItem() -> NSMenuItem {
         let item = NSMenuItem(title: "Cozy Corner", action: nil, keyEquivalent: "")
         item.image = CookieArtwork.menuIcon("item-cozy-bed")
@@ -409,6 +562,75 @@ final class MenuBarController: NSObject, NSMenuDelegate {
 
     @objc private func stopFocusAction() {
         environment.stopFocus()
+    }
+
+    @objc private func askCookieAction() {
+        environment.showAskCookie()
+    }
+
+    @objc private func quietOnAction(_ sender: NSMenuItem) {
+        let minutes = sender.representedObject as? Int ?? 0
+        environment.setQuiet(true, minutes: minutes > 0 ? minutes : nil)
+    }
+
+    @objc private func quietOffAction() {
+        environment.setQuiet(false)
+    }
+
+    @objc private func copyBackAction(_ sender: NSMenuItem) {
+        guard let text = sender.representedObject as? String else { return }
+        environment.clipboard.copyBack(text)
+    }
+
+    @objc private func clearClipboardAction() {
+        environment.clipboard.clear()
+    }
+
+    @objc private func addTodoAction() {
+        environment.showNewTodo()
+    }
+
+    @objc private func toggleTodoAction(_ sender: NSMenuItem) {
+        guard let id = sender.representedObject as? UUID else { return }
+        environment.desk.toggleTodo(id: id)
+    }
+
+    @objc private func clearTodosAction() {
+        environment.desk.clearCompletedTodos()
+    }
+
+    @objc private func newNoteAction() {
+        environment.showNewStickyNote()
+    }
+
+    @objc private func toggleNotesAction() {
+        store.profile.settings.showStickyNotes.toggle()
+    }
+
+    @objc private func tidyScreenshotsAction() {
+        let count = environment.desk.tidyableScreenshotCount()
+        let alert = NSAlert()
+        alert.messageText = "Tidy up \(count) screenshot\(count == 1 ? "" : "s")?"
+        alert.informativeText = "Screenshots older than a day will be moved into a folder called \"\(ScreenshotTidy.folderName)\" in the same place. Nothing is deleted."
+        alert.addButton(withTitle: "Tidy Up")
+        alert.addButton(withTitle: "Cancel")
+        NSApp.activate(ignoringOtherApps: true)
+        guard alert.runModal() == .alertFirstButtonReturn else { return }
+        environment.desk.tidyScreenshots()
+    }
+
+    @objc private func newReminderAction() {
+        environment.showNewReminder()
+    }
+
+    @objc private func quickTimerAction(_ sender: NSMenuItem) {
+        guard let minutes = sender.representedObject as? Int else { return }
+        environment.addReminder(text: "", minutes: minutes)
+    }
+
+    @objc private func cancelReminderAction(_ sender: NSMenuItem) {
+        guard let id = sender.representedObject as? UUID else { return }
+        environment.cancelReminder(id: id)
     }
 
     @objc private func placeCozyAction(_ sender: NSMenuItem) {

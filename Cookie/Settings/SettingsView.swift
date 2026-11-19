@@ -14,6 +14,10 @@ struct SettingsView: View {
                 .tabItem { Label("Behavior", systemImage: "figure.walk") }
             PresenceSettingsTab()
                 .tabItem { Label("Presence", systemImage: "eye") }
+            HelpersSettingsTab()
+                .tabItem { Label("Helpers", systemImage: "bell") }
+            PowerToolsSettingsTab()
+                .tabItem { Label("Power Tools", systemImage: "bolt") }
             StatsSettingsTab()
                 .tabItem { Label("Stats", systemImage: "heart") }
             PrivacySettingsTab()
@@ -21,7 +25,7 @@ struct SettingsView: View {
             AboutSettingsTab()
                 .tabItem { Label("About", systemImage: "info.circle") }
         }
-        .frame(width: 540, height: 440)
+        .frame(width: 700, height: 480)
     }
 }
 
@@ -75,7 +79,7 @@ struct PresenceSettingsTab: View {
                         value: $store.profile.settings.focusMinutes, in: 5...120, step: 5)
                 Stepper("Break length: \(store.profile.settings.breakMinutes) minutes",
                         value: $store.profile.settings.breakMinutes, in: 1...30)
-                Text("Start a session from Cookie's menu. She naps beside you, then stretches when it is time for a break.")
+                Text("Start a session from Cookie's menu. She naps beside you, then stretches when it is time for a break. Choose distracting apps under Helpers.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             } header: {

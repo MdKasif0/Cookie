@@ -13,6 +13,11 @@ final class AppEnvironment: ObservableObject {
     let windows: WindowManager
     let focus: FocusController
     let quietMode: QuietModeMonitor
+    let helpers: HelpersController
+    let desk: DeskController
+    let clipboard: ClipboardController
+    let fileDrop: FileDropController
+    let chat: ChatController
     let summonHotKey = SummonHotKey()
     private(set) var menuBarController: MenuBarController?
     private var bondWatch: AnyCancellable?
@@ -35,8 +40,30 @@ final class AppEnvironment: ObservableObject {
             say: { [weak windows] text in windows?.say(text, seconds: 6) },
             play: { [weak audioManager] effect in audioManager?.play(effect) }
         )
-        self.quietMode = QuietModeMonitor(store: store)
+        let quietMode = QuietModeMonitor(store: store)
+        self.quietMode = quietMode
+        let say: (String, TimeInterval) -> Void = { [weak windows] text, seconds in windows?.say(text, seconds: seconds) }
+        let play: (SoundEffect) -> Void = { [weak audioManager] effect in audioManager?.play(effect) }
+        let bringToCursor: () -> Void = { [weak windows, weak store, weak quietMode] in
+            quietMode?.grantOverride(seconds: 20)
+            if store?.profile.isCompanionVisible == false { store?.profile.isCompanionVisible = true }
+            windows?.showCompanion()
+            windows?.moveCompanionNearCursor()
+        }
+        self.helpers = HelpersController(store: store, engine: behaviorEngine, say: say, play: play, bringToCursor: bringToCursor)
+        self.desk = DeskController(store: store, engine: behaviorEngine, say: say, play: play, bringToCursor: bringToCursor)
+        self.clipboard = ClipboardController(store: store)
+        self.fileDrop = FileDropController(store: store, engine: behaviorEngine, say: say, play: play)
+        self.chat = ChatController(store: store, engine: behaviorEngine)
         windows.environment = self
+        CookieCommandRouter.environment = self
+        let fileDrop = self.fileDrop
+        CompanionSKView.dropHandler = { [weak fileDrop] urls, view, point in
+            guard let fileDrop, fileDrop.acceptsDrops else { return false }
+            fileDrop.handleDrop(urls, in: view, at: point)
+            return true
+        }
+        CompanionSKView.acceptsFileDrops = { [weak fileDrop] in fileDrop?.acceptsDrops ?? false }
         windows.menuProvider = { [weak self] in
             self?.createCookieMenu()
         }
@@ -145,6 +172,13 @@ final class AppEnvironment: ObservableObject {
     private func startCompanionServices() {
         quietMode.start()
         DailyClock.shared.start()
+        helpers.isQuiet = { [weak self] in self?.quietMode.isQuiet ?? false }
+        helpers.isFocusing = { [weak self] in self?.focus.isFocusing ?? false }
+        helpers.start()
+        desk.isQuiet = { [weak self] in self?.quietMode.isQuiet ?? false }
+        desk.isFocusing = { [weak self] in self?.focus.isFocusing ?? false }
+        desk.start()
+        clipboard.start()
         // Let her settle in before announcing anything.
         DispatchQueue.main.asyncAfter(deadline: .now() + 4) { [weak self] in self?.beginBondWatching() }
     }
@@ -181,6 +215,8 @@ final class AppEnvironment: ObservableObject {
 
     /// Calls Cookie to the cursor and has her wave hello. It overrides full-screen hiding briefly.
     func summonCookie() {
+        // Calling her ends quiet mode you set yourself.
+        if quietMode.isManuallyQuiet { quietMode.setManualQuiet(false) }
         quietMode.grantOverride(seconds: 20)
         if !store.profile.isCompanionVisible { store.profile.isCompanionVisible = true }
         windows.showCompanion()
@@ -236,6 +272,8 @@ final class AppEnvironment: ObservableObject {
 
     /// Full reset from Settings: back to a fresh first run.
     func resetCookie() {
+        helpers.stop()
+        desk.stop()
         behaviorEngine.stop()
         store.reset()
         presentWelcome()
@@ -273,6 +311,83 @@ final class AppEnvironment: ObservableObject {
     func removeCozy(_ kind: CozyKind) { windows.removeCozy(kind) }
     func isUnlocked(_ item: BondItem) -> Bool { store.isUnlocked(item) }
 
+    // Reminders and timers
+    func addReminder(text: String, minutes: Int) { helpers.addReminder(text: text, minutes: minutes) }
+    func cancelReminder(id: UUID) { helpers.cancelReminder(id: id) }
+    func showNewReminder() { windows.showNewReminder() }
+
+    // Sticky notes
+    func showNewStickyNote() {
+        windows.showTextPrompt(title: "New Sticky Note", placeholder: "Buy milk, call the bank…", actionTitle: "Pin It",
+                               multiline: true, maximumLength: StickyNote.maximumLength) { [weak self] text in
+            self?.windows.addStickyNote(text: text)
+        }
+    }
+
+    // Power tools
+    func showAskCookie() { windows.showAskCookie(chat: chat) }
+
+    func setQuiet(_ on: Bool, minutes: Int? = nil) {
+        quietMode.setManualQuiet(on, minutes: minutes)
+    }
+
+    /// Runs a command from a `cookie://` link or a Shortcuts action.
+    func perform(_ command: CookieCommand) {
+        guard store.profile.settings.allowLinks else {
+            log.notice("Ignored a link or Shortcuts command: they're turned off in Settings")
+            return
+        }
+        switch command {
+        case .say(let text):
+            windows.say(text, seconds: max(4, min(12, Double(text.count) / 12)))
+        case .remind(let text, let minutes):
+            helpers.addReminder(text: text, minutes: minutes)
+        case .startFocus(let minutes):
+            focus.startFocus(minutes: minutes)
+        case .stopFocus:
+            focus.stop()
+        case .quiet(let on, let minutes):
+            setQuiet(on, minutes: minutes)
+        case .toggleQuiet:
+            setQuiet(!quietMode.isManuallyQuiet)
+        case .show:
+            if !store.profile.isCompanionVisible { toggleCompanion() }
+        case .hide:
+            if store.profile.isCompanionVisible { toggleCompanion() }
+        case .summon:
+            summonCookie()
+        case .pet:
+            petCookie()
+        case .emote(let id):
+            triggerEmote(Emote.find(id))
+        case .addTodo(let text):
+            if desk.addTodo(text) { windows.say("Added to your list!", seconds: 3) }
+        case .addNote(let text):
+            windows.addStickyNote(text: text)
+        case .ask:
+            showAskCookie()
+        }
+    }
+
+    /// `cookie://` links, from `open`, Raycast, a browser or a script.
+    func handle(urls: [URL]) {
+        for url in urls {
+            switch CookieCommand.parse(url) {
+            case .success(let command):
+                perform(command)
+            case .failure(let error):
+                log.notice("Ignored link \(url.absoluteString, privacy: .public): \(String(describing: error), privacy: .public)")
+            }
+        }
+    }
+
+    // To-do list
+    func showNewTodo() {
+        windows.showTextPrompt(title: "New Task", placeholder: "Reply to Sam, water the plants…", actionTitle: "Add") { [weak self] text in
+            if self?.desk.addTodo(text) == true { self?.windows.say("Added to your list!", seconds: 3) }
+        }
+    }
+
     // Software updates
     func checkForUpdates(userInitiated: Bool = true) {
         UpdateManager.shared.checkForUpdates(userInitiated: userInitiated)
@@ -302,6 +417,9 @@ final class AppEnvironment: ObservableObject {
     }
 
     func shutdown() {
+        clipboard.stop()
+        helpers.stop()
+        desk.stop()
         behaviorEngine.stop()
         windows.companionController?.savePosition()
         store.flush()

@@ -992,6 +992,54 @@ final class CookieBehaviorEngine: ObservableObject {
         }
     }
 
+    // MARK: - Helpers: nudges, the focus guard and bedtime
+
+    /// Clears whatever she was doing so a helper moment can start cleanly.
+    private func interruptForHelper() -> Bool {
+        guard isRunning, state != .beingDragged, !isPressed else { return false }
+        cancelActiveEmote()
+        clearSession()
+        plan = nil
+        sequenceQueue = []
+        dockController.cancelExploration()
+        windowController.cancelExploration()
+        return true
+    }
+
+    /// Shows you what to do: she has a drink for water, and stretches for posture and eyes.
+    func performNudge(_ nudge: BreakNudge) {
+        guard !isFocusing, interruptForHelper() else { return }
+        switch nudge {
+        case .water:
+            enter(.sitting, sequence: [(.drinking, 3.0), (.sitting, 4.0)], duration: 0.6)
+        case .posture:
+            enter(.stretching, sequence: [(.sitting, 1.0), (.stretching, 2.2), (.sitting, 4.0)])
+        case .eyes:
+            enter(.sitting, sequence: [(.grooming, 2.5), (.sitting, 14.0)], duration: 1.0)
+        }
+    }
+
+    /// You switched to a distracting app mid-session: she wakes, gives you a look, and settles back.
+    func noticeDistraction() {
+        guard isFocusing, interruptForHelper() else { return }
+        reaction = .annoyed
+        enter(.reacting, sequence: [(.sitting, 5.0), (.yawning, 1.8), (.sleeping, 60)], duration: 2.0)
+    }
+
+    /// A quick reaction to news: a finished download, a low battery, a ticked-off task.
+    /// During a focus session she stays asleep and only the speech bubble appears.
+    func react(_ newReaction: CookieReaction) {
+        guard !isFocusing, activeEmote == nil, interruptForHelper() else { return }
+        reaction = newReaction
+        enter(.reacting, sequence: [(.sitting, 3.0)], duration: 1.6)
+    }
+
+    /// Bedtime: she yawns and curls up for the night until you wake her.
+    func windDown() {
+        guard !isFocusing, interruptForHelper() else { return }
+        enter(.yawning, sequence: [(.sitting, 1.5), (.sleeping, 180)])
+    }
+
     // MARK: - Cozy spots
 
     /// Now and then she wanders to a cozy item she has been given. The bed is favored at night,

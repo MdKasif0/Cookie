@@ -23,6 +23,7 @@ final class WindowManager: NSObject, NSWindowDelegate {
     weak var environment: AppEnvironment?
     let bubbleController = BubblePanelController()
     let cozyController = CozyPanelController()
+    private(set) lazy var stickyNotes = StickyNotesController(store: store)
     /// True while a full-screen app has her stepping aside.
     private(set) var isQuiet = false
     private var sharingHidden = false
@@ -69,6 +70,26 @@ final class WindowManager: NSObject, NSWindowDelegate {
             .removeDuplicates()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in self?.refreshCozy() }
+            .store(in: &cancellables)
+
+        stickyNotes.onEdit = { [weak self] note in self?.editStickyNote(note) }
+        stickyNotes.onRemove = { [weak self] id in self?.removeStickyNote(id) }
+        struct NotesKey: Equatable {
+            var notes: [StickyNote]
+            var visible: Bool
+        }
+        // Dragging a note changes only its origin, which needs no redraw.
+        store.$profile
+            .map { profile in
+                NotesKey(notes: profile.stickyNotes.map { note in
+                    var copy = note
+                    copy.origin = nil
+                    return copy
+                }, visible: profile.settings.showStickyNotes)
+            }
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in self?.refreshNotes() }
             .store(in: &cancellables)
     }
 
@@ -144,6 +165,7 @@ final class WindowManager: NSObject, NSWindowDelegate {
         } else if store.profile.isCompanionVisible {
             showCompanion()
         }
+        refreshNotes()
         updateCozyTargets()
     }
 
@@ -156,6 +178,109 @@ final class WindowManager: NSObject, NSWindowDelegate {
         worldItemController?.window?.sharingType = type
         bubbleController.window.sharingType = type
         cozyController.setSharing(hidden: hidden)
+        stickyNotes.setSharing(hidden: hidden)
+    }
+
+    // MARK: - Sticky notes
+
+    func refreshNotes() {
+        stickyNotes.update(visible: store.profile.settings.showStickyNotes && !isQuiet)
+    }
+
+    /// Pins a new note beside Cookie's bed if she has one, otherwise beside her.
+    func addStickyNote(text: String) {
+        guard let screen = NSScreen.screens.first else { return }
+        var anchor = companionController?.window?.frame
+            ?? CGRect(x: screen.visibleFrame.midX, y: screen.visibleFrame.minY, width: 100, height: 100)
+        if let bed = store.profile.cozyItems.first(where: { $0.kind == .bed }) {
+            let x = CozyPanelController.centerX(for: bed, primaryFrame: screen.frame)
+            let side = CozyKind.bed.panelSide * CGFloat(store.profile.settings.cookieSize)
+            anchor = CGRect(x: x - side / 2, y: CozyPanelController.floorY(primaryVisible: screen.visibleFrame), width: side, height: side)
+        }
+        let visible = (NSScreen.screens.first { $0.frame.intersects(anchor) } ?? screen).visibleFrame
+        var note = StickyNote(text: String(text.prefix(StickyNote.maximumLength)))
+        note.color = StickyColor.allCases[store.profile.stickyNotes.count % StickyColor.allCases.count]
+        note.origin = StickyNotesController.origin(beside: anchor, visible: visible, index: store.profile.stickyNotes.count)
+        store.profile.stickyNotes.append(note)
+        if !store.profile.settings.showStickyNotes { store.profile.settings.showStickyNotes = true }
+        behaviorEngine.react(.happy)
+        say("Pinned it for you!", seconds: 3)
+    }
+
+    func editStickyNote(_ note: StickyNote) {
+        showTextPrompt(title: "Edit Note", placeholder: "", actionTitle: "Save", initialText: note.text,
+                       multiline: true, maximumLength: StickyNote.maximumLength) { [weak self] text in
+            guard let self, let index = self.store.profile.stickyNotes.firstIndex(where: { $0.id == note.id }) else { return }
+            self.store.profile.stickyNotes[index].text = text
+        }
+    }
+
+    func removeStickyNote(_ id: UUID) {
+        store.profile.stickyNotes.removeAll { $0.id == id }
+    }
+
+    // MARK: - Ask Cookie
+
+    private(set) var chatWindow: NSWindow?
+
+    func showAskCookie(chat: ChatController) {
+        if let chatWindow {
+            chatWindow.makeKeyAndOrderFront(nil)
+            NSApp.activate(ignoringOtherApps: true)
+            return
+        }
+        let window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 400, height: 460),
+            styleMask: [.titled, .closable, .miniaturizable, .resizable],
+            backing: .buffered,
+            defer: false
+        )
+        window.title = "Ask \(store.profile.displayName)"
+        window.isReleasedWhenClosed = false
+        window.delegate = self
+        window.contentViewController = NSHostingController(rootView: AskCookieView(
+            chat: chat,
+            name: store.profile.displayName,
+            openSettings: { [weak self] in self?.showSettings() }
+        ))
+        window.center()
+        chatWindow = window
+        window.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
+    // MARK: - Text prompts
+
+    private(set) var promptWindow: NSWindow?
+
+    /// A small window with one text field, for notes and to-do items.
+    func showTextPrompt(title: String, placeholder: String, actionTitle: String, initialText: String = "",
+                        multiline: Bool = false, maximumLength: Int = 120, onDone: @escaping (String) -> Void) {
+        promptWindow?.close()
+        let window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 360, height: 160),
+            styleMask: [.titled, .closable, .fullSizeContentView],
+            backing: .buffered,
+            defer: false
+        )
+        window.title = title
+        window.titlebarAppearsTransparent = true
+        window.isReleasedWhenClosed = false
+        window.delegate = self
+        let view = TextPromptView(
+            title: title, placeholder: placeholder, actionTitle: actionTitle, initialText: initialText,
+            multiline: multiline, maximumLength: maximumLength,
+            onDone: { [weak window] text in
+                onDone(text)
+                window?.close()
+            },
+            onCancel: { [weak window] in window?.close() }
+        )
+        window.contentViewController = NSHostingController(rootView: view)
+        window.center()
+        promptWindow = window
+        window.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
     }
 
     // MARK: - Summoning
@@ -344,6 +469,41 @@ final class WindowManager: NSObject, NSWindowDelegate {
 
     private var photoModeModel: PhotoModeModel?
 
+    // MARK: - New reminder
+
+    private(set) var reminderWindow: NSWindow?
+
+    func showNewReminder() {
+        if let reminderWindow {
+            reminderWindow.makeKeyAndOrderFront(nil)
+            NSApp.activate(ignoringOtherApps: true)
+            return
+        }
+        let window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 360, height: 200),
+            styleMask: [.titled, .closable, .fullSizeContentView],
+            backing: .buffered,
+            defer: false
+        )
+        window.title = "New Reminder"
+        window.titlebarAppearsTransparent = true
+        window.isReleasedWhenClosed = false
+        window.delegate = self
+        let view = NewReminderView(
+            name: store.profile.displayName,
+            onAdd: { [weak self, weak window] text, minutes in
+                self?.environment?.addReminder(text: text, minutes: minutes)
+                window?.close()
+            },
+            onCancel: { [weak window] in window?.close() }
+        )
+        window.contentViewController = NSHostingController(rootView: view)
+        window.center()
+        reminderWindow = window
+        window.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
     // MARK: - Settings
 
     func showSettings() {
@@ -508,6 +668,14 @@ final class WindowManager: NSObject, NSWindowDelegate {
             emotePickerWindow = nil
         } else if window === updatePromptWindow {
             updatePromptWindow = nil
+        } else if window === chatWindow {
+            chatWindow = nil
+            // The conversation lives only as long as the window.
+            environment?.chat.reset()
+        } else if window === promptWindow {
+            promptWindow = nil
+        } else if window === reminderWindow {
+            reminderWindow = nil
         } else if window === photoModeWindow {
             photoModeWindow = nil
             photoModeModel = nil

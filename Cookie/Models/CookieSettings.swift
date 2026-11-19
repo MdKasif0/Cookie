@@ -59,6 +59,37 @@ struct CookieSettings: Codable, Equatable {
     var focusMinutes: Int = 25
     var breakMinutes: Int = 5
 
+    // Helpers
+    /// `BreakNudge` raw values that are switched on. All off until you choose them.
+    var breakNudges: [String] = []
+    /// During a focus session she reacts when you switch to one of these apps.
+    var focusGuardEnabled: Bool = true
+    var distractingApps: [DistractingApp] = []
+    var bedtimeEnabled: Bool = false
+    /// Minutes after midnight; 23:00 by default.
+    var bedtimeMinutes: Int = 23 * 60
+    /// `SystemAlertKind` raw values she watches for. Needs no permission, so all on.
+    var systemAlerts: [String] = SystemAlertKind.allCases.map(\.rawValue)
+    /// Calendar heads-ups need calendar access, so they start off.
+    var calendarHeadsUp: Bool = false
+    var calendarLeadMinutes: Int = 5
+    /// Reading Downloads and the Desktop makes macOS ask once, so these start off too.
+    var downloadAlerts: Bool = false
+    var screenshotTidyOffers: Bool = false
+    var showStickyNotes: Bool = true
+
+    // Power tools
+    /// cookie:// links and Shortcuts actions.
+    var allowLinks: Bool = true
+    /// Dropping files on Cookie offers to file or zip them.
+    var fileDropEnabled: Bool = true
+    /// The folder dropped files go to. Empty until you choose one.
+    var dropFolderPath: String = ""
+    /// Keeps your last few copies in memory. Off until you turn it on.
+    var clipboardHistory: Bool = false
+    /// Chat with Cookie through the Claude API. Off until you turn it on and add a key.
+    var askCookieEnabled: Bool = false
+
     // Presence
     /// Hide during full-screen apps and presentations.
     var hideInFullscreen: Bool = true
@@ -80,6 +111,9 @@ struct CookieSettings: Codable, Equatable {
         case autonomousToys, dockInteraction, autonomousDockExploration, dockExplorationFrequency, automaticallyCheckForUpdates
         case seasonalOutfits, timeGreetings, focusMinutes, breakMinutes
         case hideInFullscreen, hideFromScreenSharing, summonShortcut
+        case breakNudges, focusGuardEnabled, distractingApps, bedtimeEnabled, bedtimeMinutes
+        case systemAlerts, calendarHeadsUp, calendarLeadMinutes, downloadAlerts, screenshotTidyOffers, showStickyNotes
+        case allowLinks, fileDropEnabled, dropFolderPath, clipboardHistory, askCookieEnabled
     }
 
     init(from decoder: Decoder) throws {
@@ -122,6 +156,52 @@ struct CookieSettings: Codable, Equatable {
         hideInFullscreen = try container.decodeIfPresent(Bool.self, forKey: .hideInFullscreen) ?? true
         hideFromScreenSharing = try container.decodeIfPresent(Bool.self, forKey: .hideFromScreenSharing) ?? true
         summonShortcut = try container.decodeIfPresent(String.self, forKey: .summonShortcut) ?? SummonShortcut.controlOptionC.rawValue
+        breakNudges = (try? container.decodeIfPresent([String].self, forKey: .breakNudges)) ?? []
+        focusGuardEnabled = try container.decodeIfPresent(Bool.self, forKey: .focusGuardEnabled) ?? true
+        distractingApps = (try? container.decodeIfPresent([DistractingApp].self, forKey: .distractingApps)) ?? []
+        bedtimeEnabled = try container.decodeIfPresent(Bool.self, forKey: .bedtimeEnabled) ?? false
+        bedtimeMinutes = min(max(try container.decodeIfPresent(Int.self, forKey: .bedtimeMinutes) ?? 23 * 60, 0), 24 * 60 - 1)
+        systemAlerts = (try? container.decodeIfPresent([String].self, forKey: .systemAlerts)) ?? SystemAlertKind.allCases.map(\.rawValue)
+        calendarHeadsUp = try container.decodeIfPresent(Bool.self, forKey: .calendarHeadsUp) ?? false
+        calendarLeadMinutes = min(max(try container.decodeIfPresent(Int.self, forKey: .calendarLeadMinutes) ?? 5, 1), 30)
+        downloadAlerts = try container.decodeIfPresent(Bool.self, forKey: .downloadAlerts) ?? false
+        screenshotTidyOffers = try container.decodeIfPresent(Bool.self, forKey: .screenshotTidyOffers) ?? false
+        showStickyNotes = try container.decodeIfPresent(Bool.self, forKey: .showStickyNotes) ?? true
+        allowLinks = try container.decodeIfPresent(Bool.self, forKey: .allowLinks) ?? true
+        fileDropEnabled = try container.decodeIfPresent(Bool.self, forKey: .fileDropEnabled) ?? true
+        dropFolderPath = try container.decodeIfPresent(String.self, forKey: .dropFolderPath) ?? ""
+        clipboardHistory = try container.decodeIfPresent(Bool.self, forKey: .clipboardHistory) ?? false
+        askCookieEnabled = try container.decodeIfPresent(Bool.self, forKey: .askCookieEnabled) ?? false
+    }
+
+    var enabledBreakNudges: Set<BreakNudge> {
+        Set(breakNudges.compactMap(BreakNudge.init(rawValue:)))
+    }
+
+    /// The chosen drop folder, if it still exists.
+    var dropFolder: URL? {
+        guard !dropFolderPath.isEmpty else { return nil }
+        let url = URL(fileURLWithPath: dropFolderPath, isDirectory: true)
+        var isDirectory: ObjCBool = false
+        return FileManager.default.fileExists(atPath: url.path, isDirectory: &isDirectory) && isDirectory.boolValue ? url : nil
+    }
+
+    var enabledSystemAlerts: Set<SystemAlertKind> {
+        Set(systemAlerts.compactMap(SystemAlertKind.init(rawValue:)))
+    }
+
+    mutating func setSystemAlert(_ kind: SystemAlertKind, enabled: Bool) {
+        systemAlerts.removeAll { $0 == kind.rawValue }
+        if enabled { systemAlerts.append(kind.rawValue) }
+    }
+
+    func isNudgeEnabled(_ nudge: BreakNudge) -> Bool {
+        breakNudges.contains(nudge.rawValue)
+    }
+
+    mutating func setNudge(_ nudge: BreakNudge, enabled: Bool) {
+        breakNudges.removeAll { $0 == nudge.rawValue }
+        if enabled { breakNudges.append(nudge.rawValue) }
     }
 
     var summon: SummonShortcut {

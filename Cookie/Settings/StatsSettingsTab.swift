@@ -20,6 +20,7 @@ struct StatsSettingsTab: View {
             Section("Focus") {
                 LabeledContent("Sessions completed", value: "\(store.statistics.focusSessions)")
                 LabeledContent("Minutes focused", value: "\(store.statistics.focusMinutes)")
+                LabeledContent("Tasks finished", value: "\(store.statistics.tasksCompleted)")
             }
             Section("Care & Play") {
                 LabeledContent("Total interactions", value: "\(store.statistics.totalInteractions)")

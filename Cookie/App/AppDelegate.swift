@@ -53,6 +53,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         environment.createCookieMenu()
     }
 
+    /// cookie:// links. They can arrive before launch finishes, so they wait for the app to start.
+    func application(_ application: NSApplication, open urls: [URL]) {
+        environment.handle(urls: urls)
+    }
+
     func applicationWillTerminate(_ notification: Notification) {
         environment.shutdown()
     }

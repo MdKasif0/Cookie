@@ -6,6 +6,9 @@ import CoreGraphics
 @MainActor
 final class QuietModeMonitor: ObservableObject {
     @Published private(set) var isQuiet = false
+    /// Quiet mode you turned on yourself (from a link, Shortcuts or the menu), and when it ends.
+    /// `.distantFuture` means until you turn it off.
+    @Published private(set) var manualQuietUntil: Date?
 
     private let store: CookieStore
     private var timer: Timer?
@@ -39,9 +42,27 @@ final class QuietModeMonitor: ObservableObject {
         evaluate()
     }
 
+    var isManuallyQuiet: Bool {
+        guard let until = manualQuietUntil else { return false }
+        return now() < until
+    }
+
+    /// Turns quiet mode on, for `minutes` or until turned off.
+    func setManualQuiet(_ on: Bool, minutes: Int? = nil) {
+        if on {
+            manualQuietUntil = minutes.map { now().addingTimeInterval(TimeInterval($0) * 60) } ?? .distantFuture
+            overrideUntil = .distantPast
+        } else {
+            manualQuietUntil = nil
+        }
+        evaluate()
+    }
+
     func evaluate() {
-        var quiet = false
-        if store.profile.settings.hideInFullscreen, now() >= overrideUntil {
+        if let until = manualQuietUntil, now() >= until { manualQuietUntil = nil }
+        // A reminder or summon briefly overrides both kinds of quiet.
+        var quiet = isManuallyQuiet && now() >= overrideUntil
+        if !quiet, store.profile.settings.hideInFullscreen, now() >= overrideUntil {
             quiet = FullscreenDetector.isFullscreenAppActive(
                 windows: windowSource(), displays: displaySource(), ownPID: ownPID
             )

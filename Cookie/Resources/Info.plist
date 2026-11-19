@@ -8,6 +8,10 @@
 	<string>Cookie</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIconFile</key>
+	<string>AppIcon</string>
+	<key>CFBundleIconName</key>
+	<string>AppIcon</string>
 	<key>CFBundleIdentifier</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
@@ -18,24 +22,39 @@
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
 	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.cookie.mac.commands</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>cookie</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
-	<key>NSHumanReadableCopyright</key>
-	<string>© 2026 Md Kasif Uddin. All rights reserved.</string>
-	<key>CFBundleIconFile</key>
-	<string>AppIcon</string>
-	<key>CFBundleIconName</key>
-	<string>AppIcon</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.entertainment</string>
+	<key>NSCalendarsFullAccessUsageDescription</key>
+	<string>Cookie reads the start time and title of your upcoming events so she can give you a heads-up before they begin. Nothing leaves your Mac.</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>Cookie reads the start time and title of your upcoming events so she can give you a heads-up before they begin. Nothing leaves your Mac.</string>
+	<key>NSDesktopFolderUsageDescription</key>
+	<string>Cookie looks for old screenshots on your Desktop so she can offer to tidy them into a folder.</string>
+	<key>NSDownloadsFolderUsageDescription</key>
+	<string>Cookie watches your Downloads folder so she can tell you when a download finishes.</string>
 	<key>NSHighResolutionCapable</key>
 	<true/>
+	<key>NSHumanReadableCopyright</key>
+	<string>© 2026 Md Kasif Uddin. All rights reserved.</string>
+	<key>SUEnableAutomaticChecks</key>
+	<false/>
 	<key>SUFeedURL</key>
 	<string>https://raw.githubusercontent.com/MdKasif0/Cookie/main/website/appcast.xml</string>
 	<key>SUPublicEDKey</key>
 	<string>K/cA2KeUVBekRx1d1+DA0Fnhaj20UWK0DG7Ij8mPiBU=</string>
-	<key>SUEnableAutomaticChecks</key>
-	<false/>
 	<key>SUScheduledCheckInterval</key>
 	<integer>86400</integer>
 </dict>
