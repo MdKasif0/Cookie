@@ -48,6 +48,8 @@ public partial class CompanionWindow : ICompanionMenuSource
 
         _quiet = new QuietModeMonitor(() => _profile.Settings.HideInFullscreen);
         _quiet.QuietChanged += SetQuiet;
+
+        InitializeHelpers();
     }
 
     /// <summary>Called once her window exists: registers the shortcut and starts the clocks.</summary>
@@ -57,6 +59,7 @@ public partial class CompanionWindow : ICompanionMenuSource
         ApplyPresenceSettings();
         _quiet!.Start();
         _behaviorController.BeginDay();
+        StartHelpers(windowHandle);
 
         _dayTimer = new DispatcherTimer { Interval = TimeSpan.FromMinutes(1) };
         _dayTimer.Tick += (s, e) => CheckNewDay();
@@ -85,6 +88,7 @@ public partial class CompanionWindow : ICompanionMenuSource
 
     private void StopPresence()
     {
+        StopHelpers();
         _hotKey.Dispose();
         _quiet?.Stop();
         _focusTicker?.Stop();
@@ -172,6 +176,8 @@ public partial class CompanionWindow : ICompanionMenuSource
 
         if (new WindowInteropHelper(this).Handle != IntPtr.Zero) _hotKey.Register(_profile.Settings.SummonShortcut);
         RefreshCozy(raiseCookie: false);
+        ApplyHelperSettings();
+        foreach (var note in _noteWindows.Values) ScreenSharingGuard.Apply(note, exclude);
     }
 
     // MARK: Quiet mode and summoning
@@ -194,6 +200,7 @@ public partial class CompanionWindow : ICompanionMenuSource
             _worldItemWindow?.Hide();
             _boxBackWindow?.Hide();
             _cozy.HideAll();
+            RefreshNotes();
         }
         else if (_wasVisibleBeforeQuiet)
         {
@@ -204,6 +211,7 @@ public partial class CompanionWindow : ICompanionMenuSource
             _boxBackWindow?.Show();
             RefreshCozy();
         }
+        if (!quiet) RefreshNotes();
     }
 
     /// <summary>Calls Cookie to the cursor and has her wave hello. It overrides full-screen hiding briefly.</summary>

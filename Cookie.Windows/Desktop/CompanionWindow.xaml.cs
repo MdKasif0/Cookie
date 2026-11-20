@@ -179,9 +179,20 @@ public partial class CompanionWindow : Window
 
     private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
     {
+        if (msg == Cookie.Windows.Interop.HelperNativeMethods.WM_CLIPBOARDUPDATE)
+        {
+            Dispatcher.InvokeAsync(OnClipboardUpdate);
+            return IntPtr.Zero;
+        }
+
         if (SummonHotKeyService.IsHotKeyMessage(msg, wParam))
         {
-            Dispatcher.InvokeAsync(SummonCookie);
+            Dispatcher.InvokeAsync(() =>
+            {
+                // Calling her ends quiet mode you set yourself.
+                if (IsManuallyQuiet) SetManualQuiet(false);
+                SummonCookie();
+            });
             handled = true;
             return IntPtr.Zero;
         }
@@ -446,6 +457,7 @@ public partial class CompanionWindow : Window
 
         CareMenuBuilder.AddItems(menu, _behaviorController, _bond.IsUnlocked);
         CompanionMenu.AddItems(menu, this);
+        HelpersMenu.AddItems(menu, this);
 
         menu.Items.Add(new Separator());
 
@@ -520,9 +532,14 @@ public partial class CompanionWindow : Window
             _profile,
             _settingsManager,
             _audioManager,
-            () => ApplyProfileAppearance(),
+            () =>
+            {
+                ApplyProfileAppearance();
+                ApplyHelperSettings();
+            },
             _startupService,
-            () => OpenUpdateWindow());
+            () => OpenUpdateWindow(),
+            helperActions: new SettingsHelperActions(ConfirmTidyScreenshots, OpenAskCookie));
         settingsWindow.Show();
     }
 

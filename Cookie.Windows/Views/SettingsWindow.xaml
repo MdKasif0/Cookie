@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:rendering="clr-namespace:Cookie.Windows.Rendering"
         Title="Cookie Settings"
-        Height="620" Width="680"
+        Height="640" Width="760"
         WindowStartupLocation="CenterScreen"
         ThemeMode="System"
         FontSize="13">
@@ -558,6 +558,10 @@
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
+
+            <!-- Helpers and Power Tools: built in SettingsWindow.xaml.cs -->
+            <TabItem Header="Helpers" x:Name="HelpersTab"/>
+            <TabItem Header="Power Tools" x:Name="PowerToolsTab"/>
         </TabControl>
     </Grid>
 </Window>

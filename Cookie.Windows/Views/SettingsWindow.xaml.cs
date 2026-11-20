@@ -18,7 +18,8 @@ public partial class SettingsWindow : Window
         AudioManagerBase audioManager,
         Action? onSettingsChanged = null,
         IStartupService? startupService = null,
-        Action? onCheckForUpdates = null)
+        Action? onCheckForUpdates = null,
+        SettingsHelperActions? helperActions = null)
     {
         InitializeComponent();
         Cookie.Windows.Desktop.CookieTheme.Attach(this);
@@ -37,6 +38,9 @@ public partial class SettingsWindow : Window
             onCheckForUpdates);
 
         DataContext = vm;
+
+        HelpersTab.Content = new HelpersSettingsPanel(profile, settingsManager, onSettingsChanged, helperActions).Build();
+        PowerToolsTab.Content = new PowerToolsSettingsPanel(profile, settingsManager, onSettingsChanged, helperActions).Build();
         Loaded += (s, e) => UpdateLivePreview();
     }
 

@@ -17,5 +17,14 @@ public class CookieProfile
     public List<string> UnlockedItems { get; set; } = new();
 
     public List<CozyPlacement> CozyItems { get; set; } = new();
+
+    /// <summary>Reminders and timers still to come.</summary>
+    public List<Cookie.Windows.Core.Helpers.CookieReminder> Reminders { get; set; } = new();
+    /// <summary>When she last suggested going to bed (local time), so she says it once a night.</summary>
+    public DateTime? LastBedtimeWindDown { get; set; }
+    public List<Cookie.Windows.Core.Helpers.StickyNote> StickyNotes { get; set; } = new();
+    public List<Cookie.Windows.Core.Helpers.TodoItem> Todos { get; set; } = new();
+    /// <summary>When she last offered to tidy screenshots, so she asks at most once a day.</summary>
+    public DateTime? LastScreenshotOffer { get; set; }
     public DateTime LastModified { get; set; } = DateTime.UtcNow;
 }

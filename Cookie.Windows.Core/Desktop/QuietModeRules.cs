@@ -46,10 +46,34 @@ public class QuietModeState
 
     public void GrantOverride(double seconds) => _overrideUntil = Now().AddSeconds(seconds);
 
+    /// <summary>
+    /// Quiet mode you turned on yourself (from the menu or a link), and when it ends.
+    /// <see cref="DateTime.MaxValue"/> means until you turn it off.
+    /// </summary>
+    public DateTime? ManualQuietUntil { get; private set; }
+
+    public bool IsManuallyQuiet => ManualQuietUntil is { } until && Now() < until;
+
+    public void SetManualQuiet(bool on, int? minutes = null)
+    {
+        if (on)
+        {
+            ManualQuietUntil = minutes is { } m ? Now().AddMinutes(m) : DateTime.MaxValue;
+            _overrideUntil = DateTime.MinValue;
+        }
+        else
+        {
+            ManualQuietUntil = null;
+        }
+    }
+
     /// <summary>Returns true when the quiet state changed.</summary>
     public bool Evaluate(bool hideInFullscreen, int notificationState)
     {
-        bool quiet = hideInFullscreen && Now() >= _overrideUntil && QuietModeRules.ShouldHide(notificationState);
+        if (ManualQuietUntil is { } until && Now() >= until) ManualQuietUntil = null;
+        // A reminder or summon briefly overrides both kinds of quiet.
+        bool overridden = Now() < _overrideUntil;
+        bool quiet = !overridden && (IsManuallyQuiet || (hideInFullscreen && QuietModeRules.ShouldHide(notificationState)));
         if (quiet == IsQuiet) return false;
         IsQuiet = quiet;
         return true;

@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using Cookie.Windows.Core.Helpers;
+
 namespace Cookie.Windows.Core.Models;
 
 public enum ReducedMotionMode
@@ -124,6 +127,37 @@ public class CookieSettings
 
     // Updates
     public bool AutomaticallyCheckForUpdates { get; set; } = true;
+
+    // Helpers
+    /// <summary>Break nudges that are switched on. All off until you choose them.</summary>
+    public List<BreakNudge> BreakNudges { get; set; } = new();
+    /// <summary>During a focus session she reacts when you switch to one of these apps.</summary>
+    public bool FocusGuardEnabled { get; set; } = true;
+    public List<DistractingApp> DistractingApps { get; set; } = new();
+    public bool BedtimeEnabled { get; set; } = false;
+    /// <summary>Minutes after midnight; 23:00 by default.</summary>
+    public int BedtimeMinutes { get; set; } = 23 * 60;
+    /// <summary>What the system watcher speaks up about. Needs no permission, so all on.</summary>
+    public List<SystemAlertKind> SystemAlerts { get; set; } = new()
+    {
+        SystemAlertKind.Battery, SystemAlertKind.Cpu, SystemAlertKind.Disk, SystemAlertKind.Network
+    };
+    /// <summary>Watching Downloads and the Desktop starts off.</summary>
+    public bool DownloadAlerts { get; set; } = false;
+    public bool ScreenshotTidyOffers { get; set; } = false;
+    public bool ShowStickyNotes { get; set; } = true;
+
+    // Power tools
+    /// <summary>cookie:// links.</summary>
+    public bool AllowLinks { get; set; } = true;
+    /// <summary>Dropping files on Cookie offers to file or zip them.</summary>
+    public bool FileDropEnabled { get; set; } = true;
+    /// <summary>The folder dropped files go to. Empty until you choose one.</summary>
+    public string DropFolderPath { get; set; } = "";
+    /// <summary>Keeps your last few copies in memory. Off until you turn it on.</summary>
+    public bool ClipboardHistory { get; set; } = false;
+    /// <summary>Chat with Cookie through the Claude API. Off until you turn it on and add a key.</summary>
+    public bool AskCookieEnabled { get; set; } = false;
 
     public void ResetPersonalityAndActivitySettings()
     {

@@ -270,6 +270,75 @@ public partial class CookieBehaviorController
         }
     }
 
+    // MARK: Helpers: nudges, the focus guard, bedtime and quick reactions
+
+    /// <summary>Shows you what to do: she has a drink for water, and stretches for posture and eyes.</summary>
+    public void PerformNudge(Helpers.BreakNudge nudge)
+    {
+        if (IsFocusing || !PrepareForScript()) return;
+        StartCareSequence(nudge switch
+        {
+            Helpers.BreakNudge.Water => new[]
+            {
+                new CareStep(CookieState.Sitting, CookieAnimationId.Sit, 0.6),
+                new CareStep(CookieState.Drinking, CookieAnimationId.Drink, 3.0),
+                new CareStep(CookieState.Sitting, CookieAnimationId.Sit, 4.0)
+            },
+            Helpers.BreakNudge.Posture => new[]
+            {
+                new CareStep(CookieState.Stretching, CookieAnimationId.Stretch, 2.0),
+                new CareStep(CookieState.Sitting, CookieAnimationId.Sit, 1.0),
+                new CareStep(CookieState.Stretching, CookieAnimationId.Stretch, 2.2),
+                new CareStep(CookieState.Sitting, CookieAnimationId.Sit, 4.0)
+            },
+            _ => new[]
+            {
+                new CareStep(CookieState.Sitting, CookieAnimationId.Sit, 1.0),
+                new CareStep(CookieState.Grooming, CookieAnimationId.Groom, 2.5),
+                new CareStep(CookieState.Sitting, CookieAnimationId.Sit, 14.0)
+            }
+        });
+    }
+
+    /// <summary>You switched to a distracting app mid-session: she gives you a look, then settles back down.</summary>
+    public void NoticeDistraction()
+    {
+        if (!IsFocusing || !PrepareForScript()) return;
+        StartCareSequence(new[]
+        {
+            new CareStep(CookieState.Reacting, CookieAnimationId.Annoyed, 2.0),
+            new CareStep(CookieState.Sitting, CookieAnimationId.Sit, 5.0),
+            new CareStep(CookieState.Yawning, CookieAnimationId.Yawn, 2.0),
+            new CareStep(CookieState.Sleeping, CookieAnimationId.Sleep, double.PositiveInfinity)
+        });
+    }
+
+    /// <summary>Bedtime: she yawns and curls up for a long sleep.</summary>
+    public void WindDown()
+    {
+        if (IsFocusing || !PrepareForScript()) return;
+        StartCareSequence(new[]
+        {
+            new CareStep(CookieState.Yawning, CookieAnimationId.Yawn, 2.0),
+            new CareStep(CookieState.Sitting, CookieAnimationId.Sit, 1.5),
+            new CareStep(CookieState.Sleeping, CookieAnimationId.Sleep, 180)
+        });
+    }
+
+    /// <summary>
+    /// A quick reaction to news: a finished download, a low battery, a ticked-off task. During a focus
+    /// session she stays asleep and only the speech bubble appears.
+    /// </summary>
+    public void React(CookieAnimationId reaction)
+    {
+        if (IsFocusing || CurrentEmote != null || !PrepareForScript()) return;
+        StartCareSequence(new[]
+        {
+            new CareStep(CookieState.Reacting, reaction, 1.6),
+            new CareStep(CookieState.Sitting, CookieAnimationId.Sit, 3.0)
+        });
+    }
+
     /// <summary>Marks a happy occasion such as a new friendship level.</summary>
     public void Celebrate()
     {

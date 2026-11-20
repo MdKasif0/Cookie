@@ -31,9 +31,20 @@ public partial class App : Application
     {
         base.OnStartup(e);
 
+        // Windows starts Cookie with the link when a cookie:// link is opened.
+        string? link = LinkProtocol.LinkIn(e.Args);
+
         _singleInstanceMutex = new Mutex(true, SingleInstanceMutexName, out bool isOnlyInstance);
         if (!isOnlyInstance)
         {
+            // Hand the link to the copy that's already running, then quietly leave.
+            if (link != null)
+            {
+                Cookie.Windows.Core.Helpers.CommandChannel.Send(Cookie.Windows.Core.Helpers.CommandChannel.PipeNameForCurrentUser(), link);
+                Shutdown();
+                return;
+            }
+
             uint wmShowSettings = NativeMethods.RegisterWindowMessage("Cookie_ShowSettings_2026");
             if (wmShowSettings != 0)
             {
@@ -96,9 +107,10 @@ public partial class App : Application
                 });
             onboardingWindow.Show();
         }
-        else if (_profile.Settings.ShowOnStartup)
+        else if (_profile.Settings.ShowOnStartup || link != null)
         {
             _companionWindow.Show();
+            if (link != null) _companionWindow.HandleLink(link);
         }
     }
 

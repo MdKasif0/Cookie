@@ -27,6 +27,34 @@ public class CookieStatistics
     /// <summary>The highest friendship level already celebrated, so each is announced once.</summary>
     public int CelebratedBondLevel { get; set; }
 
+    /// <summary>To-do items you've ticked off.</summary>
+    public int TasksCompleted { get; set; }
+    /// <summary>The local day the task rewards below were counted for.</summary>
+    public DateTime? TaskRewardDay { get; set; }
+    public int TaskRewardsToday { get; set; }
+
+    /// <summary>Affection a finished task earns, and how many tasks a day earn it, so the bond can't be farmed.</summary>
+    public const int TaskAffection = 3;
+    public const int RewardedTasksPerDay = 5;
+
+    /// <summary>Counts a finished task. Returns true when it earned bond points.</summary>
+    public bool RecordTaskCompleted(DateTime nowLocal)
+    {
+        TasksCompleted++;
+        if (TaskRewardDay is { } day && day.Date == nowLocal.Date)
+        {
+            if (TaskRewardsToday >= RewardedTasksPerDay) return false;
+        }
+        else
+        {
+            TaskRewardDay = nowLocal.Date;
+            TaskRewardsToday = 0;
+        }
+        TaskRewardsToday++;
+        Affection += TaskAffection;
+        return true;
+    }
+
     public void RecordLaunch(DateTime now)
     {
         FirstLaunchedAt ??= now;

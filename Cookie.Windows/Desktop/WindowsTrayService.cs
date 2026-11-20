@@ -151,6 +151,7 @@ public class WindowsTrayService : IDisposable
         // Feeding and toys
         CareMenuBuilder.AddItems(menu, _behaviorController, _menuSource.Bond.IsUnlocked);
         CompanionMenu.AddItems(menu, _menuSource);
+        if (_menuSource is IHelpersMenuSource helpers) HelpersMenu.AddItems(menu, helpers);
 
         menu.Items.Add(new Separator());
 

@@ -40,6 +40,15 @@ public sealed class QuietModeMonitor
         Evaluate();
     }
 
+    public bool IsManuallyQuiet => _state.IsManuallyQuiet;
+
+    /// <summary>Quiet mode you turned on yourself, for <paramref name="minutes"/> or until turned off.</summary>
+    public void SetManualQuiet(bool on, int? minutes = null)
+    {
+        _state.SetManualQuiet(on, minutes);
+        Evaluate();
+    }
+
     public void Evaluate()
     {
         int notificationState = QuietModeRules.AcceptsNotifications;
