@@ -83,15 +83,15 @@ const CookieReleases = {
     id: "windows",
     name: "Windows",
     displayName: "Windows",
-    version: "1.1.0",
-    releaseDate: "2026-10-15",
-    formattedReleaseDate: "October 15, 2026",
+    version: "1.4.0",
+    releaseDate: "2026-11-20",
+    formattedReleaseDate: "November 20, 2026",
     installerType: "Windows Installer (.exe)",
     artifactName: "Cookie-Setup.exe",
     downloadUrl: "download/windows",
-    fileSizeBytes: 57123680,
-    formattedSize: "54.5 MB",
-    sha256: "1b9990805306716a7a6720105580be40586f1aab4aaf96e9c04a892bde05e534",
+    fileSizeBytes: 75055451,
+    formattedSize: "71.6 MB",
+    sha256: "716441c2ccfcbd7a6288ea568672339458413d4e6d5c1271cf3031ab51606d81",
     isInstallerAvailable: true,
     installerStatusText: "Official Windows Setup (.exe)",
     installerNote: "Compiled with Inno Setup 6 on GitHub Actions Windows runner. Fully self-contained .NET 10 desktop companion.",
@@ -100,19 +100,19 @@ const CookieReleases = {
     portable: {
       isAvailable: true,
       name: "Portable 64-bit (.zip)",
-      artifactName: "Cookie-Windows-1.1.0-win-x64-Portable.zip",
+      artifactName: "Cookie-Windows-1.4.0-win-x64-Portable.zip",
       downloadUrl: "download/windows-portable",
-      fileSizeBytes: 77247713,
-      formattedSize: "73.6 MB",
-      sha256: "474777092e9f4303a5255c518650537f7a5dc20c855560e84e728a0b7db41f0a",
+      fileSizeBytes: 96772672,
+      formattedSize: "92.3 MB",
+      sha256: "26aab0c9643e9e85a66c1aef4b96e058bddf83be932e72cc40e67c4a5db068a3",
       desc: "Self-contained standalone package. Extract and run Cookie.exe directly without installation."
     },
 
     architecture: "64-bit (x64)",
     minimumOS: "Windows 10 (version 19041+) & Windows 11",
     heroButtonLabel: "Download for Windows",
-    heroReleaseTag: "Version 1.1.0 · 54.5 MB Installer (.exe) · Windows 10 & 11 · 100% Offline",
-    cardMeta: "Version 1.1.0 · Windows 10 (build 19041+) & Windows 11",
+    heroReleaseTag: "Version 1.4.0 · 71.6 MB Installer (.exe) · Windows 10 & 11 · 100% Offline",
+    cardMeta: "Version 1.4.0 · Windows 10 (build 19041+) & Windows 11",
     specs: [
       {
         title: "64-bit Architecture",
@@ -131,8 +131,8 @@ const CookieReleases = {
       },
       {
         title: "Package Size",
-        desc: "Inno Setup installer (~54.5 MB) including all sprite sheets, audio effects, and clean uninstaller.",
-        pill: "54.5 MB Installer"
+        desc: "Inno Setup installer (~71.6 MB) including all sprite sheets, audio effects, and clean uninstaller.",
+        pill: "71.6 MB Installer"
       }
     ],
     installSteps: [

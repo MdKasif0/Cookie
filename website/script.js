@@ -969,8 +969,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     if (downloadCardSpecs) {
       downloadCardSpecs.innerHTML = isWin
-        ? `<span>~54.5 MB Installer (.exe)</span><span class="meta-dot">·</span><span>Windows 10 &amp; 11 (x64)</span><span class="meta-dot">·</span><span>Free &amp; Open Source</span>`
-        : `<span>~23 MB Disk Image</span><span class="meta-dot">·</span><span>Universal Binary</span><span class="meta-dot">·</span><span>Free &amp; Open Source</span>`;
+        ? `<span>~${rel.formattedSize} Installer (.exe)</span><span class="meta-dot">·</span><span>Windows 10 &amp; 11 (x64)</span><span class="meta-dot">·</span><span>Free &amp; Open Source</span>`
+        : `<span>~${rel.formattedSize} Disk Image</span><span class="meta-dot">·</span><span>Universal Binary</span><span class="meta-dot">·</span><span>Free &amp; Open Source</span>`;
     }
 
     if (mainDownloadBtn && mainDownloadBtnText) {
