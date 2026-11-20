@@ -39,6 +39,22 @@ public class SettingsPersistenceTests : IDisposable
     }
 
     [Fact]
+    public void AutomaticUpdateCheck_IsOnForOldProfilesAndStaysOffOnceTurnedOff()
+    {
+        string filePath = Path.Combine(_testDirectory, "profile.json");
+
+        // A profile saved before the setting existed has no field for it: the check stays on.
+        File.WriteAllText(filePath, "{\"Version\":1,\"DisplayName\":\"Cookie\",\"Settings\":{\"SoundEnabled\":true}}");
+        var profile = new SettingsManager(filePath).LoadProfile();
+        Assert.True(profile.Settings.AutomaticallyCheckForUpdates);
+
+        profile.Settings.AutomaticallyCheckForUpdates = false;
+        new SettingsManager(filePath).SaveProfileImmediate(profile);
+
+        Assert.False(new SettingsManager(filePath).LoadProfile().Settings.AutomaticallyCheckForUpdates);
+    }
+
+    [Fact]
     public void SaveAndLoad_PersistsCustomSettingsCorrectly()
     {
         string filePath = Path.Combine(_testDirectory, "profile.json");

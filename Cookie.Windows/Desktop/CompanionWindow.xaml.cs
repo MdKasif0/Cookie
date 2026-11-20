@@ -161,10 +161,13 @@ public partial class CompanionWindow : Window
         _audioManager.Play(SoundEffect.Welcome);
         StartPresence(hWnd);
 
-        // Gentle background update check 15 seconds after companion spawns
+        // Gentle background update check 15 seconds after companion spawns, unless it's turned off in
+        // Settings. The setting is read after the wait, so switching it off in those seconds still counts.
+        // "Check for Updates Now…" in Settings and the tray always checks.
         _ = System.Threading.Tasks.Task.Run(async () =>
         {
             await System.Threading.Tasks.Task.Delay(15000).ConfigureAwait(false);
+            if (!_profile.Settings.AutomaticallyCheckForUpdates) return;
             try
             {
                 var result = await _updateService.CheckForUpdatesAsync().ConfigureAwait(false);
