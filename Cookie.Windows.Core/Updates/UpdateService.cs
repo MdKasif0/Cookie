@@ -46,7 +46,7 @@ public class UpdateService : IUpdateService, IDisposable
 
         CurrentVersion = currentVersion ??
                          typeof(UpdateService).Assembly.GetName().Version?.ToString(3) ??
-                         "1.1.0";
+                         "1.4.0";
     }
 
     public void Dispose()

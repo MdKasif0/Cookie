@@ -12,6 +12,7 @@ public partial class AboutWindow : Window
     public AboutWindow(CookieAppearanceConfig? appearance = null, Action? onCheckUpdates = null)
     {
         InitializeComponent();
+        VersionText.Text = $"Version {Cookie.Windows.ViewModels.SettingsViewModel.CurrentAppVersion} (Windows Edition)";
         Cookie.Windows.Desktop.CookieTheme.Attach(this);
         _onCheckUpdates = onCheckUpdates;
 

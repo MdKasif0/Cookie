@@ -19,9 +19,9 @@
     <Title>Cookie</Title>
     <Company>Cookie Desktop Companion</Company>
     <Description>Cookie Desktop Companion for Windows</Description>
-    <Version>1.1.0</Version>
-    <AssemblyVersion>1.1.0.0</AssemblyVersion>
-    <FileVersion>1.1.0.0</FileVersion>
+    <Version>1.4.0</Version>
+    <AssemblyVersion>1.4.0.0</AssemblyVersion>
+    <FileVersion>1.4.0.0</FileVersion>
     <Copyright>© 2026 Md Kasif Uddin. All rights reserved.</Copyright>
     
     <!-- Build Configurations -->

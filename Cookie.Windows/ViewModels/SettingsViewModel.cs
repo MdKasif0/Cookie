@@ -737,7 +737,10 @@ public class SettingsViewModel : INotifyPropertyChanged
         set { if (_profile.Settings.PurringSounds != value) { _profile.Settings.PurringSounds = value; SaveAndNotify(); OnPropertyChanged(); } }
     }
 
-    public string AppVersion => "1.1.0";
+    /// <summary>The installed version, read from the app itself so it never goes stale.</summary>
+    public static string CurrentAppVersion => System.Reflection.Assembly.GetEntryAssembly()?.GetName().Version?.ToString(3) ?? "1.4.0";
+
+    public string AppVersion => CurrentAppVersion;
     public string CopyrightText => "© 2026 Md Kasif Uddin. All rights reserved.";
 
     private void SaveAndNotify()

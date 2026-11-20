@@ -21,6 +21,9 @@ jobs:
       run:
         shell: pwsh
     env:
+      # The Windows version. Keep it in step with Cookie.Windows.csproj and CookieSetup.iss;
+      # the version check below fails the build if they disagree.
+      COOKIE_VERSION: '1.4.0'
       # Signing runs only when its secrets exist. See DISTRIBUTION.md.
       SIGN_WITH_AZURE: ${{ secrets.AZURE_CLIENT_ID != '' }}
       SIGN_WITH_PFX: ${{ secrets.WINDOWS_CERT_PFX_BASE64 != '' }}
@@ -33,6 +36,24 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
+
+      - name: Check Version Numbers
+        run: |
+          $version = $env:COOKIE_VERSION
+          $project = ([xml](Get-Content Cookie.Windows/Cookie.Windows.csproj)).Project.PropertyGroup.Version | Where-Object { $_ } | Select-Object -First 1
+          $installer = (Select-String -Path Packaging/windows/CookieSetup.iss -Pattern '#define MyAppVersion "(.+)"').Matches[0].Groups[1].Value
+          if ($project -ne $version -or $installer -ne $version) {
+            Write-Error "Version mismatch: workflow $version, Cookie.Windows.csproj $project, CookieSetup.iss $installer."
+            exit 1
+          }
+          if ($env:GITHUB_REF -like 'refs/tags/windows-v*') {
+            $tag = $env:GITHUB_REF_NAME -replace '^windows-v', ''
+            if ($tag -ne $version) {
+              Write-Error "The tag says $tag but the app is $version."
+              exit 1
+            }
+          }
+          Write-Host "Building Cookie for Windows $version"
 
       - name: Restore Dependencies
         run: dotnet restore Cookie.Windows.sln
@@ -110,7 +131,7 @@ jobs:
         run: |
           New-Item -ItemType Directory -Force -Path dist/windows/installer
           & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" Packaging/windows/CookieSetup.iss
-          Copy-Item dist/windows/installer/CookieSetup-1.1.0.exe dist/windows/installer/Cookie-Setup.exe -Force
+          Copy-Item dist/windows/installer/CookieSetup-${{ env.COOKIE_VERSION }}.exe dist/windows/installer/Cookie-Setup.exe -Force
           Write-Host "Inno Setup installer compiled successfully."
 
       - name: Sign Installer (Azure Artifact Signing)
@@ -125,7 +146,7 @@ jobs:
           certificate-profile-name: ${{ secrets.AZURE_SIGNING_PROFILE }}
           files: |
             ${{ github.workspace }}\dist\windows\installer\Cookie-Setup.exe
-            ${{ github.workspace }}\dist\windows\installer\CookieSetup-1.1.0.exe
+            ${{ github.workspace }}\dist\windows\installer\CookieSetup-${{ env.COOKIE_VERSION }}.exe
           file-digest: SHA256
           timestamp-rfc3161: http://timestamp.acs.microsoft.com
           timestamp-digest: SHA256
@@ -136,20 +157,20 @@ jobs:
           WINDOWS_CERT_PFX_BASE64: ${{ secrets.WINDOWS_CERT_PFX_BASE64 }}
           WINDOWS_CERT_PASSWORD: ${{ secrets.WINDOWS_CERT_PASSWORD }}
         run: |
-          ./Packaging/windows/sign.ps1 -Files dist/windows/installer/Cookie-Setup.exe,dist/windows/installer/CookieSetup-1.1.0.exe
+          ./Packaging/windows/sign.ps1 -Files dist/windows/installer/Cookie-Setup.exe,dist/windows/installer/CookieSetup-${{ env.COOKIE_VERSION }}.exe
 
       - name: Package Portable Zip
         run: |
-          Compress-Archive -Path dist/windows/win-x64/* -DestinationPath dist/windows/Cookie-Windows-1.1.0-win-x64-Portable.zip -Force
+          Compress-Archive -Path dist/windows/win-x64/* -DestinationPath dist/windows/Cookie-Windows-${{ env.COOKIE_VERSION }}-win-x64-Portable.zip -Force
           Write-Host "Portable zip packaged successfully."
 
       - name: Compute Checksums
         run: |
           $installerHash = (Get-FileHash -Algorithm SHA256 dist/windows/installer/Cookie-Setup.exe).Hash.ToLower()
-          $zipHash = (Get-FileHash -Algorithm SHA256 dist/windows/Cookie-Windows-1.1.0-win-x64-Portable.zip).Hash.ToLower()
+          $zipHash = (Get-FileHash -Algorithm SHA256 dist/windows/Cookie-Windows-${{ env.COOKIE_VERSION }}-win-x64-Portable.zip).Hash.ToLower()
           $exeHash = (Get-FileHash -Algorithm SHA256 dist/windows/win-x64/Cookie.exe).Hash.ToLower()
           "$installerHash  dist/windows/installer/Cookie-Setup.exe" | Out-File -FilePath dist/windows/SHA256SUMS.txt -Encoding utf8
-          "$zipHash  dist/windows/Cookie-Windows-1.1.0-win-x64-Portable.zip" | Out-File -FilePath dist/windows/SHA256SUMS.txt -Append -Encoding utf8
+          "$zipHash  dist/windows/Cookie-Windows-${{ env.COOKIE_VERSION }}-win-x64-Portable.zip" | Out-File -FilePath dist/windows/SHA256SUMS.txt -Append -Encoding utf8
           "$exeHash  dist/windows/win-x64/Cookie.exe" | Out-File -FilePath dist/windows/SHA256SUMS.txt -Append -Encoding utf8
           Get-Content dist/windows/SHA256SUMS.txt
 
@@ -159,8 +180,8 @@ jobs:
           name: Cookie-Windows-Installer
           path: |
             dist/windows/installer/Cookie-Setup.exe
-            dist/windows/installer/CookieSetup-1.1.0.exe
-            dist/windows/Cookie-Windows-1.1.0-win-x64-Portable.zip
+            dist/windows/installer/CookieSetup-${{ env.COOKIE_VERSION }}.exe
+            dist/windows/Cookie-Windows-${{ env.COOKIE_VERSION }}-win-x64-Portable.zip
             dist/windows/SHA256SUMS.txt
           if-no-files-found: error
 

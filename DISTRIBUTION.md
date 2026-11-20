@@ -126,7 +126,7 @@ The website's Windows download and the Windows update feed follow `releases/late
 
 **Windows**
 
-1. Write `release-notes/windows-<version>.md`, and set the version in `Cookie.Windows.csproj` and `CookieSetup.iss`.
+1. Write `release-notes/windows-<version>.md`, and set the version in `Cookie.Windows.csproj`, `Cookie.Windows.Core.csproj`, `app.manifest`, `Packaging/windows/CookieSetup.iss` and `COOKIE_VERSION` in `.github/workflows/build-windows.yml`. The workflow stops if they or the tag disagree.
 2. Push a tag such as `windows-v1.2.0`. The *Build Cookie for Windows* workflow builds, signs, creates the signed update manifest, and publishes the installer, the portable zip, the checksums and the update feed. (Pushes to `main` without a tag only build and keep the files as a workflow artifact.)
 3. Update the version text in `website/releases.js`, then commit and push.
 
