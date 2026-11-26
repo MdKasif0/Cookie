@@ -42,7 +42,7 @@ const CookieReleases = {
       },
       {
         title: "Download Size",
-        desc: "Compact ~48 MB disk image. 100% offline with zero background daemons.",
+        desc: "Compact ~48 MB disk image. Private by default, with zero background daemons.",
         pill: "48 MB DMG"
       }
     ],
@@ -111,7 +111,7 @@ const CookieReleases = {
     architecture: "64-bit (x64)",
     minimumOS: "Windows 10 (version 19041+) & Windows 11",
     heroButtonLabel: "Download for Windows",
-    heroReleaseTag: "Version 1.4.0 · 71.6 MB Installer (.exe) · Windows 10 & 11 · 100% Offline",
+    heroReleaseTag: "Version 1.4.0 · 71.6 MB Installer (.exe) · Windows 10 & 11 · Private by Default",
     cardMeta: "Version 1.4.0 · Windows 10 (build 19041+) & Windows 11",
     specs: [
       {
@@ -126,7 +126,7 @@ const CookieReleases = {
       },
       {
         title: "Privacy & Elevation",
-        desc: "Installs cleanly per-user with zero administrative elevation required. 100% offline companion.",
+        desc: "Installs cleanly per-user with zero administrative elevation required. Private by default.",
         pill: "No Admin Required"
       },
       {
@@ -164,7 +164,7 @@ const CookieReleases = {
     ],
     securityNotes: {
       title: "Windows SmartScreen & Publisher Verification",
-      desc: "Cookie is an independent, 100% offline open-source project. Initial releases without accumulated download history may trigger a standard Windows Defender SmartScreen notice ('Windows protected your PC'). Click 'More info' → 'Run anyway'. We recommend downloading solely from official Cookie releases."
+      desc: "Cookie is an independent open-source project. Initial releases without accumulated download history may trigger a standard Windows Defender SmartScreen notice ('Windows protected your PC'). Click 'More info' → 'Run anyway'. We recommend downloading solely from official Cookie releases."
     }
   }
 };

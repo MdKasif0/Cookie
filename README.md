@@ -13,7 +13,7 @@
   [![Tech Stack](https://img.shields.io/badge/UI-SwiftUI%20%7C%20SpriteKit-75856f?style=flat-square&logo=swift&logoColor=white)](https://developer.apple.com/swift/)
   [![Updates](https://img.shields.io/badge/Updates-Sparkle%202.6%20(EdDSA)-262421?style=flat-square)](website/appcast.xml)
   [![License](https://img.shields.io/badge/License-MIT-5d4d40?style=flat-square)](LICENSE)
-  [![Privacy](https://img.shields.io/badge/Privacy-100%25%20Offline%20%7C%20Zero%20Telemetry-262421?style=flat-square)](website/#privacy)
+  [![Privacy](https://img.shields.io/badge/Privacy-Private%20by%20Default%20%7C%20Zero%20Telemetry-262421?style=flat-square)](website/#privacy)
   [![Disk Image](https://img.shields.io/badge/Download-~47%20MB%20DMG-e87920?style=flat-square)](https://github.com/MdKasif0/Cookie/releases)
 
 </div>
@@ -26,7 +26,7 @@
 
 ## 📖 Overview
 
-**Cookie** is a lightweight, offline desktop companion for macOS built with **SwiftUI** and **SpriteKit**. She roams your screen, leaps across window edges and the Dock, follows your cursor, and naps quietly beside your work—whisper-quiet on hardware (~0% idle CPU) and completely private.
+**Cookie** is a lightweight, private desktop companion for macOS built with **SwiftUI** and **SpriteKit**. She roams your screen, leaps across window edges and the Dock, follows your cursor, and naps quietly beside your work—whisper-quiet on hardware (~0% idle CPU) and completely private.
 
 ---
 
@@ -41,7 +41,7 @@
 | **🧶 Toys & Treats** | Interactive desktop items (yarn, mouse, cardboard box) and snack rewards. |
 | **🎨 Character Studio (⌘K)** | 10 fur palettes, coats, eye styles, body scaling, and layered accessories. |
 | **🎵 Designed Audio** | A formant-modeled voice and a continuous looping purr, with independent volume controls. |
-| **🔒 100% Private & Offline** | Zero analytics, zero cloud dependencies, and local JSON storage. |
+| **🔒 Private by Default** | Zero analytics and local storage. Cookie goes online only to check for updates (switchable) and for the optional Ask Cookie chat. |
 | **💞 Friendship & Unlocks** | Pets, treats, play and each new day grow your bond; hats, coats, toys and cozy spots unlock as it deepens. |
 | **⏲️ Focus Sessions** | Cookie naps beside you while you work, then stretches and nudges you to take a break. |
 | **🌙 Daily Rhythm** | Sleepy at night, a stretch in the morning, and seasonal outfits chosen from your local clock. |
