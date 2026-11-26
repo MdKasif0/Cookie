@@ -39,12 +39,19 @@ sign_app_bundle() {
     sign_path "${sparkle}/Versions/B/Autoupdate"
     sign_path "${sparkle}/Versions/B/Updater.app"
     sign_path "${sparkle}"
-    sign_path "${app}"
+    # Under Hardened Runtime every protected resource needs an entitlement; without the
+    # calendar one, macOS silently denies EventKit and calendar heads-ups stop working.
+    sign_path --entitlements "${ENTITLEMENTS}" "${app}"
     codesign --verify --deep --strict --verbose=2 "${app}"
+    if ! codesign -d --entitlements - --xml "${app}" 2>/dev/null | grep -q 'personal-information.calendars'; then
+        echo "error: the signed app is missing the calendar entitlement." >&2
+        exit 1
+    fi
 }
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+ENTITLEMENTS="${SCRIPT_DIR}/mac/Cookie.entitlements"
 DIST_DIR="${PROJECT_ROOT}/dist"
 APP_NAME="Cookie"
 VERSION="1.4.0"
@@ -67,6 +74,7 @@ if [[ -n "${SIGN_IDENTITY}" ]]; then
         "CODE_SIGN_IDENTITY=${SIGN_IDENTITY}"
         "DEVELOPMENT_TEAM=${TEAM_ID}"
         "ENABLE_HARDENED_RUNTIME=YES"
+        "CODE_SIGN_ENTITLEMENTS=${ENTITLEMENTS}"
         "CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO"
         "OTHER_CODE_SIGN_FLAGS=--timestamp"
     )

@@ -58,9 +58,10 @@ Store an app-specific password from [account.apple.com](https://account.apple.co
 ```bash
 xcrun notarytool store-credentials "CookieNotary" \
   --apple-id "developer@example.com" \
-  --team-id "TEAM_ID" \
-  --password "xxxx-xxxx-xxxx-xxxx"
+  --team-id "TEAM_ID"
 ```
+
+Leave out `--password`: notarytool then asks for it, so the app-specific password never lands in your shell history.
 
 ### Step 3: Build, Sign, Notarize and Staple
 `Packaging/build_dmg.sh` does all of this when these variables are set. It enables Hardened Runtime, signs Sparkle's nested helpers inside-out, signs the DMG, submits it to Apple, staples the ticket, and fails if Apple rejects the build.
@@ -74,6 +75,12 @@ COOKIE_NOTARY_PROFILE="CookieNotary" \
 
 Without these variables the script produces an ad-hoc development DMG, and its last line of output says so. Hardened Runtime stays off in `project.yml` because ad-hoc builds cannot load Sparkle with it enabled.
 
+**Entitlements.** Under Hardened Runtime, macOS silently denies any protected resource the app has no entitlement for. `Packaging/mac/Cookie.entitlements` grants the calendar (for event heads-ups), and the script stops if the signed app lacks it. If Cookie starts using another protected resource (contacts, location, camera, microphone, Apple Events), add its entitlement there, or the feature will fail only in notarized builds.
+
+Then run `scripts/release_update.sh <version> <build> dist/Cookie-<version>.dmg`, passing the stapled DMG, so Sparkle's EdDSA signature covers the final file.
+
+**Switching from ad-hoc to Developer ID.** Existing installs accept the first signed update because Sparkle checks its EdDSA signature, which doesn't change. macOS treats the signed app as a new app for privacy permissions, so people are asked once more for Calendar, Desktop and Downloads access. After that, permissions survive updates.
+
 ### Step 4: Verify on a Clean Mac
 Download the DMG through a browser so it gets the quarantine flag, then open it on a Mac that has never run Cookie. If a build is rejected, read Apple's reason with `xcrun notarytool log <submission-id> --keychain-profile "CookieNotary"`.
 
@@ -85,7 +92,7 @@ An unsigned installer shows a blue SmartScreen warning. Choose one route, then a
 
 | Route | Secrets to add | Notes |
 | :--- | :--- | :--- |
-| **Azure Artifact Signing** | `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_CLIENT_SECRET`, `AZURE_SIGNING_ENDPOINT`, `AZURE_SIGNING_ACCOUNT`, `AZURE_SIGNING_PROFILE` | Monthly subscription with no hardware token. Check that your country and account type are eligible before relying on it. |
+| **Azure Artifact Signing** | `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_CLIENT_SECRET`, `AZURE_SIGNING_ENDPOINT`, `AZURE_SIGNING_ACCOUNT`, `AZURE_SIGNING_PROFILE` | From $9.99 a month, with no hardware token. Individual developers must be in the US or Canada and need a pay-as-you-go Azure subscription with an Individual billing account; free, trial and sponsored subscriptions don't work. Organizations in more countries qualify. See Microsoft's [quickstart](https://learn.microsoft.com/en-us/azure/artifact-signing/quickstart). |
 | **PFX certificate** | `WINDOWS_CERT_PFX_BASE64`, `WINDOWS_CERT_PASSWORD` | Only for a certificate you can export as a PFX. Most public certificate authorities now keep keys on hardware tokens or in the cloud, so check before buying. |
 | **Microsoft Store** | None in this workflow | The Store signs the package for you, but it needs a separate MSIX package and listing, which this repo does not build yet. |
 
@@ -205,5 +212,6 @@ Until then, anything you need from before this change can be restored with, for 
 - [ ] `codesign --verify --deep --strict` passes and `xcrun stapler validate` succeeds on the DMG.
 - [ ] `signtool verify /pa` passes on `Cookie-Setup.exe`.
 - [ ] Both downloads open without a security warning on a clean machine.
+- [ ] On the signed Mac build, calendar heads-ups still work (Hardened Runtime needs the calendar entitlement).
 - [ ] No debug flags, test arguments, or absolute local file paths in the Release build.
 - [ ] Sprites and audio are bundled in the app.

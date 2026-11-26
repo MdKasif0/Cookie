@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Entitlements for the Developer ID (notarized) release of Cookie, applied by Packaging/build_dmg.sh.
+  Notarization needs the hardened runtime, and under it each protected resource the app reads must be
+  declared here. Cookie reads only the calendar (for event heads-ups). Desktop and Downloads access is
+  covered by the usage strings in Info.plist; it needs no entitlement outside the App Sandbox.
+-->
+<plist version="1.0">
+<dict>
+	<key>com.apple.security.personal-information.calendars</key>
+	<true/>
+</dict>
+</plist>
