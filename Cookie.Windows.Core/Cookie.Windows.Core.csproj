@@ -7,7 +7,7 @@
     <RootNamespace>Cookie.Windows.Core</RootNamespace>
     <AssemblyName>Cookie.Windows.Core</AssemblyName>
     <Product>Cookie</Product>
-    <Version>1.4.0</Version>
+    <Version>1.4.1</Version>
     <Copyright>© 2026 Md Kasif Uddin. All rights reserved.</Copyright>
   </PropertyGroup>
 

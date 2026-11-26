@@ -23,7 +23,7 @@
                 <rendering:CookieCanvas x:Name="AboutCanvas" Width="120" Height="120" HorizontalAlignment="Center"/>
                 <TextBlock Text="Cookie" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextCharcoal}" 
                            HorizontalAlignment="Center" Margin="0,8,0,2"/>
-                <TextBlock x:Name="VersionText" Text="Version 1.4.0 (Windows Edition)" FontSize="12" Foreground="{DynamicResource TextMuted}" 
+                <TextBlock x:Name="VersionText" Text="Version 1.4.1 (Windows Edition)" FontSize="12" Foreground="{DynamicResource TextMuted}" 
                            HorizontalAlignment="Center"/>
             </StackPanel>
         </Border>

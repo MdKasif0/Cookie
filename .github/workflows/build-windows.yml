@@ -23,7 +23,7 @@ jobs:
     env:
       # The Windows version. Keep it in step with Cookie.Windows.csproj and CookieSetup.iss;
       # the version check below fails the build if they disagree.
-      COOKIE_VERSION: '1.4.0'
+      COOKIE_VERSION: '1.4.1'
       # Signing runs only when its secrets exist. See DISTRIBUTION.md.
       SIGN_WITH_AZURE: ${{ secrets.AZURE_CLIENT_ID != '' }}
       SIGN_WITH_PFX: ${{ secrets.WINDOWS_CERT_PFX_BASE64 != '' }}

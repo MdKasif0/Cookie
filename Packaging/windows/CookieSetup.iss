@@ -4,7 +4,7 @@
 ; ==============================================================================
 
 #define MyAppName "Cookie"
-#define MyAppVersion "1.4.0"
+#define MyAppVersion "1.4.1"
 #define MyAppPublisher "Md Kasif Uddin"
 #define MyAppURL "https://cookie-v1.netlify.app"
 #define MyAppExeName "Cookie.exe"
