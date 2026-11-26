@@ -152,7 +152,7 @@ public partial class CompanionWindow : Window
             _audioManager,
             _profile,
             _startupService,
-            openSettingsAction: () => Dispatcher.InvokeAsync(OpenSettingsWindow),
+            openSettingsAction: () => Dispatcher.InvokeAsync(() => OpenSettingsWindow()),
             openEmotePickerAction: () => Dispatcher.InvokeAsync(OpenEmotePickerWindow),
             openAboutAction: () => Dispatcher.InvokeAsync(OpenAboutWindow),
             checkForUpdatesAction: () => Dispatcher.InvokeAsync(OpenUpdateWindow),
@@ -202,7 +202,7 @@ public partial class CompanionWindow : Window
 
         if (_wmShowSettings != 0 && (uint)msg == _wmShowSettings)
         {
-            Dispatcher.InvokeAsync(OpenSettingsWindow);
+            Dispatcher.InvokeAsync(() => OpenSettingsWindow());
             handled = true;
             return IntPtr.Zero;
         }
@@ -520,12 +520,15 @@ public partial class CompanionWindow : Window
         _activeEmotePicker.Show();
     }
 
-    public void OpenSettingsWindow()
+    public void OpenSettingsWindow() => OpenSettingsWindow(SettingsTab.General);
+
+    public void OpenSettingsWindow(SettingsTab tab)
     {
         foreach (Window w in Application.Current.Windows)
         {
             if (w is SettingsWindow existing)
             {
+                existing.SelectTab(tab);
                 existing.Activate();
                 return;
             }
@@ -543,6 +546,7 @@ public partial class CompanionWindow : Window
             _startupService,
             () => OpenUpdateWindow(),
             helperActions: new SettingsHelperActions(ConfirmTidyScreenshots, OpenAskCookie));
+        settingsWindow.SelectTab(tab);
         settingsWindow.Show();
     }
 

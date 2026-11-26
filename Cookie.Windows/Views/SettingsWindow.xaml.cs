@@ -44,8 +44,21 @@ public partial class SettingsWindow : Window
         Loaded += (s, e) => UpdateLivePreview();
     }
 
+    /// <summary>Brings a tab to the front, for example Power Tools from the helpers tour.</summary>
+    public void SelectTab(SettingsTab tab)
+    {
+        switch (tab)
+        {
+            case SettingsTab.Helpers: HelpersTab.IsSelected = true; break;
+            case SettingsTab.PowerTools: PowerToolsTab.IsSelected = true; break;
+        }
+    }
+
     private void UpdateLivePreview()
     {
         PreviewCanvas?.UpdateAppearance(_profile.Appearance);
     }
 }
+
+/// <summary>Settings tabs that other parts of Cookie can open directly.</summary>
+public enum SettingsTab { General, Helpers, PowerTools }

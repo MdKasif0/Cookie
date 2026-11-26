@@ -31,7 +31,19 @@ This is the most important part: it's the path everyone who already has Cookie w
 - [ ] Open a full-screen video or game: she steps aside. **Ctrl+Alt+C** calls her to the cursor.
 - [ ] Share your screen in Teams, Zoom or Discord: she doesn't appear in what others see.
 
-## 3. Helpers
+## 3. The helpers tour
+
+(In the release after 1.4.1.)
+
+- [ ] About 8 seconds after she appears, a card beside her walks through reminders, notes, file drop and chat.
+      It doesn't steal focus from the app you're typing in.
+- [ ] **Set a Reminder**, **Pin a Note** and **Open Settings** each work. The note doesn't land on top of the card,
+      and Settings opens on Power Tools.
+- [ ] The card follows her when you drag her, stays above the taskbar, and hides during a full-screen app.
+- [ ] After **Done** or **Skip Tour**, it doesn't come back on the next launch. **Take the Tour** in her menu and
+      the tray menu starts it again.
+
+## 4. Helpers
 
 - [ ] **Reminder** in 1 minute: she comes to the cursor and meows, even over a full-screen app.
 - [ ] Turn on a **break nudge** with a short interval and check it arrives.
@@ -48,7 +60,7 @@ This is the most important part: it's the path everyone who already has Cookie w
 - [ ] **Ask Cookie** (optional, needs your Claude API key): she answers. Quit and reopen, and the key is still
       saved (Credential Manager → Windows Credentials, as `Cookie/AnthropicApiKey`).
 
-## 4. Settings and quitting
+## 5. Settings and quitting
 
 - [ ] Turn off **Automatically check for updates**, restart Cookie, and confirm no update window appears.
       (Fixed after 1.4.0. On 1.4.0 itself the window still appears.)

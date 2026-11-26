@@ -26,5 +26,7 @@ public class CookieProfile
     public List<Cookie.Windows.Core.Helpers.TodoItem> Todos { get; set; } = new();
     /// <summary>When she last offered to tidy screenshots, so she asks at most once a day.</summary>
     public DateTime? LastScreenshotOffer { get; set; }
+    /// <summary>Whether she has shown the helpers tour. Profiles from before it existed start without it, so people who update see it once.</summary>
+    public bool HasSeenHelpersTour { get; set; }
     public DateTime LastModified { get; set; } = DateTime.UtcNow;
 }

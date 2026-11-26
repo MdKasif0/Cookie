@@ -22,6 +22,7 @@ public interface IHelpersMenuSource
     void CopyBack(string text);
     void OpenAskCookie();
     void SetManualQuiet(bool on, int? minutes = null);
+    void StartHelpersTour();
 }
 
 /// <summary>Reminders, To-Do, Sticky Notes, Clipboard, Ask Cookie and Quiet Mode, for the tray and Cookie's own menu.</summary>
@@ -51,6 +52,10 @@ public static class HelpersMenu
         }
 
         menu.Items.Add(BuildQuiet(source));
+
+        var tour = new MenuItem { Header = "Take the Tour" };
+        tour.Click += (s, e) => source.StartHelpersTour();
+        menu.Items.Add(tour);
     }
 
     private static MenuItem BuildReminders(IHelpersMenuSource source)

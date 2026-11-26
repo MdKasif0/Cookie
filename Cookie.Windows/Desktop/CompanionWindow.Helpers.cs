@@ -155,6 +155,7 @@ public partial class CompanionWindow : IHelpersMenuSource
             double x = _behaviorController.CozyCenterX(bed);
             anchor = new CoreRect(x - 60, area.Bottom - 120, 120, 120);
         }
+        anchor = NoteAnchorWithTour(anchor);
         var note = new StickyNote
         {
             Text = text.Length > StickyNote.MaximumLength ? text[..StickyNote.MaximumLength] : text,

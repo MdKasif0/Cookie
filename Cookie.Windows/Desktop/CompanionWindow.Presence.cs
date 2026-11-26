@@ -66,6 +66,8 @@ public partial class CompanionWindow : ICompanionMenuSource
         _dayTimer.Start();
 
         After(TimeSpan.FromSeconds(2.5), SayGreeting);
+        // After her greeting has faded: new friends, and people who updated from before the helpers, get the tour once.
+        After(TimeSpan.FromSeconds(8), OfferTourIfDue);
         After(TimeSpan.FromSeconds(4), () =>
         {
             CelebrateIfNeeded();
@@ -171,6 +173,7 @@ public partial class CompanionWindow : ICompanionMenuSource
         ScreenSharingGuard.Apply(this, exclude);
         _cozy.SetExcludedFromCapture(exclude);
         if (_bubble != null) ScreenSharingGuard.Apply(_bubble, exclude);
+        if (_tour != null) ScreenSharingGuard.Apply(_tour, exclude);
         if (_worldItemWindow != null) ScreenSharingGuard.Apply(_worldItemWindow, exclude);
         if (_boxBackWindow != null) ScreenSharingGuard.Apply(_boxBackWindow, exclude);
 
@@ -191,6 +194,7 @@ public partial class CompanionWindow : ICompanionMenuSource
             _bubble.IsSuppressed = quiet;
             _bubble.HideNow();
         }
+        _tour?.SetSuppressed(quiet);
 
         if (quiet)
         {
