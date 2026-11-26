@@ -1,29 +1,50 @@
 import SwiftUI
 import ServiceManagement
 
+/// Which Settings tab is showing, so other parts of Cookie (like the helpers tour) can open a specific one.
+@MainActor
+final class SettingsNavigation: ObservableObject {
+    enum Tab: Hashable {
+        case general, appearance, sound, behavior, presence, helpers, powerTools, stats, privacy, about
+    }
+    @Published var tab: Tab = .general
+}
+
 struct SettingsView: View {
+    @EnvironmentObject private var navigation: SettingsNavigation
+
     var body: some View {
-        TabView {
+        TabView(selection: $navigation.tab) {
             GeneralSettingsTab()
                 .tabItem { Label("General", systemImage: "gearshape") }
+                .tag(SettingsNavigation.Tab.general)
             AppearanceSettingsTab()
                 .tabItem { Label("Appearance", systemImage: "paintpalette") }
+                .tag(SettingsNavigation.Tab.appearance)
             SoundSettingsTab()
                 .tabItem { Label("Sound", systemImage: "speaker.wave.2") }
+                .tag(SettingsNavigation.Tab.sound)
             BehaviorSettingsTab()
                 .tabItem { Label("Behavior", systemImage: "figure.walk") }
+                .tag(SettingsNavigation.Tab.behavior)
             PresenceSettingsTab()
                 .tabItem { Label("Presence", systemImage: "eye") }
+                .tag(SettingsNavigation.Tab.presence)
             HelpersSettingsTab()
                 .tabItem { Label("Helpers", systemImage: "bell") }
+                .tag(SettingsNavigation.Tab.helpers)
             PowerToolsSettingsTab()
                 .tabItem { Label("Power Tools", systemImage: "bolt") }
+                .tag(SettingsNavigation.Tab.powerTools)
             StatsSettingsTab()
                 .tabItem { Label("Stats", systemImage: "heart") }
+                .tag(SettingsNavigation.Tab.stats)
             PrivacySettingsTab()
                 .tabItem { Label("Privacy", systemImage: "lock.shield") }
+                .tag(SettingsNavigation.Tab.privacy)
             AboutSettingsTab()
                 .tabItem { Label("About", systemImage: "info.circle") }
+                .tag(SettingsNavigation.Tab.about)
         }
         .frame(width: 700, height: 480)
     }

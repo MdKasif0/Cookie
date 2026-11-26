@@ -9,6 +9,7 @@ struct CookieApp: App {
             SettingsView()
                 .environmentObject(appDelegate.environment)
                 .environmentObject(appDelegate.environment.store)
+                .environmentObject(appDelegate.environment.windows.settingsNavigation)
         }
     }
 }

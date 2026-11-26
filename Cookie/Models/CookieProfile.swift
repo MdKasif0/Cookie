@@ -24,6 +24,9 @@ struct CookieProfile: Codable, Equatable {
     var todos: [TodoItem] = []
     /// When she last offered to tidy screenshots, so she asks at most once a day.
     var lastScreenshotOffer: Date?
+    /// Whether she has shown the helpers tour. Profiles from before the tour existed start without it,
+    /// so people who update see it once.
+    var hasSeenHelpersTour: Bool = false
 
     init() {}
 
@@ -39,7 +42,7 @@ struct CookieProfile: Codable, Equatable {
         case legacySoundEnabled = "soundEnabled"
         case legacySoundVolume = "soundVolume"
         case isCompanionVisible, hasCompletedWelcome, companionPosition, lastRestingState
-        case reminders, lastBedtimeWindDown, stickyNotes, todos, lastScreenshotOffer
+        case reminders, lastBedtimeWindDown, stickyNotes, todos, lastScreenshotOffer, hasSeenHelpersTour
     }
 
     /// Encodes everything except the legacy key, which only exists for
@@ -62,6 +65,7 @@ struct CookieProfile: Codable, Equatable {
         try container.encode(stickyNotes, forKey: .stickyNotes)
         try container.encode(todos, forKey: .todos)
         try container.encodeIfPresent(lastScreenshotOffer, forKey: .lastScreenshotOffer)
+        try container.encode(hasSeenHelpersTour, forKey: .hasSeenHelpersTour)
     }
 
     init(from decoder: Decoder) throws {
@@ -103,5 +107,6 @@ struct CookieProfile: Codable, Equatable {
         stickyNotes = (try? container.decodeIfPresent([StickyNote].self, forKey: .stickyNotes)) ?? []
         todos = (try? container.decodeIfPresent([TodoItem].self, forKey: .todos)) ?? []
         lastScreenshotOffer = try? container.decodeIfPresent(Date.self, forKey: .lastScreenshotOffer)
+        hasSeenHelpersTour = (try? container.decodeIfPresent(Bool.self, forKey: .hasSeenHelpersTour)) ?? false
     }
 }

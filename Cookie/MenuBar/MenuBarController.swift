@@ -219,6 +219,10 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         settingsItem.target = self
         menu.addItem(settingsItem)
 
+        let tourItem = NSMenuItem(title: "Take the Tour", action: #selector(tourAction), keyEquivalent: "")
+        tourItem.target = self
+        menu.addItem(tourItem)
+
         // 9. Check for Updates
         let updateItem = NSMenuItem(title: "Check for Updates…", action: #selector(checkForUpdatesAction), keyEquivalent: "")
         updateItem.target = self
@@ -684,6 +688,10 @@ final class MenuBarController: NSObject, NSMenuDelegate {
 
     @objc private func settingsAction() {
         environment.showSettings()
+    }
+
+    @objc private func tourAction() {
+        environment.startHelpersTour()
     }
 
     @objc private func checkForUpdatesAction() {

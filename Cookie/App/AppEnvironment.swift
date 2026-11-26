@@ -26,7 +26,12 @@ final class AppEnvironment: ObservableObject {
     private var cancellables: Set<AnyCancellable> = []
 
     init() {
+        #if DEBUG
+        // For trying things without touching your real profile: COOKIE_STORE_PATH=/tmp/test.json
+        let store = CookieStore(storageURL: ProcessInfo.processInfo.environment["COOKIE_STORE_PATH"].map { URL(fileURLWithPath: $0) })
+        #else
         let store = CookieStore()
+        #endif
         let audioManager = AudioManager(store: store)
         let behaviorEngine = CookieBehaviorEngine(store: store)
         let windows = WindowManager(store: store, audioManager: audioManager, behaviorEngine: behaviorEngine)
@@ -155,6 +160,8 @@ final class AppEnvironment: ObservableObject {
             behaviorEngine.start()
             startCompanionServices()
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) { [weak self] in self?.greet() }
+            // After her greeting has faded: people who updated from before the helpers get the tour once.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 9) { [weak self] in self?.offerTourIfDue() }
         } else {
             presentWelcome()
         }
@@ -258,6 +265,54 @@ final class AppEnvironment: ObservableObject {
         behaviorEngine.start()
         startCompanionServices()
         audioManager.play(.welcome)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 4) { [weak self] in self?.offerTourIfDue() }
+    }
+
+    // MARK: - Helpers tour
+
+    /// From her menu: always available, and brings her back on screen if she was hidden.
+    func startHelpersTour() {
+        configureTour()
+        if !store.profile.isCompanionVisible { toggleCompanion() }
+        windows.startTour(steps: HelpersTour.steps(name: store.profile.displayName))
+    }
+
+    /// Starts the tour by itself only once, and only at a calm moment; otherwise it waits for another launch.
+    private func offerTourIfDue() {
+        guard HelpersTour.canStartOnItsOwn(
+            hasCompletedWelcome: store.profile.hasCompletedWelcome,
+            hasSeenTour: store.profile.hasSeenHelpersTour,
+            isVisible: store.profile.isCompanionVisible,
+            isQuiet: quietMode.isQuiet,
+            isFocusing: focus.isFocusing
+        ) else { return }
+        configureTour()
+        windows.startTour(steps: HelpersTour.steps(name: store.profile.displayName))
+    }
+
+    private func configureTour() {
+        let tour = windows.tour
+        guard tour.onEnd == nil else { return }
+        tour.onStepShown = { [weak self] step in
+            self?.behaviorEngine.react(step.reaction)
+            self?.audioManager.play(.chirp)
+        }
+        tour.onAction = { [weak self] action in
+            guard let self else { return }
+            switch action {
+            case .newReminder: self.windows.showNewReminder()
+            case .pinNote: self.windows.addStickyNote(text: HelpersTour.sampleNote)
+            case .openSettings: self.windows.showSettings(tab: .powerTools)
+            }
+        }
+        tour.onEnd = { [weak self] finished in
+            guard let self else { return }
+            self.store.profile.hasSeenHelpersTour = true
+            if finished {
+                self.behaviorEngine.celebrate()
+                self.audioManager.play(.happy)
+            }
+        }
     }
 
     /// The welcome window was closed without continuing: start Cookie with
@@ -272,6 +327,7 @@ final class AppEnvironment: ObservableObject {
 
     /// Full reset from Settings: back to a fresh first run.
     func resetCookie() {
+        windows.tour.end(finished: false)
         helpers.stop()
         desk.stop()
         behaviorEngine.stop()

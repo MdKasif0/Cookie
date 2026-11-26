@@ -23,6 +23,8 @@ final class WindowManager: NSObject, NSWindowDelegate {
     weak var environment: AppEnvironment?
     let bubbleController = BubblePanelController()
     let cozyController = CozyPanelController()
+    let settingsNavigation = SettingsNavigation()
+    let tour = TourPanelController()
     private(set) lazy var stickyNotes = StickyNotesController(store: store)
     /// True while a full-screen app has her stepping aside.
     private(set) var isQuiet = false
@@ -139,8 +141,22 @@ final class WindowManager: NSObject, NSWindowDelegate {
             companionController?.hide()
             worldItemController?.hide()
             bubbleController.hide()
+            tour.end(finished: false)
             refreshCozy()
         }
+    }
+
+    // MARK: - Helpers tour
+
+    /// Starts the tour beside her. Returns false if she isn't on screen to give it.
+    @discardableResult
+    func startTour(steps: [HelpersTour.Step]) -> Bool {
+        guard store.profile.isCompanionVisible, !isQuiet, !tour.isShowing else { return false }
+        showCompanion()
+        guard let window = companionController?.window else { return false }
+        bubbleController.hide()
+        tour.start(steps: steps, beside: window)
+        return true
     }
 
     // MARK: - Speech bubbles
@@ -158,6 +174,7 @@ final class WindowManager: NSObject, NSWindowDelegate {
         guard quiet != isQuiet else { return }
         isQuiet = quiet
         bubbleController.isSuppressed = quiet
+        tour.setSuppressed(quiet)
         if quiet {
             companionController?.hide()
             worldItemController?.hide()
@@ -197,6 +214,8 @@ final class WindowManager: NSObject, NSWindowDelegate {
             let side = CozyKind.bed.panelSide * CGFloat(store.profile.settings.cookieSize)
             anchor = CGRect(x: x - side / 2, y: CozyPanelController.floorY(primaryVisible: screen.visibleFrame), width: side, height: side)
         }
+        // During the tour, keep clear of its card too.
+        if tour.isShowing { anchor = anchor.union(tour.frame) }
         let visible = (NSScreen.screens.first { $0.frame.intersects(anchor) } ?? screen).visibleFrame
         var note = StickyNote(text: String(text.prefix(StickyNote.maximumLength)))
         note.color = StickyColor.allCases[store.profile.stickyNotes.count % StickyColor.allCases.count]
@@ -506,7 +525,8 @@ final class WindowManager: NSObject, NSWindowDelegate {
 
     // MARK: - Settings
 
-    func showSettings() {
+    func showSettings(tab: SettingsNavigation.Tab? = nil) {
+        if let tab { settingsNavigation.tab = tab }
         if let settingsWindow {
             settingsWindow.makeKeyAndOrderFront(nil)
             NSApp.activate(ignoringOtherApps: true)
@@ -526,6 +546,7 @@ final class WindowManager: NSObject, NSWindowDelegate {
             rootView: SettingsView()
                 .environmentObject(store)
                 .environmentObject(environment)
+                .environmentObject(settingsNavigation)
         )
         window.center()
         settingsWindow = window
